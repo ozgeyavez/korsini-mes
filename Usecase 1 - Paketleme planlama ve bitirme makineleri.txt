@@ -1,0 +1,87 @@
+Bir etiket fabrikası için "MCC Korsini MES" adında bir üretim takip uygulaması istiyorum. Bütün yazılar Türkçe olsun.
+
+Fabrika kalıp içi etiket (IML) üretiyor. Üretim üç proseste ilerliyor: Baskı → Kesim → Paketleme. Bu ilk sürümde yalnızca Paketleme prosesini kuruyoruz. Paketlemede 5 bitirme makinesi var. Her makinede iş, koparma makinesinde başlıyor ve paketleme makinesinde bitiyor. Paketleme makinesinde bir görüntü işleme kamerası var; kamera her koliyi kontrol edip hata kodu üretiyor.
+
+Amacım şu: takım lideri işleri makinelere ekrandan atasın, operatör işi kurallara uygun başlatsın, kameranın bulduğu hatalar sipariş bilgisiyle birlikte anında görünsün.
+
+KİMLER KULLANACAK
+- Takım lideri: planlama ekranında havuzdaki işleri makinelere atar, sıralarını değiştirir
+- Koparma operatörü: kendi makinesindeki sıradaki işi başlatır
+- Paketleme operatörü: kamera sonuçlarını görür, işi bitirir
+- Yönetici: bütün makineleri ve işleri görür
+- Admin: makineleri, iş başlatma ve bitirme kurallarını tanımlar
+Giriş ekranında bu kullanıcılardan biriyle hızlıca girebileyim, böylece her rolü deneyebileyim.
+
+EKRANLAR
+
+1. Proses seçimi (ana sayfa)
+- Üç büyük kart olsun: Baskı, Kesim, Paketleme
+- Baskı ve Kesim kartları gri görünsün, üzerlerinde "Yakında" yazsın. Tıklanınca "Bu proses yakında eklenecek" mesajı çıksın.
+- Paketleme kartına tıklanınca Makinelerim ekranı açılsın.
+
+2. Makinelerim
+- 5 makine kartı olsun: Bitirme-1, Bitirme-2, Bitirme-3, Bitirme-4, Bitirme-5
+- Her kartta şunlar görünsün:
+  - Makinenin durumu: Boşta (gri), Çalışıyor (yeşil), Duruş (kırmızı)
+  - Üzerindeki iş: iş emri numarası, müşteri, ürün
+  - Planlanan ve paketlenen adet, ilerleme çubuğu
+  - Kameranın bu işte bulduğu hata sayısı
+  - Sırada bekleyen iş sayısı
+- Karta tıklanınca o makinenin detay ekranı açılsın.
+
+3. Planlama
+- Solda "İş havuzu" olsun: henüz makineye atanmamış iş emirleri
+- Her iş emrinde şunlar yazsın: iş emri no, müşteri, ürün kodu, ürün adı, sipariş adedi, termin tarihi
+- Sağda 5 makinenin sütunu olsun; her sütunda o makineye atanmış işler sırasıyla görünsün
+- Takım lideri bir işi havuzdan makineye sürükleyerek ya da "Makineye ata" butonuyla atayabilsin
+- Makinedeki işlerin sırasını değiştirebilsin, başlamamış bir işi havuza geri alabilsin
+- Başlamış bir iş başka makineye taşınamasın
+- Termini geçmiş iş kırmızı, termini bugün olan iş turuncu görünsün
+
+4. Makine detayı · İşi başlat (koparma makinesi)
+- Makinenin sıradaki işi büyük yazıyla görünsün
+- "İşi başlat" butonuna basınca sistem başlatma kurallarını kontrol etsin. Kurallar ekranda tik listesi olarak görünsün:
+  - İş bu makineye atanmış olmalı
+  - İş, makinenin sırasındaki ilk iş olmalı
+  - Makinede açık başka bir iş olmamalı
+  - Operatör teyit numarasını girmiş olmalı
+- Kuralların hepsi sağlanmadan iş başlamasın; sağlanmayan kural kırmızı görünsün ve nedeni yazsın.
+- İş başlayınca makine "Çalışıyor" olsun ve başlangıç saati kaydedilsin.
+- Operatör "Durdur" deyip duruş nedeni seçebilsin, "Devam et" ile işe dönebilsin.
+
+5. Makine detayı · Kamera ve işi bitir (paketleme makinesi)
+- Görüntü işleme kamerasından gelen her koli bir satır olarak listelensin: koli no, saat, adet, sonuç
+- Kamera üç hata kodu üretiyor:
+  - C. Mixup: koliye farklı bir ürünün etiketi karışmış
+  - P. Mixup: koliye farklı bir baskının etiketi karışmış
+  - Adet hatası: kolideki etiket adedi beklenenden farklı
+- Hatalı koliler kırmızı görünsün ve yanında sipariş bilgisi yazsın: iş emri no, müşteri, ürün kodu, beklenen adet, kameranın saydığı adet
+- Üstte özet kutuları olsun: Toplam koli, Hatasız koli, C. Mixup, P. Mixup, Adet hatası
+- Operatör hatalı koliye "İncelendi" diyip not yazabilsin
+- "İşi bitir" butonuna basınca sistem bitirme kurallarını kontrol etsin:
+  - Bütün hatalı koliler incelenmiş olmalı
+  - Paketlenen adet sipariş adedinin en az %98'i olmalı; değilse takım liderinin onayı istensin
+- İş bitince makine "Boşta" olsun ve sıradaki iş öne gelsin.
+
+6. Tanımlar (sadece admin)
+- Makineleri, duruş nedenlerini ve hata kodlarını ekleyip düzenleyebileyim
+- İş başlatma ve bitirme kurallarını açıp kapatabileyim, %98 sınırını değiştirebileyim
+
+ÖRNEK VERİ
+- 5 makine: Bitirme-1'den Bitirme-5'e
+- Bitirme-1 ve Bitirme-3 çalışıyor, Bitirme-4 duruşta, Bitirme-2 ve Bitirme-5 boşta
+- Havuzda 8, makinelerde toplam 6 iş emri olsun
+- Müşteriler: Süt Ürünleri A.Ş., Dondurma Gıda, Boya Kimya, Kozmetik Ltd., Ev Bakım A.Ş.
+- Ürünler gerçekçi olsun, örneğin "Yoğurt kabı 500 g yan etiket", "Dondurma kutusu 1 L kapak etiketi", "Boya kovası 2,5 L etiketi"
+- Sipariş adetleri 20.000 ile 250.000 arasında, koli başına 1.000 ile 2.500 etiket olsun
+- Çalışan işlerde kamera kayıtları olsun; kolilerin çoğu hatasız, birkaçı C. Mixup, P. Mixup ya da adet hatası
+- Duruş nedenleri: Malzeme bekleme, Arıza, Ayar, Kamera hatası, Operatör yok
+
+DENEME BUTONU
+Makinelerden ve kameradan gerçek veri gelmiyor. "Üretimi canlandır" diye bir buton olsun. Her basışta çalışan makinelere yeni koliler eklesin; kolilerin bir kısmı rastgele hata kodlu olsun. Böylece ekranların canlı değiştiğini görebileyim.
+
+GÖRÜNÜM
+- Koyu lacivert zemin (#18222e), kartlar biraz daha açık lacivert, vurgu rengi turuncu (#e8875c)
+- Sade ve büyük yazılar; makine ekranları tablette rahat dokunulacak büyük butonlarla
+- Solda menü: Prosesler, Makinelerim, Planlama, Tanımlar. Herkes yalnızca kendi rolünün ekranlarını görsün.
+- Bütün saatler Türkiye saatine göre olsun. Liste boşken "Henüz kayıt yok" gibi açıklayıcı bir mesaj çıksın.
