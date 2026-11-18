@@ -1,6 +1,6 @@
 # MCC Korsini MES Prototipi
 
-MCC Korsini bitirme hattı için üretim takip (MES) tasarım prototipi. MCC'nin resmi sistemi değildir; iş emirleri, kamera, kalite ve bakım kayıtları örnektir. Veriler tarayıcı belleğinde (localStorage) tutulur; "Örnek veriye dön" ile sıfırlanır.
+MCC Korsini (Türkiye) paketleme prosesi için üretim takip (MES) tasarım prototipi. MCC'nin resmi sistemi değildir; iş emirleri, kamera, kalite ve bakım kayıtları örnektir. Veriler tarayıcı belleğinde (localStorage) tutulur; "Örnek veriye dön" ile sıfırlanır.
 
 ## Modüller
 - Üretim: Prosesler (Baskı ve Kesim "Yakında"), Makinelerim (Bitirme-1…5), Planlama

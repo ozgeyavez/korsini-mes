@@ -220,7 +220,7 @@ function render(){
   else body=({makineler:viewMachines,planlama:viewPlan,kalite:viewQuality,bakim:viewMaint,aksiyonlar:viewActions,otomasyonlar:viewAutos,ayarlar:viewSettings}[r]||(()=>{r='prosesler';return viewProcs()}))();
   const nk=r.startsWith('makine-')?'makineler':r,cn=counts(),un=unread();
   app.innerHTML=`<header class="hdr"><div class="hdr-in">
-      <a class="prod" href="#prosesler" aria-label="Ana sayfa">${LOGO()}<span class="sep"></span><div><b>Korsini MES</b><small>Bitirme hattı</small></div></a>
+      <a class="prod" href="#prosesler" aria-label="Ana sayfa">${LOGO()}<span class="sep"></span><div><b>Korsini MES</b><small>Türkiye</small></div></a>
       <span class="spacer"></span><span class="clock" id="clock"></span>
       <button class="btn primary sm" data-act="sim" title="Çalışan makinelere yeni koliler ekler">▶<span class="sim-t">Üretimi canlandır</span></button>
       <div class="bellw"><button class="bell" data-act="bell" aria-label="Bildirimler">${svg('bell')}<span class="n" id="bell-n" ${un?'':'hidden'}>${un}</span></button>${U.bell?bellPanel():''}</div>
@@ -241,7 +241,7 @@ function updBell(){const b=$('#bell-n');if(!b)return;const u=unread();b.textCont
 function viewLogin(){
   return `<div class="login">
     <section class="login-art"><div>${LOGO()}</div>
-      <div><span class="label">Korsini · Bitirme hattı</span><h1 style="margin-top:10px">Üretim takip sistemi</h1><p>İş emrini makineye atayın, koparmada kurallarla başlatın, paketlemede kamera kontrolüyle bitirin. Kalite, bakım ve otomasyonlar aynı yerde.</p></div>
+      <div><span class="label">MCC Korsini · Türkiye</span><h1 style="margin-top:10px">Üretim takip sistemi</h1><p>İş emrini makineye atayın, koparmada kurallarla başlatın, paketlemede kamera kontrolüyle bitirin. Kalite, bakım ve otomasyonlar aynı yerde.</p></div>
       <div class="blocks" aria-hidden="true"><i></i><i></i><i></i></div>
       <span class="muted" style="font-size:12.5px;position:relative">Prototip · Ekranlardaki iş emirleri, kamera ve bakım kayıtları örnek veridir.</span></section>
     <section class="login-form"><div><h2>Giriş yapın</h2><p class="muted" style="margin:4px 0 0">Denemek için bir rol seçin.</p></div>
