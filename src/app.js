@@ -665,6 +665,7 @@ function stackbar(rows,keys,labels,colors){
   return `<div class="hb">${rows.map(r=>{const tot=keys.reduce((a,k)=>a+r[k],0);return `<div class="hb-r"><span class="hb-l">${esc(r.k)}</span><div class="hb-t" style="background:transparent"><span style="display:flex;width:${tot/max*100}%;height:100%;border-radius:6px;overflow:hidden">${keys.map((k,j)=>`<i style="flex:${r[k]};background:${colors[j]}" title="${esc(labels[j])}: ${r[k]}"></i>`).join('')}</span></div><b>${N(tot)} · %${P1(r.errRate)}</b></div>`}).join('')}</div>
   <div class="legend">${labels.map((n,j)=>`<span><i style="background:${colors[j]}"></i>${esc(n)}</span>`).join('')}</div>`;
 }
+const pchSw=(slot,cur,list)=>`<div class="chartsw"><span class="label">Grafik</span><div class="seg">${list.map(([k,l])=>`<button class="${cur===k?'on':''}" data-act="pChart" data-id="${slot}" data-v="${k}">${l}</button>`).join('')}</div></div>`;
 function dashBody(F,facts){
   const fs=facts.filter(x=>(F.c==='all'||x.customer===F.c)),ms=S.machines.filter(m=>F.m==='all'||m.id===F.m);
   const rows=ms.map(m=>{const xs=fs.filter(x=>x.m===m.id),r={k:m.name,m:m.id,sh:[0,0,0],prod:0,target:0,bad:0,koli:0,errs:0,CMIX:0,PMIX:0,QTY:0,stopMin:0};
@@ -676,11 +677,17 @@ function dashBody(F,facts){
     rows:rows.map(r=>[r.k,...r.sh,r.prod,P1(r.pct),r.bad,(r.badRate).toFixed(2).replace('.',','),r.koli,r.errs,r.CMIX,r.PMIX,r.QTY,P1(r.errRate),r.stopMin])};
   return `<div class="kstrip">${rk('Paketlenen etiket',N(T.prod),'',`Hedef gerçekleşme %${P1(T.target?T.prod/T.target*100:0)}`)}${rk('Fire oranı','%'+(T.prod?(T.bad/T.prod*100):0).toFixed(2).replace('.',','),'',N(T.bad)+' bozuk etiket')}${rk('Kalite hata oranı','%'+P1(T.koli?T.errs/T.koli*100:0),'',N(T.errs)+' hatalı koli / '+N(T.koli))}${rk('En çok üreten',best&&best.prod?esc(best.k):'—','var(--ok)',best&&best.prod?N(best.prod)+' etiket':'')}</div>
   <section class="rsec"><div><span class="label">Vardiya adetleri · ${esc(rangeLabel(F))}</span><h2>Bitirme makinelerinde vardiya bazında üretim</h2></div>
-    ${gcol(rows.map(r=>({k:r.k,vals:r.sh})),S.shifts.map(s=>s.n+' '+s.s+'–'+s.e),SHC,fmtM)}</section>
+    ${(()=>{const pc=U.pChart||{},c=pc.v||'auto',rr=rows.map(r=>Object.assign({},r,{s0:r.sh[0],s1:r.sh[1],s2:r.sh[2]}));
+      const sw=pchSw('v',c,[['auto','Gruplu sütun'],['stack','Yığılmış çubuk'],['pie','Pasta'],['tree','Ağaç haritası'],['gauge','Gösterge (hedef %)'],['line','Çizgi']]);
+      const ch=c==='stack'?stackbar(rr.map(r=>Object.assign(r,{errRate:r.pct})),['s0','s1','s2'],S.shifts.map(x=>x.n),SHC).replace(/ · %([0-9,]+)<\/b>/g,' · hedef %$1</b>'):c==='pie'?pie(rows,'prod',''):c==='tree'?treemap(rows,'prod',''):c==='gauge'?gauges(rows,'pct','%'):c==='line'?lineChart(rows,'prod',''):gcol(rows.map(r=>({k:r.k,vals:r.sh})),S.shifts.map(s=>s.n+' '+s.s+'–'+s.e),SHC,fmtM);
+      return sw+ch})()}</section>
   <div class="rsplit"><section class="rsec"><div><span class="label">Pakon bozuk / paketlenen</span><h2>Fire oranı</h2></div>
-    ${hbar(rows.map(r=>({k:r.k,v:r.badRate})),'v','%%')}<p class="hint" style="margin:0">Fire, Pakon üretim takip formundaki bozuk etiketlerin paketlenen etikete oranıdır.</p></section>
+    ${(()=>{const c=(U.pChart||{}).f||'auto',fr=rows.map(r=>({k:r.k,v:r.badRate,bad:r.bad}));
+      const sw=pchSw('f',c,[['auto','Yatay çubuk'],['col','Sütun'],['pie','Pasta (bozuk etiket)'],['tree','Ağaç haritası'],['gauge','Gösterge']]);
+      return sw+(c==='col'?vcol(fr,'v','%','#7d8b93'):c==='pie'?pie(fr,'bad',''):c==='tree'?treemap(fr,'bad',''):c==='gauge'?gauges(fr.map(r=>Object.assign(r,{v:Math.round(r.v*100)/100})),'v','%%'):hbar(fr,'v','%%'))})()}<p class="hint" style="margin:0">Fire, Pakon üretim takip formundaki bozuk etiketlerin paketlenen etikete oranıdır.</p></section>
   <section class="rsec"><div><span class="label">Kamera · hata koduna göre</span><h2>Kalite hataları</h2></div>
-    ${stackbar(rows,S.errorCodes.map(c=>c.code),S.errorCodes.map(c=>c.label),ERRC)}</section></div>
+    ${(()=>{const c=(U.pChart||{}).k||'auto';const sw=pchSw('k',c,[['auto','Yığılmış çubuk'],['bar','Yatay çubuk'],['pie','Pasta'],['donut','Halka'],['tree','Ağaç haritası']]);
+      return sw+(c==='bar'?hbar(rows,'errs','',false,'#cf3b3b'):c==='pie'?pie(rows,'errs',''):c==='donut'?donut(rows,'errs',''):c==='tree'?treemap(rows,'errs',''):stackbar(rows,S.errorCodes.map(c=>c.code),S.errorCodes.map(c=>c.label),ERRC))})()}</section></div>
   <section class="rsec"><h2>Bitirme 1–5 karşılaştırma tablosu</h2><div class="nwt">${table([['Makine',r=>`<a href="#makine-${r.m}"><b>${esc(r.k)}</b></a>`,''],...S.shifts.map((s,i)=>[s.n,r=>`<span class="num">${N(r.sh[i])}</span>`,'r']),['Toplam',r=>`<b class="num">${N(r.prod)}</b>`,'r'],['Hedef',r=>`<span class="num ${r.pct>=100?'delta-up':'delta-down'}">%${P1(r.pct)}</span>`,'r'],['Fire %',r=>`<span class="num" title="${N(r.bad)} bozuk etiket">%${r.badRate.toFixed(2).replace('.',',')}</span>`,'r'],['Hatalı koli',r=>`<span class="num" title="${N(r.koli)} koli kontrol edildi">${N(r.errs)}</span>`,'r'],['Hata %',r=>`<span class="num">%${P1(r.errRate)}</span>`,'r'],['Duruş',r=>`<span class="num">${dur(r.stopMin)}</span>`,'r']],rows)}</div></section>`;
 }
 function factsToday(){
@@ -1113,6 +1120,7 @@ document.addEventListener('click',e=>{
     case 'repSel':{U.rf.r=el.dataset.v;const c=(S.customReports||[]).find(x=>x.id===el.dataset.v);if(c){const q=quickRange(c.per);Object.assign(U.rf,{by:c.by,m:c.m,from:prodDayKey(q[0]),to:prodDayKey(q[1])})}render();break}
     case 'repDel':{const c=S.customReports.find(x=>x.id===el.dataset.id);if(!c)return;if(U.delArm!==c.id){U.delArm=c.id;toast('Silmek için “Sil”e tekrar basın');setTimeout(()=>{U.delArm=null},4000);return}S.customReports=S.customReports.filter(x=>x.id!==c.id);U.delArm=null;U.rf.r='pano';audit('Rapor silindi',c.name);persist();render();toast('Rapor silindi');break}
     case 'repCsv':exportCsv();break;
+    case 'pChart':U.pChart=U.pChart||{};U.pChart[el.dataset.id]=el.dataset.v;render();break;
     case 'bChart':U.bChart=U.bChart||{};U.bChart[el.dataset.id]=el.dataset.v;render();break;
     case 'crChart':{U.crChart=U.crChart||{};U.crChart[el.dataset.id]=el.dataset.v;const c=S.customReports.find(x=>x.id===el.dataset.id);if(c&&crCanEdit(c)){c.chart=el.dataset.v;persist()}render();break}
     case 'repQuick':{const q=quickRange(el.dataset.v);U.rf.from=prodDayKey(q[0]);U.rf.to=prodDayKey(q[1]);render();break}
