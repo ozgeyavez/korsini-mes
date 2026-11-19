@@ -1,10 +1,9 @@
 (function(){
 'use strict';
 const TZ='Europe/Istanbul',KEY='korsini-mes-v4',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
-const ROLES={lider:'Takım lideri',koparma:'Koparma operatörü',paketleme:'Pakon operatörü',kalite:'Kalite uzmanı',bakim:'Bakım teknisyeni',planlama:'Planlama uzmanı',yonetici:'Yönetici',admin:'Admin'};
+const ROLES={lider:'Takım lideri',koparma:'Koparma operatörü',paketleme:'Pakon operatörü',kalite:'Kalite uzmanı',bakim:'Bakım teknisyeni',yonetici:'Yönetici',admin:'Admin'};
 const USERS=[
-  {id:'u1',name:'Takım Lideri 1',ini:'TL',c:'#2fac66',role:'lider',note:'İşleri Bitirme makinelerine atar, onay verir'},
-  {id:'u8',name:'Planlama Uzmanı 1',ini:'PU',c:'#ffe58a',role:'planlama',note:'Pakon iş emirlerini Excel ile yükler'},
+  {id:'u1',name:'Takım Lideri 1',ini:'TL',c:'#2fac66',role:'lider',note:'Pakon planını Excel ile yükler, Bitirme makinelerine atar'},
   {id:'u2',name:'Koparma Operatörü 1',ini:'KO',c:'#6fb0e1',role:'koparma',note:'Koparma kontrol formuyla işi başlatır'},
   {id:'u3',name:'Pakon Operatörü 1',ini:'PO',c:'#ffd744',role:'paketleme',note:'Kamera sonuçlarını inceler, Pakon formuyla bitirir'},
   {id:'u6',name:'Kalite Uzmanı 1',ini:'KU',c:'#9fd7b8',role:'kalite',note:'Hata analizini ve uygunsuzlukları yönetir'},
@@ -12,13 +11,13 @@ const USERS=[
   {id:'u4',name:'Yönetici 1',ini:'Y1',c:'#a4b6be',role:'yonetici',note:'Bütün modülleri görür, otomasyonları kurar'},
   {id:'u5',name:'Admin 1',ini:'A1',c:'#dce6eb',role:'admin',note:'Ayarları ve yetkileri yönetir'}];
 const CAN={
-  upload:['planlama','lider','admin'],plan:['lider','admin'],seePlan:['lider','planlama','yonetici','admin'],
+  upload:['lider','admin'],plan:['lider','admin'],seePlan:['lider','yonetici','admin'],
   start:['koparma','lider','admin'],finish:['paketleme','lider','admin'],approve:['lider','admin'],
   seeQual:['kalite','lider','yonetici','admin'],editQual:['kalite','admin'],
   seeMaint:['bakim','lider','yonetici','admin'],editMaint:['bakim','admin'],
-  seeTrack:['lider','kalite','bakim','planlama','yonetici','admin'],seeAuto:['lider','kalite','bakim','yonetici','admin'],editAuto:['yonetici','admin'],
-  report:['lider','paketleme','planlama','yonetici','admin'],settings:['admin']};
-const PERM_ROWS=[['upload','Excel ile iş emri yükler'],['seePlan','Planlamayı görür'],['plan','İşi Bitirme makinesine atar'],['start','Koparma formuyla işi başlatır'],['finish','Pakon formuyla işi bitirir'],['approve','Eksik adetle bitirmeyi onaylar'],['report','Vardiya sayı raporunu görür'],['seeQual','Kalite modülünü görür'],['editQual','Uygunsuzluk açar, kapatır'],['seeMaint','Bakım modülünü görür'],['editMaint','Arızaya müdahale eder'],['seeAuto','Otomasyonları görür'],['editAuto','Otomasyon kurar'],['settings','Ayarları değiştirir']];
+  seeTrack:['lider','kalite','bakim','yonetici','admin'],seeAuto:['lider','kalite','bakim','yonetici','admin'],editAuto:['yonetici','admin'],
+  report:['lider','paketleme','yonetici','admin'],settings:['admin']};
+const PERM_ROWS=[['upload','Pakon planını Excel ile yükler'],['seePlan','Planlamayı görür'],['plan','İşi Bitirme makinesine atar'],['start','Koparma formuyla işi başlatır'],['finish','Pakon formuyla işi bitirir'],['approve','Eksik adetle bitirmeyi onaylar'],['report','Vardiya sayı raporunu görür'],['seeQual','Kalite modülünü görür'],['editQual','Uygunsuzluk açar, kapatır'],['seeMaint','Bakım modülünü görür'],['editMaint','Arızaya müdahale eder'],['seeAuto','Otomasyonları görür'],['editAuto','Otomasyon kurar'],['settings','Ayarları değiştirir']];
 const TECH={'Injection Molding IML':'#2fac66','Thermoforming IML':'#6fb0e1','Blow Molding IML':'#ffd744','SealPPeel':'#a4b6be','NextCycle IML':'#1c784c','IML':'#8a9ba3'};
 const CHANNELS=['Uygulama','SMS','E-posta'],SEVS=['Bilgi','Uyarı','Kritik'],SEVC={Bilgi:'st-info',Uyarı:'st-warn',Kritik:'st-stop'};
 const RESULTS={none:'Yalnızca bildirim',action:'Aksiyon aç',ncr:'Uygunsuzluk aç',maint:'Bakım talebi aç'};
@@ -150,7 +149,7 @@ function seed(){
       {id:4,on:true,name:'İncelenmemiş hatalı koli birikti',metric:'unrev',op:'ge',th:3,sev:'Uyarı',roles:['lider','paketleme'],ch:['Uygulama'],res:'none',owner:'lider',days:1},
       {id:5,on:true,name:'Periyodik bakım gecikti',metric:'pmLate',op:'ge',th:1,sev:'Uyarı',roles:['bakim'],ch:['Uygulama','E-posta'],res:'none',owner:'bakim',days:1},
       {id:6,on:false,name:'Sırada iş varken makine boşta',metric:'idleQ',op:'ge',th:20,sev:'Bilgi',roles:['lider'],ch:['Uygulama'],res:'none',owner:'lider',days:1}],
-    autoState:{},runs:[],notifs:[],reports:[],imports:[{ts:now-10*H,user:'Planlama Uzmanı 1',file:'Pakon_plan_19.11.xlsx',added:SEED_ORDERS.length,skipped:2}],
+    autoState:{},runs:[],notifs:[],reports:[],imports:[{ts:now-10*H,user:'Takım Lideri 1',file:'Pakon_plan_19.11.xlsx',added:SEED_ORDERS.length,skipped:2}],
     actions:[
       {id:'AK-001',title:'Bitirme-2 koparma bıçağı değişim planı',src:'Elle açıldı',machine:'B2',owner:'bakim',due:now+2*DAY,status:'Devam ediyor',created:now-2*DAY,note:''},
       {id:'AK-002',title:'Boya Kimya işlerinde 500\'lü deste sayım teyidi',src:'Elle açıldı',machine:'B4',owner:'kalite',due:now-DAY,status:'Açık',created:now-3*DAY,note:''},
@@ -162,7 +161,7 @@ function seed(){
       {id:'BT-001',machine:'B4',type:'Arıza',desc:'Koparma makinesinde Arıza nedeniyle duruş',status:'Açık',created:now-18*MIN,startedAt:null,doneAt:null,note:'',src:'Duruş kaydı'},
       {id:'BT-002',machine:'B3',type:'Kamera hatası',desc:'Görüntü işleme kamerası bağlantı kopması',status:'Tamamlandı',created:now-26*H,startedAt:now-25.8*H,doneAt:now-25.1*H,note:'Kamera ağ kablosu yenilendi.',src:'Duruş kaydı'},
       {id:'BT-003',machine:'B1',type:'Arıza',desc:'Konveyör kayışı kaydı',status:'Tamamlandı',created:now-3*DAY,startedAt:now-3*DAY+12*MIN,doneAt:now-3*DAY+58*MIN,note:'Kayış gerginliği ayarlandı.',src:'Duruş kaydı'}],
-    pm,audit:[{ts:now-10*H,user:'Planlama Uzmanı 1',what:'Excel ile iş emri yüklendi',detail:'Pakon_plan_19.11.xlsx · '+SEED_ORDERS.length+' iş'}]};
+    pm,audit:[{ts:now-10*H,user:'Takım Lideri 1',what:'Excel ile iş emri yüklendi',detail:'Pakon_plan_19.11.xlsx · '+SEED_ORDERS.length+' iş'}]};
 }
 function load(){
   try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);S=d.S;user=USERS.find(u=>u.id===d.uid)||null;rollBoard();return}}catch(e){}
@@ -292,7 +291,7 @@ function updBell(){const b=$('#bell-n');if(!b)return;const u=unread();b.textCont
 function viewLogin(){
   return `<div class="login">
     <section class="login-art"><div>${LOGO()}</div>
-      <div><span class="label">MCC Korsini · Türkiye</span><h1 style="margin-top:10px">Üretim takip sistemi</h1><p>Pakon iş emirlerini Excel ile yükleyin, Bitirme makinelerine atayın, koparma formuyla başlatın, kamera sonuçlarını sipariş bazında izleyin ve Pakon formuyla bitirin.</p></div>
+      <div><span class="label">MCC Korsini · Türkiye</span><h1 style="margin-top:10px">Üretim takip sistemi</h1><p>Takım lideri Pakon planını Excel ile yükler ve Bitirme makinelerine atar. İş koparma formuyla başlar, kamera sonuçları sipariş bazında izlenir ve Pakon formuyla biter.</p></div>
       <div class="blocks" aria-hidden="true"><i></i><i></i><i></i></div>
       <span class="muted" style="font-size:12.5px;position:relative">Prototip · İş emirleri, kamera görüntüleri, kalite ve bakım kayıtları örnek veridir.</span></section>
     <section class="login-form"><div><h2>Giriş yapın</h2><p class="muted" style="margin:4px 0 0">Denemek için bir rol seçin.</p></div>
@@ -459,7 +458,7 @@ function viewPlan(){
     <div class="step"><span class="n">Adım 1</span><h3>Şablonu indir</h3><p class="small muted">Sütun başlıkları ve açıklamaları dosyanın içinde. İş yeri sütununa PAKON yazılır.</p><button class="btn" data-act="xlsTpl">↓ Şablonu indir (.xlsx)</button></div>
     <div class="step"><span class="n">Adım 2</span><h3>Planı doldur</h3><p class="small muted">Her satır bir iş emri. Zorunlu alanlar: SD No, müşteri, artikel, stok adı, iş miktarı. Ambalaj bilgisi yoksa 1.000 × 24 deste alınır.</p><button class="btn ghost" data-act="xlsSmp">Dolu örneği indir</button></div>
     <div class="step"><span class="n">Adım 3</span><h3>Yükle ve yayınla</h3><label class="drop" id="drop" for="xls-file" tabindex="0"><b>↑ Excel dosyasını seçin veya buraya bırakın</b><span class="muted small">.xlsx ya da .xls</span></label><input id="xls-file" type="file" accept=".xlsx,.xls" style="position:absolute;left:-9999px"><button class="btn ghost sm" style="justify-self:start" data-act="xlsSample">Örnek dosyayla dene</button></div></div>`
-    :`<div class="camhdr"><span class="muted">Plan yükleme Planlama rolüne açıktır. Takım lideri havuzdaki işleri Bitirme makinelerine atar.</span></div>`;
+    :`<div class="camhdr"><span class="muted">Plan yükleme ve makine atamasını saha takım lideri yapar.</span></div>`;
   const assignSec=`<section class="panel"><div class="panel-h"><div><h2>Bitirme makinelerine atama</h2><span class="muted small">${can('plan')?'Havuzdaki işi bir makinenin sütununa sürükleyin ya da listeden seçin.':'Atamayı saha takım lideri yapar.'}</span></div>
     <div class="legend"><span><i style="background:var(--bad)"></i>Termini geçmiş</span><span><i style="background:var(--yellow)"></i>Termini bugün</span><span><i style="background:var(--brand)"></i>Çalışıyor</span><span>⚠ Önceki proses uyarısı</span></div></div>
   <div class="plan">
@@ -472,7 +471,7 @@ function viewPlan(){
         ${!cur&&!m.queue.length?'<div class="empty" style="padding:18px;font-size:13px">İş atanmadı</div>':''}</section>`}).join('')}
     </div></div></div></section>`;
   const off=U.planDay||0;
-  return `<div class="head"><div><div class="crumb"><a href="#prosesler">Prosesler</a>/<span>Paketleme · Pakon</span></div><h1>Pakon İş Planı</h1><p>Planlama ekibi Pakon iş emirlerini Excel ile yükler. Yayınlanan işler havuza düşer, saha takım lideri Bitirme-1…5'e atar.</p></div>
+  return `<div class="head"><div><div class="crumb"><a href="#prosesler">Prosesler</a>/<span>Paketleme · Pakon</span></div><h1>Pakon İş Planı</h1><p>Saha takım lideri Pakon planını Excel ile yükler, yayınlanan işler havuza düşer ve yine takım lideri Bitirme-1…5'e atar.</p></div>
     <div class="seg" aria-label="Plan kaynağı"><button class="on" data-act="xlsFocus">Excel</button><button disabled title="ERP entegrasyonu sonraki fazda eklenecek">ERP · Sonraki faz</button></div></div>
   ${steps}${imp}
   ${last?`<div class="camhdr"><span class="dot"></span><span>Son yayın: <b>${esc(last.file)}</b> · ${DT(last.ts)} · ${esc(last.user)} · ${last.added} iş havuza eklendi${last.skipped?', '+last.skipped+' satır atlandı':''}</span></div>`:''}
@@ -653,7 +652,7 @@ function downloadTemplate(full){
 }
 function xlsModal(){
   const x=U.xls;
-  if(!x)return {title:'Excel\'den iş emri yükle',wide:true,ok:null,body:`<p class="muted" style="margin:0">Planlama, Pakon iş yeri için iş emirlerini Excel ile yükler. İlk sayfanın ilk satırı başlık olmalı. Yalnızca “İş Yeri” PAKON olan satırlar alınır; sistemde zaten olan SD'ler atlanır.</p>
+  if(!x)return {title:'Excel\'den iş emri yükle',wide:true,ok:null,body:`<p class="muted" style="margin:0">Takım lideri, Pakon iş yeri için iş emirlerini Excel ile yükler. İlk sayfanın ilk satırı başlık olmalı. Yalnızca “İş Yeri” PAKON olan satırlar alınır; sistemde zaten olan SD'ler atlanır.</p>
     <div class="drop" id="drop"><b>Excel dosyasını buraya bırakın</b><span class="muted small">.xlsx ya da .xls</span><label class="btn primary" for="xls-file">Dosya seç</label><input id="xls-file" type="file" accept=".xlsx,.xls" style="position:absolute;left:-9999px"></div>
     <div class="btns"><button class="btn" data-act="xlsSample">Örnek dosyayla dene</button><button class="btn ghost" data-act="xlsTpl">Şablonu indir</button></div>
     <div><span class="label">Sütunlar</span><div class="chipsel" style="margin-top:6px">${XCOLS.map(c=>`<span class="chip ${['sd','customer','artikel','name','qty'].includes(c[0])?'c-info':'c-idle'}">${c[1]}</span>`).join('')}</div><span class="hint">Mavi olanlar zorunlu. Başlık yazımında büyük/küçük harf ve Türkçe karakter farkı sorun olmaz.</span></div>`};
@@ -668,8 +667,8 @@ function importXls(){
   x.rows.filter(r=>r.st[0]!=='err').forEach(r=>{const tech=(Object.values(S.orders).find(o=>o.artikel===r.artikel)||{}).tech;
     const o=mkOrder([r.sd,r.sob||'—',r.customer,r.artikel,r.name,tech||'IML','',r.qty,r.montaj,r.perDeste,r.desteKoli,r.due||now+3*DAY,r.place,r.kokteyl,r.note,''],now,'Excel: '+x.file);S.orders[o.id]=o;n++});
   S.imports.unshift({ts:now,user:me(),file:x.file,added:n,skipped:x.rows.length-n});
-  audit('Excel ile iş emri yüklendi',x.file+' · '+n+' iş');notify('Pakon havuzuna '+n+' iş eklendi',x.file+' · '+me(),['lider']);
-  U.xls=null;U.modal=null;save();render();toast(n+' iş emri yayınlandı ve Pakon havuzuna düştü. Takım lideri Bitirme makinelerine atayabilir.');
+  audit('Excel ile iş emri yüklendi',x.file+' · '+n+' iş');notify('Pakon planı yayınlandı: '+n+' iş',x.file+' · '+me(),['lider','yonetici']);
+  U.xls=null;U.modal=null;save();render();toast(n+' iş emri yayınlandı ve Pakon havuzuna düştü. Şimdi Bitirme makinelerine atayabilirsiniz. Takım lideri Bitirme makinelerine atayabilir.');
 }
 
 /* ---------- pencereler ---------- */
