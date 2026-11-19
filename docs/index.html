@@ -514,6 +514,32 @@ tr.tot td{font-weight:700;background:var(--surface-2)}
 .filterbar .filters .field:first-child{flex:0 0 auto}
 .filterbar .filters input[type=date]{min-width:0}
 .filterbar .filters .field{max-width:320px}
+
+/* v13: sade rapor tuvali */
+.rcanvas{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:4px 24px 8px;display:grid;min-width:0}
+.rtool{padding:16px 0;border-bottom:1px solid var(--line)}
+.rtool .filters{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.rtool .field{flex:1 1 160px;min-width:140px;max-width:280px}
+.rtool .field:first-child{flex:0 0 auto;max-width:none}
+.rtool .seg{min-height:46px;align-items:center}
+.kstrip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid var(--line)}
+.rk{display:grid;gap:4px;padding:18px 20px 18px 0;min-width:0}
+.rk + .rk{border-left:1px solid var(--line);padding-left:20px}
+.rk b{font-size:28px;font-weight:700;color:var(--fg);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk small{font-size:12.5px;color:var(--muted)}
+.rsec{padding:22px 0;border-bottom:1px solid var(--line);display:grid;gap:14px;min-width:0}
+.rcanvas > .rsec:last-child{border-bottom:0}
+.rsplit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-bottom:1px solid var(--line)}
+.rsplit > .rsec{border-bottom:0}
+.rsplit > .rsec:first-child{padding-right:24px;border-right:1px solid var(--line)}
+.rsplit > .rsec + .rsec{padding-left:24px}
+.rcanvas .tablewrap{border-color:var(--line)}
+.rcanvas h2{font-size:17px}
+.rtabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto}
+.rtabs button{background:none;border:0;padding:10px 14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.rtabs button:hover{color:var(--fg)}
+.rtabs button.on{color:var(--fg);border-bottom-color:var(--brand)}
+@media (max-width:900px){.kstrip{grid-template-columns:repeat(2,minmax(0,1fr))}.rk:nth-child(3){border-left:0;padding-left:0}.rsplit{grid-template-columns:1fr}.rsplit > .rsec:first-child{padding-right:0;border-right:0;border-bottom:1px solid var(--line)}.rsplit > .rsec + .rsec{padding-left:0}.rcanvas{padding:4px 16px 8px}}
 </style></head>
 <body>
 <template id="logo-tpl"><svg class="logo" role="img" aria-label="MCC Global IML" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1326.13 313.2"> <g class="logo-st4"> <g> <g> <path class="logo-st3" d="M1143.8,66.8h128.91V.54h-128.91c-58.13,0-107.24,47.44-107.24,103.58s49.11,103.59,107.24,103.59h128.91v-66.26h-128.91c-20.52,0-37.22-16.74-37.22-37.33s16.7-37.32,37.22-37.32Z"/> <path class="logo-st3" d="M893.63,66.8h128.91V.54h-128.91c-58.13,0-107.24,47.44-107.24,103.58s49.11,103.59,107.24,103.59h128.91v-66.26h-128.91c-20.52,0-37.22-16.74-37.22-37.33s16.7-37.32,37.22-37.32Z"/> <path class="logo-st3" d="M669.34.31h-192.25v207.42h66.26V66.57h45.87v141.16h66.26V66.57h13.85c20.42,0,37.04,16.66,37.04,37.15v104.01h66.26v-104.01c0-57.02-46.34-103.4-103.3-103.4Z"/> <g> <path class="logo-st3" d="M1294.42,22.06h-4.53V3.7h-5.26V0h15.01v3.7h-5.23v18.36Z"/> <path class="logo-st3" d="M1307.22,22.06h-4.53V0h5.13l6.58,13.39,6.61-13.39h5.13v22.06h-4.53v-13.76l-7.21,14.42-7.18-14.42v13.76Z"/> </g> </g> <g> <path class="logo-st1" d="M389.25,89.61C387.36,39.88,346.38,0,296.25,0h-108.86v186.93h201.87v-97.32Z"/> <path class="logo-st0" d="M126.1,222.25c1.89,49.73,42.87,89.61,93.01,89.61h108.86V124.93H126.1v97.32Z"/> <path class="logo-st2" d="M155.77,153.59c-1.45-38.28-33-68.97-71.59-68.97H.39v143.89h155.38v-74.91Z"/> </g> <g> <path class="logo-st3" d="M545.18,273.42v3.71c0,10.61-3.09,18.55-10,25.55-6.9,6.9-15.66,10.61-25.35,10.61-20.2,0-35.34-15.25-35.34-35.55s15.04-35.86,35.24-35.86c11.13,0,21.12,4.74,27.82,13.19l-10.61,8.35c-5.05-5.98-10.1-8.55-16.9-8.55-12.06,0-21.23,9.89-21.23,22.88s9.48,22.77,21.54,22.77c5.87,0,11.75-2.58,15.35-6.9,2.06-2.37,3.09-4.53,4.22-8.66h-19.17v-11.54h34.42Z"/> <path class="logo-st3" d="M619.27,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> <path class="logo-st3" d="M711.29,253.43c5.87,6.59,8.76,14.53,8.76,24.52,0,19.58-15.66,35.34-35.14,35.34s-35.86-15.56-35.86-35.34,15.66-36.06,36.07-36.06c10.1,0,19.37,4.12,26.17,11.54ZM663.48,277.75c0,12.78,9.17,22.57,21.12,22.57s21.12-9.79,21.12-22.26c0-13.29-8.86-23.08-21.02-23.08s-21.23,9.69-21.23,22.77Z"/> <path class="logo-st3" d="M780.12,243.23c8.45,0,13.91,1.24,17.52,3.92,4.22,3.19,6.59,8.45,6.59,14.53,0,4.74-1.44,8.66-4.33,11.75-1.96,1.96-3.5,2.89-7.21,4.12,4.12.93,5.98,1.75,8.14,3.71,3.19,2.89,4.95,7.11,4.95,12.36,0,6.39-2.68,12.06-7.11,15.04-3.61,2.37-7.83,3.3-15.35,3.3h-25.35v-68.73h22.15ZM772.08,272.39h5.67c8.35,0,12.26-2.99,12.26-9.38,0-3.5-1.65-6.49-4.12-7.73-1.96-.93-4.84-1.34-8.86-1.34h-4.95v18.44ZM772.08,301.55h6.9c4.84,0,7.11-.41,9.17-1.85,2.27-1.55,3.4-4.02,3.4-7.32,0-3.71-1.34-6.29-3.92-7.83-2.16-1.24-4.33-1.65-9.48-1.65h-6.08v18.65Z"/> <path class="logo-st3" d="M855.24,300.11l-4.12,11.85h-14.94l23.7-68.73h17.62l23.49,68.73h-15.46l-3.92-11.85h-26.38ZM868.43,260.13l-9.58,28.44h19.06l-9.48-28.44Z"/> <path class="logo-st3" d="M972.19,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> <path class="logo-st3" d="M1080.18,311.96h-14.12v-68.73h14.12v68.73Z"/> <path class="logo-st3" d="M1135.41,311.96h-14.12v-68.73h15.97l20.51,41.73,20.61-41.73h15.97v68.73h-14.12v-42.87l-22.46,44.93-22.36-44.93v42.87Z"/> <path class="logo-st3" d="M1272.56,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> </g> </g> </g> </svg></template>
@@ -1111,7 +1137,10 @@ const allFacts=()=>[...(S.hist||[]),...factsToday()];
 function rangeFacts(F){const a=k2ts(F.from),b=k2ts(F.to);return allFacts().filter(x=>x.day>=a&&x.day<=b)}
 function prevRange(F){const a=k2ts(F.from),b=k2ts(F.to),n=Math.round((b-a)/DAY)+1;return allFacts().filter(x=>x.day>=a-n*DAY&&x.day<=b-n*DAY)}
 const rangeLabel=F=>F.from===F.to?DD(k2ts(F.from)):DD(k2ts(F.from))+' – '+DD(k2ts(F.to));
-const SHC=['#2fac66','#6fb0e1','#d9a900'];
+const SHC=['#1c784c','#2bb673','#9fd7b8'];
+const ERRC=['#8f1d1d','#cf3b3b','#f0a3a3'];
+const RCOL={uretim:'var(--brand)',kamera:'#cf3b3b',bozuk:'#7d8b93',durus:'#5d6e76'};
+const rk=(l,v,c,sm)=>`<div class="rk"><span class="label">${l}</span><b class="num">${v}</b>${sm?`<small>${sm}</small>`:''}</div>`;
 function gcol(groups,series,colors,fmt){
   const W0=660,H0=250,B=30,T=24,gw=(W0-20)/groups.length,bw=gw*.72/series.length,max=Math.max(1,...groups.flatMap(g=>g.vals));
   return `<svg class="chart" viewBox="0 0 ${W0} ${H0}" role="img" aria-label="Vardiya adetleri grafiği"><line x1="10" x2="${W0-10}" y1="${H0-B}" y2="${H0-B}" stroke="var(--line)"/>${groups.map((g,i)=>{const x0=10+i*gw+gw*.14;
@@ -1132,14 +1161,14 @@ function dashBody(F,facts){
   const best=[...rows].sort((a,b)=>b.prod-a.prod)[0],fmtM=v=>v>=1e6?P1(v/1e6)+' M':v>=1e3?Math.round(v/1000)+' B':String(v);
   U.repExport={name:'bitirme_karsilastirma_'+F.from+'_'+F.to,head:['Makine','1. vardiya','2. vardiya','3. vardiya','Toplam','Hedef %','Bozuk (fire)','Fire %','Kontrol edilen koli','Hatalı koli','C. Mixup','P. Mixup','Adet hatası','Hata %','Duruş dk'],
     rows:rows.map(r=>[r.k,...r.sh,r.prod,P1(r.pct),r.bad,(r.badRate).toFixed(2).replace('.',','),r.koli,r.errs,r.CMIX,r.PMIX,r.QTY,P1(r.errRate),r.stopMin])};
-  return `<div class="strip">${kpi('Paketlenen etiket',N(T.prod),'',`Hedef gerçekleşme %${P1(T.target?T.prod/T.target*100:0)}`)}${kpi('Fire oranı','%'+(T.prod?(T.bad/T.prod*100):0).toFixed(2).replace('.',','),'var(--bad)',N(T.bad)+' bozuk etiket')}${kpi('Kalite hata oranı','%'+P1(T.koli?T.errs/T.koli*100:0),'var(--bad)',N(T.errs)+' hatalı koli / '+N(T.koli))}${kpi('En çok üreten',best&&best.prod?esc(best.k):'—','var(--ok)',best&&best.prod?N(best.prod)+' etiket':'')}</div>
-  <section class="panel"><div><span class="label">Vardiya adetleri · ${esc(rangeLabel(F))}</span><h2>Bitirme makinelerinde vardiya bazında üretim</h2></div>
+  return `<div class="kstrip">${rk('Paketlenen etiket',N(T.prod),'',`Hedef gerçekleşme %${P1(T.target?T.prod/T.target*100:0)}`)}${rk('Fire oranı','%'+(T.prod?(T.bad/T.prod*100):0).toFixed(2).replace('.',','),'',N(T.bad)+' bozuk etiket')}${rk('Kalite hata oranı','%'+P1(T.koli?T.errs/T.koli*100:0),'',N(T.errs)+' hatalı koli / '+N(T.koli))}${rk('En çok üreten',best&&best.prod?esc(best.k):'—','var(--ok)',best&&best.prod?N(best.prod)+' etiket':'')}</div>
+  <section class="rsec"><div><span class="label">Vardiya adetleri · ${esc(rangeLabel(F))}</span><h2>Bitirme makinelerinde vardiya bazında üretim</h2></div>
     ${gcol(rows.map(r=>({k:r.k,vals:r.sh})),S.shifts.map(s=>s.n+' '+s.s+'–'+s.e),SHC,fmtM)}</section>
-  <div class="cols2"><section class="panel"><div><span class="label">Pakon bozuk / paketlenen</span><h2>Fire oranı</h2></div>
+  <div class="rsplit"><section class="rsec"><div><span class="label">Pakon bozuk / paketlenen</span><h2>Fire oranı</h2></div>
     ${hbar(rows.map(r=>({k:r.k,v:r.badRate})),'v','%%')}<p class="hint" style="margin:0">Fire, Pakon üretim takip formundaki bozuk etiketlerin paketlenen etikete oranıdır.</p></section>
-  <section class="panel"><div><span class="label">Kamera · hata koduna göre</span><h2>Kalite hataları</h2></div>
-    ${stackbar(rows,S.errorCodes.map(c=>c.code),S.errorCodes.map(c=>c.label),['#cf3b3b','#e8875c','#d9a900'])}</section></div>
-  <section class="panel"><h2>Bitirme 1–5 karşılaştırma tablosu</h2><div class="nwt">${table([['Makine',r=>`<a href="#makine-${r.m}"><b>${esc(r.k)}</b></a>`,''],...S.shifts.map((s,i)=>[s.n,r=>`<span class="num">${N(r.sh[i])}</span>`,'r']),['Toplam',r=>`<b class="num">${N(r.prod)}</b>`,'r'],['Hedef',r=>`<span class="num ${r.pct>=100?'delta-up':'delta-down'}">%${P1(r.pct)}</span>`,'r'],['Fire %',r=>`<span class="num" title="${N(r.bad)} bozuk etiket">%${r.badRate.toFixed(2).replace('.',',')}</span>`,'r'],['Hatalı koli',r=>`<span class="num" title="${N(r.koli)} koli kontrol edildi">${N(r.errs)}</span>`,'r'],['Hata %',r=>`<span class="num">%${P1(r.errRate)}</span>`,'r'],['Duruş',r=>`<span class="num">${dur(r.stopMin)}</span>`,'r']],rows)}</div></section>`;
+  <section class="rsec"><div><span class="label">Kamera · hata koduna göre</span><h2>Kalite hataları</h2></div>
+    ${stackbar(rows,S.errorCodes.map(c=>c.code),S.errorCodes.map(c=>c.label),ERRC)}</section></div>
+  <section class="rsec"><h2>Bitirme 1–5 karşılaştırma tablosu</h2><div class="nwt">${table([['Makine',r=>`<a href="#makine-${r.m}"><b>${esc(r.k)}</b></a>`,''],...S.shifts.map((s,i)=>[s.n,r=>`<span class="num">${N(r.sh[i])}</span>`,'r']),['Toplam',r=>`<b class="num">${N(r.prod)}</b>`,'r'],['Hedef',r=>`<span class="num ${r.pct>=100?'delta-up':'delta-down'}">%${P1(r.pct)}</span>`,'r'],['Fire %',r=>`<span class="num" title="${N(r.bad)} bozuk etiket">%${r.badRate.toFixed(2).replace('.',',')}</span>`,'r'],['Hatalı koli',r=>`<span class="num" title="${N(r.koli)} koli kontrol edildi">${N(r.errs)}</span>`,'r'],['Hata %',r=>`<span class="num">%${P1(r.errRate)}</span>`,'r'],['Duruş',r=>`<span class="num">${dur(r.stopMin)}</span>`,'r']],rows)}</div></section>`;
 }
 function factsToday(){
   const now=Date.now(),ds=dayStart(now),ci=slotOf(now),out=[];
@@ -1179,15 +1208,15 @@ function aggregate(rep,facts,by){
   tot.pct=tot.target?Math.round(tot.prod/tot.target*1000)/10:0;tot.errRate=tot.koli?Math.round(tot.errs/tot.koli*1000)/10:0;tot.badRate=tot.prod?Math.round(tot.bad/tot.prod*10000)/100:0;
   return {rows,tot};
 }
-function hbar(rows,v,u,good){
+function hbar(rows,v,u,good,color){
   if(!rows.length)return '';const max=Math.max(good?110:1,...rows.map(r=>r[v]));
   const fmt=x=>u==='%%'?'%'+x.toFixed(2).replace('.',','):u==='%'?'%'+P1(x):N(x);
-  return `<div class="hb">${rows.map(r=>`<div class="hb-r"><span class="hb-l">${esc(String(r.k).slice(0,22))}</span><div class="hb-t"><i style="width:${Math.max(.5,r[v]/max*100)}%;background:${good?(r[v]>=100?'var(--ok)':'var(--bad)'):'var(--brand)'}"></i>${good?`<span class="tg" style="left:${100/max*100}%" title="Hedef %100"></span>`:''}</div><b>${fmt(r[v])}</b></div>`).join('')}</div>`;
+  return `<div class="hb">${rows.map(r=>`<div class="hb-r"><span class="hb-l">${esc(String(r.k).slice(0,22))}</span><div class="hb-t"><i style="width:${Math.max(.5,r[v]/max*100)}%;background:${good?(r[v]>=100?'var(--ok)':'var(--bad)'):u==='%%'?'#7d8b93':(color||'var(--brand)')}"></i>${good?`<span class="tg" style="left:${100/max*100}%" title="Hedef %100"></span>`:''}</div><b>${fmt(r[v])}</b></div>`).join('')}</div>`;
 }
-function vcol(rows,v,u){
+function vcol(rows,v,u,color){
   if(!rows.length)return '';const W0=640,H0=220,B=28,T=22,n=rows.length,cw=(W0-20)/n,max=Math.max(1,...rows.map(r=>r[v]));
   return `<svg class="chart" viewBox="0 0 ${W0} ${H0}" role="img" aria-label="Günlük grafik"><line x1="10" x2="${W0-10}" y1="${H0-B}" y2="${H0-B}" stroke="var(--line)"/>${rows.map((r,i)=>{const hh=Math.max(2,(H0-B-T)*r[v]/max),x=10+i*cw+cw*.18,w=cw*.64,y=H0-B-hh;
-    return `<rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="4" fill="var(--brand)"/><text class="val" x="${x+w/2}" y="${y-6}" text-anchor="middle">${u==='%'?'%'+P1(r[v]):r[v]>=1e6?P1(r[v]/1e6)+' M':r[v]>=1e4?Math.round(r[v]/1000)+' B':N(r[v])}</text><text x="${x+w/2}" y="${H0-9}" text-anchor="middle">${esc(r.k)}</text>`}).join('')}</svg>`;
+    return `<rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="4" fill="${color||'var(--brand)'}"/><text class="val" x="${x+w/2}" y="${y-6}" text-anchor="middle">${u==='%'?'%'+P1(r[v]):r[v]>=1e6?P1(r[v]/1e6)+' M':r[v]>=1e4?Math.round(r[v]/1000)+' B':N(r[v])}</text><text x="${x+w/2}" y="${H0-9}" text-anchor="middle">${esc(r.k)}</text>`}).join('')}</svg>`;
 }
 function repCols(rep,by){
   const f=(k,l,fmt,cls)=>[l,r=>fmt?fmt(r[k]):`<span class="num">${N(r[k])}</span>`,cls||'r'];
@@ -1204,9 +1233,9 @@ function viewReports(){
   const minK=prodDayKey(dayStart(Date.now())-6*DAY),maxK=prodDayKey(Date.now());if(F.from>F.to)F.to=F.from;
   const rep=REPORTS.find(x=>x.k===F.r);if(rep.by.length&&!rep.by.includes(F.by))F.by=rep.by[0];
   const custs=[...new Set([...(S.hist||[]).map(x=>x.customer),...Object.values(S.orders).map(o=>o.customer)])].sort();
-  const list=`<section class="reppanel"><span class="label">Rapor seçin</span><div class="replist">${REPORTS.map(x=>`<button class="${x.k===F.r?'on':''}" data-act="repSel" data-v="${x.k}"><b>${x.n}</b><small>${x.d}</small></button>`).join('')}</div></section>`;
+  const list=`<div class="rtabs" role="tablist">${REPORTS.map(x=>`<button role="tab" aria-selected="${x.k===F.r}" class="${x.k===F.r?'on':''}" data-act="repSel" data-v="${x.k}" title="${esc(x.d)}">${x.n}</button>`).join('')}</div>`;
   const qk=PERIODS.find(p=>{const q=quickRange(p[0]);return prodDayKey(q[0])===F.from&&prodDayKey(q[1])===F.to});
-  const filters=`<div class="filterbar"><div class="filters">${fld('Tarih',`<div class="seg">${PERIODS.map(p=>`<button class="${qk&&qk[0]===p[0]?'on':''}" data-act="repQuick" data-v="${p[0]}">${p[1]}</button>`).join('')}</div>`)}${fld('Başlangıç',`<input class="input" type="date" data-rf="from" min="${minK}" max="${maxK}" value="${F.from}">`)}${fld('Bitiş',`<input class="input" type="date" data-rf="to" min="${minK}" max="${maxK}" value="${F.to}">`)}${fld('Makine',`<select class="input" data-rf="m">${opts([['all','Bütün Bitirme makineleri'],...S.machines.map(m=>[m.id,m.name])],F.m)}</select>`)}${F.r==='pano'?'':fld('Vardiya',`<select class="input" data-rf="sh">${opts([['all','Bütün vardiyalar'],...S.shifts.map((s,i)=>[i,s.n+' · '+s.s+'–'+s.e])],F.sh)}</select>`)}${fld('Müşteri',`<select class="input" data-rf="c">${opts([['all','Bütün müşteriler'],...custs],F.c)}</select>`)}${rep.by.length?fld('Kırılım',`<select class="input" data-rf="by">${opts(rep.by.map(b=>[b,BYL[b]]),F.by)}</select>`):''}</div></div>`;
+  const filters=`<div class="rtool"><div class="filters">${fld('Tarih',`<div class="seg">${PERIODS.map(p=>`<button class="${qk&&qk[0]===p[0]?'on':''}" data-act="repQuick" data-v="${p[0]}">${p[1]}</button>`).join('')}</div>`)}${fld('Başlangıç',`<input class="input" type="date" data-rf="from" min="${minK}" max="${maxK}" value="${F.from}">`)}${fld('Bitiş',`<input class="input" type="date" data-rf="to" min="${minK}" max="${maxK}" value="${F.to}">`)}${fld('Makine',`<select class="input" data-rf="m">${opts([['all','Bütün Bitirme makineleri'],...S.machines.map(m=>[m.id,m.name])],F.m)}</select>`)}${F.r==='pano'?'':fld('Vardiya',`<select class="input" data-rf="sh">${opts([['all','Bütün vardiyalar'],...S.shifts.map((s,i)=>[i,s.n+' · '+s.s+'–'+s.e])],F.sh)}</select>`)}${fld('Müşteri',`<select class="input" data-rf="c">${opts([['all','Bütün müşteriler'],...custs],F.c)}</select>`)}${rep.by.length?fld('Kırılım',`<select class="input" data-rf="by">${opts(rep.by.map(b=>[b,BYL[b]]),F.by)}</select>`):''}</div></div>`;
   let body;
   if(rep.k==='pano'){body=dashBody(F,rangeFacts(F))}
   else if(rep.k==='siparis'){
@@ -1214,8 +1243,8 @@ function viewReports(){
     const st=o=>o.status==='bitti'?'<span class="pill st-run">Bitti</span>':o.status==='calisiyor'?'<span class="pill st-info">Çalışıyor</span>':o.status==='sirada'?'<span class="pill st-idle">Sırada</span>':'<span class="pill st-warn">Havuzda</span>';
     const late=os.filter(o=>o.status!=='bitti'&&dayKey(o.due)<dayKey(Date.now())).length,tot=os.reduce((a,o)=>a+o.qty,0),pk=os.reduce((a,o)=>a+produced(o),0);
     U.repExport={name:'siparis_durumu',head:['SD','SOB','Müşteri','Artikel','Stok adı','Sipariş','Paketlenen','Bakiye','Durum','Makine','Termin'],rows:os.map(o=>[o.id,o.sob,o.customer,o.artikel,o.name,o.qty,produced(o),produced(o)-o.qty,o.status,o.machine?mName(o.machine):'',DD(o.due)])};
-    body=`<div class="strip">${kpi('Sipariş',os.length)}${kpi('Sipariş edilen etiket',N(tot))}${kpi('Paketlenen',N(pk),'var(--ok)','%'+P1(tot?pk/tot*100:0))}${kpi('Termini geçmiş açık',late,late?'var(--bad)':'')}</div>
-    <section class="panel">${table([['SD',o=>`<b class="mono">${o.id}</b><br><span class="small muted">${esc(o.sob)}</span>`],['Müşteri · Artikel',o=>`${esc(o.customer)}<br><span class="mono small muted">${esc(o.artikel)}</span>`],['Sipariş',o=>`<span class="num">${N(o.qty)}</span>`,'r'],['Paketlenen',o=>`<div style="display:grid;gap:4px;min-width:140px"><span class="num">${N(produced(o))} · %${P1(Math.min(999,pct(o)))}</span><div class="bar"><span style="width:${Math.min(100,pct(o))}%"></span></div></div>`],['Bakiye',o=>{const b=produced(o)-o.qty;return `<span class="num ${b>=0?'delta-up':'delta-down'}">${b>0?'+':''}${N(b)}</span>`},'r'],['Durum',o=>st(o)],['Makine',o=>esc(o.machine?mName(o.machine):'—')],['Termin',o=>o.status!=='bitti'&&dayKey(o.due)<dayKey(Date.now())?`<span class="chip c-bad">${D(o.due)}</span>`:D(o.due)]],os)}</section>`;
+    body=`<div class="kstrip">${rk('Sipariş',os.length)}${rk('Sipariş edilen etiket',N(tot))}${rk('Paketlenen',N(pk),'var(--ok)','%'+P1(tot?pk/tot*100:0))}${rk('Termini geçmiş açık',late,late?'var(--bad)':'')}</div>
+    <section class="rsec">${table([['SD',o=>`<b class="mono">${o.id}</b><br><span class="small muted">${esc(o.sob)}</span>`],['Müşteri · Artikel',o=>`${esc(o.customer)}<br><span class="mono small muted">${esc(o.artikel)}</span>`],['Sipariş',o=>`<span class="num">${N(o.qty)}</span>`,'r'],['Paketlenen',o=>`<div style="display:grid;gap:4px;min-width:140px"><span class="num">${N(produced(o))} · %${P1(Math.min(999,pct(o)))}</span><div class="bar"><span style="width:${Math.min(100,pct(o))}%"></span></div></div>`],['Bakiye',o=>{const b=produced(o)-o.qty;return `<span class="num ${b>=0?'delta-up':'delta-down'}">${b>0?'+':''}${N(b)}</span>`},'r'],['Durum',o=>st(o)],['Makine',o=>esc(o.machine?mName(o.machine):'—')],['Termin',o=>o.status!=='bitti'&&dayKey(o.due)<dayKey(Date.now())?`<span class="chip c-bad">${D(o.due)}</span>`:D(o.due)]],os)}</section>`;
   } else {
     const facts=rangeFacts(F),{rows,tot}=aggregate(rep,facts,F.by),prev=F.cmp?aggregate(rep,prevRange(F),F.by):null;
     const v=rep.k==='hedef'?'pct':rep.v;
@@ -1230,14 +1259,14 @@ function viewReports(){
     const allCols=[[BYL[F.by],r=>`<b>${esc(r.k)}</b>`,''],...cols,...(prev?[['Önceki dönem',r=>{const p=prevMap[r.k];if(!p)return '<span class="muted">—</span>';const a=r[v],b=p[v];const d=b?Math.round((a-b)/b*1000)/10:0,good=higherBetter?d>=0:d<=0;return `<span class="num">${v==='pct'?'%'+P1(b):N(b)}</span> <span class="small ${good?'delta-up':'delta-down'}">${d>0?'+':''}${P1(d)}%</span>`},'r']]:[])];
     const totRow=Object.assign({},tot,{k:'Toplam',_cls:'tot'});
     U.repExport={name:rep.k+'_'+F.by+'_'+F.per,head:[BYL[F.by],...cols.map(c=>c[0].replace(/<[^>]+>/g,''))],rows:[...rows,tot].map(r=>[r.k,...cols.map(c=>c[1](r).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim())])};
-    body=`<div class="strip">${k1.map((x,i)=>kpi(x[0],esc(x[1]),i===2&&rep.k!=='durus'?(rep.k==='uretim'||rep.k==='hedef'?(tot.pct>=100?'var(--ok)':'var(--bad)'):'var(--bad)'):'',i===0?delta:'')).join('')}</div>
-    <section class="panel"><div class="panel-h"><div><span class="label">${esc(rep.n)} · ${esc(rangeLabel(F))} · ${esc(BYL[F.by])} kırılımı</span><h2>${esc(rep.n)} ${esc(BYL[F.by]).toLocaleLowerCase('tr')} bazında</h2></div></div>
-      ${rows.length?(F.by==='day'?vcol(rows,v,rep.k==='hedef'?'%':rep.u):hbar(rows.slice(0,12),v,rep.k==='hedef'?'%':rep.u,rep.k==='hedef')):''}
+    body=`<div class="kstrip">${k1.map((x,i)=>rk(x[0],esc(x[1]),'',i===0?delta:'')).join('')}</div>
+    <section class="rsec"><div class="panel-h"><div><span class="label">${esc(rep.n)} · ${esc(rangeLabel(F))} · ${esc(BYL[F.by])} kırılımı</span><h2>${esc(rep.n)} ${esc(BYL[F.by]).toLocaleLowerCase('tr')} bazında</h2></div></div>
+      ${rows.length?(F.by==='day'?vcol(rows,v,rep.k==='hedef'?'%':rep.u,RCOL[rep.k]):hbar(rows.slice(0,12),v,rep.k==='hedef'?'%':rep.u,rep.k==='hedef',RCOL[rep.k])):''}
       <div class="nwt">${table(allCols,rows.length?[...rows,totRow]:[],'Seçilen filtrelerde veri yok.')}</div></section>`;
   }
   return `<div class="head"><div><div class="crumb"><span>Analiz</span></div><h1>Raporlar</h1><p>Rapor seçin, filtreleyin, kırılımı değiştirin. Bugünün verisi canlı; geçmiş 6 gün örnek veridir.</p></div>
     <div class="btns">${F.r!=='siparis'&&F.r!=='pano'?`<label class="toggle" style="padding:8px 12px"><span>Önceki dönemle karşılaştır</span><input type="checkbox" data-rf="cmp" ${F.cmp?'checked':''}></label>`:''}<button class="btn" data-act="repCsv">↓ CSV indir</button></div></div>
-  <div class="rep">${list}<div style="display:grid;gap:18px;min-width:0">${filters}${body}</div></div>`;
+  ${list}<div class="rcanvas">${filters}${body}</div>`;
 }
 function exportCsv(){
   const x=U.repExport;if(!x)return;const q=v=>{const s=String(v??'');return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
