@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const TZ='Europe/Istanbul',KEY='korsini-mes-v5',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
+const TZ='Europe/Istanbul',KEY='korsini-mes-v6',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
 const ROLES={lider:'Takım lideri',koparma:'Koparma operatörü',paketleme:'Pakon operatörü',kalite:'Kalite uzmanı',bakim:'Bakım teknisyeni',yonetici:'Yönetici',admin:'Admin'};
 const USERS=[
   {id:'u1',name:'Takım Lideri 1',ini:'TL',c:'#2fac66',role:'lider',note:'Pakon planını Excel ile yükler, Bitirme makinelerine atar'},
@@ -16,7 +16,7 @@ const CAN={
   seeQual:['kalite','lider','yonetici','admin'],editQual:['kalite','admin'],
   seeMaint:['bakim','lider','yonetici','admin'],editMaint:['bakim','admin'],
   seeTrack:['lider','kalite','bakim','yonetici','admin'],seeAuto:['lider','kalite','bakim','yonetici','admin'],editAuto:['yonetici','admin'],
-  report:['lider','paketleme','yonetici','admin'],settings:['admin']};
+  report:['lider','paketleme','yonetici','admin'],seeRep:['lider','kalite','bakim','yonetici','admin'],settings:['admin']};
 const PERM_ROWS=[['upload','Pakon planını Excel ile yükler'],['seePlan','Planlamayı görür'],['plan','İşi Bitirme makinesine atar'],['start','Hat temizlik kontrolüyle işi başlatır'],['finish','Pakon formuyla işi bitirir'],['approve','Eksik adetle bitirmeyi onaylar'],['report','Vardiya sayı raporunu görür'],['seeQual','Kalite modülünü görür'],['editQual','Uygunsuzluk açar, kapatır'],['seeMaint','Bakım modülünü görür'],['editMaint','Arızaya müdahale eder'],['seeAuto','Otomasyonları görür'],['editAuto','Otomasyon kurar'],['settings','Ayarları değiştirir']];
 const TECH={'Injection Molding IML':'#2fac66','Thermoforming IML':'#6fb0e1','Blow Molding IML':'#ffd744','SealPPeel':'#a4b6be','NextCycle IML':'#1c784c','IML':'#8a9ba3'};
 const CHANNELS=['Uygulama','SMS','E-posta'],SEVS=['Bilgi','Uyarı','Kritik'],SEVC={Bilgi:'st-info',Uyarı:'st-warn',Kritik:'st-stop'};
@@ -28,7 +28,7 @@ const UP_ACK=['Bozuklar kırmızı kasalarda geldi, ayıklama yapıldı','Ayıkl
 const TEAM_ROLES=['Koparma','Birleştirme','Birleştirme','Kamera ve koli'];
 const CREW_C=['#9fd7b8','#b9d8f0','#b9d8f0','#ffe58a'];
 const PAKON_R=['Karışma','Renk farkı','Tonlama','Leke','Benek','Çizik','Kırık','Çiftleme','Kırışıklık','Lak bozuğu','Açma','Kurumama','Silik','Yolma','Arka verme / yapışma','Yaldız bozuğu','Kesim hatası','Yırtık','Çapak','Yenik','Hammadde bozuğu','Diğer'];
-const ICON={home:'<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',proc:'<path d="M4 6h16M4 12h10M4 18h6"/>',mac:'<rect x="3" y="4" width="8" height="7" rx="1.5"/><rect x="13" y="4" width="8" height="7" rx="1.5"/><rect x="3" y="13" width="8" height="7" rx="1.5"/><rect x="13" y="13" width="8" height="7" rx="1.5"/>',plan:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',rep:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/>',qual:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',maint:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',act:'<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 13l2 2 4-4"/>',auto:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',set:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>'};
+const ICON={chart:'<path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/>',home:'<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',proc:'<path d="M4 6h16M4 12h10M4 18h6"/>',mac:'<rect x="3" y="4" width="8" height="7" rx="1.5"/><rect x="13" y="4" width="8" height="7" rx="1.5"/><rect x="3" y="13" width="8" height="7" rx="1.5"/><rect x="13" y="13" width="8" height="7" rx="1.5"/>',plan:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',rep:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/>',qual:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',maint:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',act:'<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 13l2 2 4-4"/>',auto:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',set:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>'};
 const svg=k=>`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[k]}</svg>`;
 
 let S,user=null;
@@ -105,6 +105,7 @@ function addBox(wo,ts,result,r,reviewed){
   const b={no,ts,count,result,reviewed:!!reviewed,decision:reviewed?DECISIONS[0]:'',note:reviewed?'Koli ayrıldı, desteler yeniden sayıldı.':'',img:hash(no)};
   wo.boxes.push(b);return b;
 }
+const S_TARGET=320000;
 function seed(){
   const r=rng(19),now=Date.now(),orders={};
   SEED_ORDERS.forEach(p=>orders[p[0]]=mkOrder(p,now));
@@ -137,7 +138,15 @@ function seed(){
   const pmT=[['Kamera lensi temizliği',1],['Koparma bıçağı kontrolü',7],['Konveyör kayışı kontrolü',14],['Kamera kalibrasyonu',30]];
   const lastAgo={B1:[.4,3,6,12],B2:[.5,9,4,20],B3:[.3,2,10,12],B4:[.6,5,15,26],B5:[.2,1,3,8]};
   const pm=[];machines.forEach(m=>pmT.forEach((t,i)=>pm.push({id:m.id+'-'+i,machine:m.id,name:t[0],days:t[1],last:now-lastAgo[m.id][i]*DAY})));
-  return {machines,orders,board,seq:{AK:3,UG:2,BT:3,OT:0},
+  const hist=[],ords=Object.values(orders),R2=rng(77),ds0=dayStart(now);
+  for(let d=6;d>=1;d--)machines.forEach((m,mi)=>[0,1,2].forEach(sh=>{const o=ords[Math.floor(R2()*ords.length)],base=m.id==='B2'?.62:m.id==='B5'?.7:1;
+    const prod=Math.round((880000+R2()*420000)*base/1000)*1000,koli=Math.round(prod/perBox(o)),ec=Math.round(koli*(.02+R2()*.08));
+    const e={CMIX:0,PMIX:0,QTY:0};for(let k=0;k<ec;k++){const x=R2();e[x<.3?'CMIX':x<.7?'PMIX':'QTY']++}
+    const bad=Math.round(prod*(.002+R2()*.008)/100)*100,rs={};let left=bad;['Karışma','Lak bozuğu','Kesim hatası','Renk farkı','Çapak','Leke'].forEach((rn,j)=>{if(left<=0||R2()<.35)return;const v=j===5?left:Math.round(left*(.3+R2()*.4)/100)*100;rs[rn]=v;left-=v});if(left>0)rs['Diğer']=left;
+    const stops=[];const ns=Math.floor(R2()*3.2);for(let k=0;k<ns;k++)stops.push({r:['Malzeme bekleme','Arıza','Ayar','Kamera hatası','Kawahara ayarı','Operatör yok'][Math.floor(R2()*(m.id==='B4'?3:6))],min:5+Math.floor(R2()*(m.id==='B4'?70:40))});
+    hist.push({day:ds0-d*DAY,sh,m:m.id,sd:o.id,customer:o.customer,artikel:o.artikel,prod,koli,err:e,bad,reasons:rs,stops,setup:R2()<.5?1:R2()<.2?2:0,target:S_TARGET*4})}));
+  const stopLog=[{m:'B1',r:'Ayar',s:now-2.6*H,e:now-2.6*H+22*MIN},{m:'B3',r:'Malzeme bekleme',s:now-3.4*H,e:now-3.4*H+41*MIN},{m:'B4',r:'Arıza',s:now-18*MIN,e:null}];
+  return {machines,orders,board,hist,stopLog,seq:{AK:3,UG:2,BT:3,OT:0},
     stopReasons:[{n:'Malzeme bekleme',maint:false},{n:'Arıza',maint:true},{n:'Ayar',maint:false},{n:'Kamera hatası',maint:true},{n:'Kawahara ayarı',maint:false},{n:'Operatör yok',maint:false}],
     errorCodes:[{code:'CMIX',label:'C. Mixup',desc:'Koliye farklı bir ürünün etiketi karışmış'},{code:'PMIX',label:'P. Mixup',desc:'Koliye farklı bir baskının etiketi karışmış'},{code:'QTY',label:'Adet hatası',desc:'Kolideki etiket adedi beklenenden farklı'}],
     pakonReasons:[...PAKON_R],
@@ -257,6 +266,7 @@ function camImg(wo,b){
 const NAVG=[
   ['Üretim',[['isler','Bekleyen İşlerim','home',1],['makineler','Makinelerim','mac',1],['planlama','Planlama','plan','seePlan'],['rapor','Vardiya Sayı Raporu','rep','report']]],
   ['Kalite',[['kalite','Kalite Kontrol','qual','seeQual']]],
+  ['Analiz',[['raporlar','Raporlar','chart','seeRep']]],
   ['Bakım',[['bakim','Bakım Yönetimi','maint','seeMaint']]],
   ['Takip',[['aksiyonlar','Aksiyonlar','act','seeTrack'],['otomasyonlar','Akıllı Otomasyonlar','auto','seeAuto']]],
   ['Yönetim',[['ayarlar','Ayarlar','set','settings']]]];
@@ -269,7 +279,7 @@ function render(){
   let r=route();const it=NAVG.flatMap(g=>g[1]).find(i=>i[0]===r);if(it&&!navOk(it))r='makineler';
   let body;
   if(r.startsWith('makine-')&&M(r.slice(7)))body=viewMachine(M(r.slice(7)));
-  else body=U.proc!=='paketleme'&&r!=='ayarlar'?viewSoon():({isler:viewTasks,makineler:viewMachines,planlama:viewPlan,rapor:viewReport,kalite:viewQuality,bakim:viewMaint,aksiyonlar:viewActions,otomasyonlar:viewAutos,ayarlar:viewSettings}[r]||(()=>{r='isler';return viewTasks()}))();
+  else body=U.proc!=='paketleme'&&r!=='ayarlar'?viewSoon():({raporlar:viewReports,isler:viewTasks,makineler:viewMachines,planlama:viewPlan,rapor:viewReport,kalite:viewQuality,bakim:viewMaint,aksiyonlar:viewActions,otomasyonlar:viewAutos,ayarlar:viewSettings}[r]||(()=>{r='isler';return viewTasks()}))();
   const nk=r.startsWith('makine-')?'makineler':r,cn=counts(),un=unread();
   app.innerHTML=`<header class="hdr"><div class="hdr-in">
       <a class="prod" href="#isler" aria-label="Ana sayfa">${LOGO()}<span class="sep"></span><div><b>Korsini MES</b><small>Türkiye</small></div></a>
@@ -561,6 +571,161 @@ function viewReport(){
   ${rows.length?`<div class="sumline" style="justify-content:flex-end">${mini('Adet toplam',N(tA))}${mini('Tabaka toplam',N(tT))}</div>`:''}</section>`;
 }
 
+/* ---------- raporlar ---------- */
+const REPORTS=[
+  {k:'pano',n:'Bitirme karşılaştırma',d:'Bitirme 1–5 vardiya adetleri, fire oranı ve kalite hataları',v:null,by:[]},
+  {k:'uretim',n:'Üretim',d:'Paketlenen etiket, koli ve iş değişimi',v:'prod',u:'etiket',by:['m','day','sh','customer','artikel']},
+  {k:'hedef',n:'Hedef gerçekleşme',d:'Vardiya hedefine göre gerçekleşme yüzdesi',v:'pct',u:'%',by:['m','day','sh']},
+  {k:'kamera',n:'Kamera hataları',d:'C. Mixup, P. Mixup ve adet hataları',v:'errs',u:'koli',by:['m','day','sh','customer','artikel','code']},
+  {k:'bozuk',n:'Pakon bozuk',d:'Pakon formundaki uygun olmayan ürün',v:'bad',u:'etiket',by:['reason','m','day','sh','customer']},
+  {k:'durus',n:'Duruşlar',d:'Duruş süresi ve sayısı, nedene göre',v:'stopMin',u:'dk',by:['reason','m','day','sh']},
+  {k:'siparis',n:'Sipariş durumu',d:'SD bazında paketlenen, bakiye ve termin',v:null,by:[]}];
+const BYL={m:'Makine',day:'Gün',sh:'Vardiya',customer:'Müşteri',artikel:'Artikel',code:'Hata kodu',reason:'Neden'};
+const PERIODS=[['today','Bugün'],['yday','Dün'],['d7','Son 7 gün']];
+const k2ts=k=>{const [y,m,d]=k.split('-').map(Number);return Date.UTC(y,m-1,d,8)-IST};
+const prodDayKey=ts=>dayKey(dayStart(ts));
+function quickRange(p){const t=dayStart(Date.now());return p==='today'?[t,t]:p==='yday'?[t-DAY,t-DAY]:[t-6*DAY,t]}
+const allFacts=()=>[...(S.hist||[]),...factsToday()];
+function rangeFacts(F){const a=k2ts(F.from),b=k2ts(F.to);return allFacts().filter(x=>x.day>=a&&x.day<=b)}
+function prevRange(F){const a=k2ts(F.from),b=k2ts(F.to),n=Math.round((b-a)/DAY)+1;return allFacts().filter(x=>x.day>=a-n*DAY&&x.day<=b-n*DAY)}
+const rangeLabel=F=>F.from===F.to?DD(k2ts(F.from)):DD(k2ts(F.from))+' – '+DD(k2ts(F.to));
+const SHC=['#2fac66','#6fb0e1','#d9a900'];
+function gcol(groups,series,colors,fmt){
+  const W0=660,H0=250,B=30,T=24,gw=(W0-20)/groups.length,bw=gw*.72/series.length,max=Math.max(1,...groups.flatMap(g=>g.vals));
+  return `<svg class="chart" viewBox="0 0 ${W0} ${H0}" role="img" aria-label="Vardiya adetleri grafiği"><line x1="10" x2="${W0-10}" y1="${H0-B}" y2="${H0-B}" stroke="var(--line)"/>${groups.map((g,i)=>{const x0=10+i*gw+gw*.14;
+    return g.vals.map((v,j)=>{const hh=Math.max(v?2:0,(H0-B-T)*v/max),x=x0+j*bw,y=H0-B-hh;return `<rect x="${x+1}" y="${y}" width="${bw-3}" height="${hh}" rx="3" fill="${colors[j]}"/><text class="val" x="${x+bw/2}" y="${y-5}" text-anchor="middle" style="font-size:10.5px">${fmt(v)}</text>`}).join('')+`<text class="lbl" x="${x0+bw*series.length/2}" y="${H0-10}" text-anchor="middle">${esc(g.k)}</text>`}).join('')}</svg>
+  <div class="legend">${series.map((n,j)=>`<span><i style="background:${colors[j]}"></i>${esc(n)}</span>`).join('')}</div>`;
+}
+function stackbar(rows,keys,labels,colors){
+  const W0=640,L=110,R=110,rh=32,h=rows.length*rh+10,max=Math.max(1,...rows.map(r=>keys.reduce((a,k)=>a+r[k],0)));
+  return `<svg class="chart" viewBox="0 0 ${W0} ${h}" role="img" aria-label="Kalite hataları grafiği">${rows.map((r,i)=>{let x=L;const y=i*rh+6,tot=keys.reduce((a,k)=>a+r[k],0);
+    return `<text class="lbl" x="${L-10}" y="${y+15}" text-anchor="end">${esc(r.k)}</text>`+keys.map((k,j)=>{const w=(W0-L-R)*r[k]/max;const o=`<rect x="${x}" y="${y}" width="${w}" height="20" fill="${colors[j]}"/>`;x+=w;return o}).join('')+`<text class="val" x="${x+8}" y="${y+15}">${N(tot)} koli · %${P1(r.errRate)}</text>`}).join('')}</svg>
+  <div class="legend">${labels.map((n,j)=>`<span><i style="background:${colors[j]}"></i>${esc(n)}</span>`).join('')}</div>`;
+}
+function dashBody(F,facts){
+  const fs=facts.filter(x=>(F.c==='all'||x.customer===F.c)),ms=S.machines.filter(m=>F.m==='all'||m.id===F.m);
+  const rows=ms.map(m=>{const xs=fs.filter(x=>x.m===m.id),r={k:m.name,m:m.id,sh:[0,0,0],prod:0,target:0,bad:0,koli:0,errs:0,CMIX:0,PMIX:0,QTY:0,stopMin:0};
+    xs.forEach(x=>{r.sh[x.sh]+=x.prod;r.prod+=x.prod;r.target+=x.target;r.bad+=x.bad;r.koli+=x.koli;S.errorCodes.forEach(c=>{r[c.code]+=x.err[c.code]||0;r.errs+=x.err[c.code]||0});x.stops.forEach(s=>r.stopMin+=s.min)});
+    r.pct=r.target?r.prod/r.target*100:0;r.badRate=r.prod?r.bad/r.prod*100:0;r.errRate=r.koli?r.errs/r.koli*100:0;return r});
+  const T={prod:0,target:0,bad:0,koli:0,errs:0};rows.forEach(r=>Object.keys(T).forEach(k=>T[k]+=r[k]));
+  const best=[...rows].sort((a,b)=>b.prod-a.prod)[0],fmtM=v=>v>=1e6?P1(v/1e6)+' M':v>=1e3?Math.round(v/1000)+' B':String(v);
+  U.repExport={name:'bitirme_karsilastirma_'+F.from+'_'+F.to,head:['Makine','1. vardiya','2. vardiya','3. vardiya','Toplam','Hedef %','Bozuk (fire)','Fire %','Kontrol edilen koli','Hatalı koli','C. Mixup','P. Mixup','Adet hatası','Hata %','Duruş dk'],
+    rows:rows.map(r=>[r.k,...r.sh,r.prod,P1(r.pct),r.bad,(r.badRate).toFixed(2).replace('.',','),r.koli,r.errs,r.CMIX,r.PMIX,r.QTY,P1(r.errRate),r.stopMin])};
+  return `<div class="strip">${kpi('Paketlenen etiket',N(T.prod),'',`Hedef gerçekleşme %${P1(T.target?T.prod/T.target*100:0)}`)}${kpi('Fire oranı','%'+(T.prod?(T.bad/T.prod*100):0).toFixed(2).replace('.',','),'var(--bad)',N(T.bad)+' bozuk etiket')}${kpi('Kalite hata oranı','%'+P1(T.koli?T.errs/T.koli*100:0),'var(--bad)',N(T.errs)+' hatalı koli / '+N(T.koli))}${kpi('En çok üreten',best&&best.prod?esc(best.k):'—','var(--ok)',best&&best.prod?N(best.prod)+' etiket':'')}</div>
+  <section class="panel"><div><span class="label">Vardiya adetleri · ${esc(rangeLabel(F))}</span><h2>Bitirme makinelerinde vardiya bazında üretim</h2></div>
+    ${gcol(rows.map(r=>({k:r.k,vals:r.sh})),S.shifts.map(s=>s.n+' '+s.s+'–'+s.e),SHC,fmtM)}</section>
+  <div class="cols2"><section class="panel"><div><span class="label">Pakon bozuk / paketlenen</span><h2>Fire oranı</h2></div>
+    ${hbar(rows.map(r=>({k:r.k,v:Math.round(r.badRate*100)/100})),'v','%')}<p class="hint" style="margin:0">Fire, Pakon üretim takip formundaki bozuk etiketlerin paketlenen etikete oranıdır.</p></section>
+  <section class="panel"><div><span class="label">Kamera · hata koduna göre</span><h2>Kalite hataları</h2></div>
+    ${stackbar(rows,S.errorCodes.map(c=>c.code),S.errorCodes.map(c=>c.label),['#cf3b3b','#e8875c','#d9a900'])}</section></div>
+  <section class="panel"><h2>Bitirme 1–5 karşılaştırma tablosu</h2>${table([['Makine',r=>`<a href="#makine-${r.m}"><b>${esc(r.k)}</b></a>`,''],...S.shifts.map((s,i)=>[s.n,r=>`<span class="num">${N(r.sh[i])}</span>`,'r']),['Toplam',r=>`<b class="num">${N(r.prod)}</b>`,'r'],['Hedef',r=>`<span class="num ${r.pct>=100?'delta-up':'delta-down'}">%${P1(r.pct)}</span>`,'r'],['Fire',r=>`<span class="num">${N(r.bad)} · %${r.badRate.toFixed(2).replace('.',',')}</span>`,'r'],['Hatalı koli',r=>`<span class="num">${N(r.errs)} / ${N(r.koli)}</span>`,'r'],...S.errorCodes.map(c=>[c.label,r=>`<span class="num">${N(r[c.code])}</span>`,'r']),['Hata oranı',r=>`<span class="num">%${P1(r.errRate)}</span>`,'r'],['Duruş',r=>`<span class="num">${dur(r.stopMin)}</span>`,'r']],rows)}</section>`;
+}
+function factsToday(){
+  const now=Date.now(),ds=dayStart(now),ci=slotOf(now),out=[];
+  S.machines.forEach(m=>{const sl=slotData(m);
+    for(let sh=0;sh<=Math.min(2,Math.floor(ci/4));sh++){const a=ds+sh*8*H,b=a+8*H,el=Math.min(1,(now-a)/(8*H));
+      const prod=sl.slice(sh*4,sh*4+4).filter(x=>x.i<=ci).reduce((t,x)=>t+x.prod,0);
+      const os=Object.values(S.orders).filter(o=>o.machine===m.id||(o.boxes.length&&o.boxes.some(x=>x.live)&&o.kop&&o.kop.live&&o.machine===m.id));
+      const bx=[];os.forEach(o=>o.boxes.forEach(x=>{if(x.ts>=a&&x.ts<b)bx.push({o,x})}));
+      const e={CMIX:0,PMIX:0,QTY:0};bx.forEach(({x})=>{if(x.result!=='OK')e[x.result]++});
+      const cnt={};bx.forEach(({o})=>cnt[o.id]=(cnt[o.id]||0)+1);const top=Object.entries(cnt).sort((p,q)=>q[1]-p[1])[0];const o=top?W(top[0]):(m.current?W(m.current):null);
+      const rs={};let bad=0;Object.values(S.orders).forEach(w=>{if(w.pakon&&w.pakon.masa===m.masa&&w.pakon.ts>=a&&w.pakon.ts<b){Object.entries(w.pakon.reasons).forEach(([k,v])=>{rs[k]=(rs[k]||0)+v;bad+=v})}});
+      const stops=(S.stopLog||[]).filter(x=>x.m===m.id&&x.s<b&&(x.e||now)>a).map(x=>({r:x.r,min:Math.round((Math.min(x.e||now,b)-Math.max(x.s,a))/MIN)}));
+      const setup=Object.values(S.orders).filter(w=>w.machine===m.id&&w.startedAt>=a&&w.startedAt<b).length;
+      out.push({day:ds,sh,m:m.id,sd:o?o.id:'—',customer:o?o.customer:'—',artikel:o?o.artikel:'—',prod,koli:bx.length,err:e,bad,reasons:rs,stops,setup,target:Math.round(S.rules.slotTarget*4*el)})}});
+  return out;
+}
+function factsFor(per,shift){const now=Date.now(),ds=dayStart(now);let f=[...(S.hist||[]),...factsToday()];
+  const from=per==='today'?ds:per==='yday'?ds-DAY:ds-6*DAY,to=per==='yday'?ds:ds+DAY;return f.filter(x=>x.day>=from&&x.day<to)}
+function prevFacts(per){const now=Date.now(),ds=dayStart(now),all=[...(S.hist||[]),...factsToday()];
+  if(per==='today')return all.filter(x=>x.day===ds-DAY);if(per==='yday')return all.filter(x=>x.day===ds-2*DAY);return all.filter(x=>x.day<ds-6*DAY)}
+function aggregate(rep,facts,by){
+  const F=U.rf,fs=facts.filter(x=>(F.m==='all'||x.m===F.m)&&(F.sh==='all'||x.sh===+F.sh)&&(F.c==='all'||x.customer===F.c));
+  const g={},key=(x,extra)=>by==='m'?mName(x.m):by==='day'?D(x.day):by==='sh'?S.shifts[x.sh].n:by==='customer'?x.customer:by==='artikel'?x.artikel:extra;
+  const add=(k,o)=>{const r=g[k]=g[k]||{k,prod:0,koli:0,target:0,errs:0,CMIX:0,PMIX:0,QTY:0,bad:0,stopMin:0,stopN:0,setup:0,_ord:o};return r};
+  fs.forEach(x=>{
+    if(by==='code'){S.errorCodes.forEach(c=>{const r=add(c.label,c.code);r.errs+=x.err[c.code]||0;r.koli+=0})}
+    else if(by==='reason'){
+      if(rep.k==='bozuk')Object.entries(x.reasons).forEach(([k,v])=>{const r=add(k);r.bad+=v});
+      else x.stops.forEach(s=>{const r=add(s.r);r.stopMin+=s.min;r.stopN++});
+    } else {const r=add(key(x),by==='day'?x.day:by==='sh'?x.sh:null);r.prod+=x.prod;r.koli+=x.koli;r.target+=x.target;r.setup+=x.setup;
+      S.errorCodes.forEach(c=>{r[c.code]+=x.err[c.code]||0;r.errs+=x.err[c.code]||0});r.bad+=x.bad;x.stops.forEach(s=>{r.stopMin+=s.min;r.stopN++})}});
+  const rows=Object.values(g);rows.forEach(r=>{r.pct=r.target?Math.round(r.prod/r.target*1000)/10:0;r.errRate=r.koli?Math.round(r.errs/r.koli*1000)/10:0;r.badRate=r.prod?Math.round(r.bad/r.prod*10000)/100:0});
+  if(by==='day'||by==='sh')rows.sort((a,b)=>a._ord-b._ord);else rows.sort((a,b)=>b[rep.v]-a[rep.v]);
+  const tot={k:'Toplam',prod:0,koli:0,target:0,errs:0,CMIX:0,PMIX:0,QTY:0,bad:0,stopMin:0,stopN:0,setup:0};
+  if(by==='code'||by==='reason'){rows.forEach(r=>['errs','bad','stopMin','stopN'].forEach(k=>tot[k]+=r[k]))}
+  fs.forEach(x=>{if(by!=='code'&&by!=='reason'){tot.prod+=x.prod;tot.koli+=x.koli;tot.target+=x.target;tot.setup+=x.setup;S.errorCodes.forEach(c=>{tot[c.code]+=x.err[c.code]||0;tot.errs+=x.err[c.code]||0});tot.bad+=x.bad;x.stops.forEach(s=>{tot.stopMin+=s.min;tot.stopN++})}else{tot.prod+=x.prod;tot.koli+=x.koli;tot.target+=x.target}});
+  tot.pct=tot.target?Math.round(tot.prod/tot.target*1000)/10:0;tot.errRate=tot.koli?Math.round(tot.errs/tot.koli*1000)/10:0;tot.badRate=tot.prod?Math.round(tot.bad/tot.prod*10000)/100:0;
+  return {rows,tot};
+}
+function hbar(rows,v,u,good){
+  if(!rows.length)return '';const W0=640,L=170,R=90,rh=30,h=rows.length*rh+10,max=Math.max(1,...rows.map(r=>r[v]));
+  return `<svg class="chart" viewBox="0 0 ${W0} ${h}" role="img" aria-label="Grafik">${rows.map((r,i)=>{const w=Math.max(2,(W0-L-R)*r[v]/max),y=i*rh+6;
+    const col=good?(r[v]>=100?'var(--ok)':'var(--bad)'):'var(--brand)';
+    return `<text class="lbl" x="${L-10}" y="${y+15}" text-anchor="end">${esc(String(r.k).slice(0,24))}</text><rect x="${L}" y="${y}" width="${w}" height="20" rx="4" fill="${col}"/><text class="val" x="${L+w+8}" y="${y+15}">${u==='%'?'%'+P1(r[v]):N(r[v])}</text>`}).join('')}
+    ${good?`<line x1="${L+(W0-L-R)*100/max}" x2="${L+(W0-L-R)*100/max}" y1="0" y2="${h}" stroke="var(--fg)" stroke-dasharray="4 4" opacity=".5"/><text x="${L+(W0-L-R)*100/max+4}" y="${h-2}">hedef %100</text>`:''}</svg>`;
+}
+function vcol(rows,v,u){
+  if(!rows.length)return '';const W0=640,H0=220,B=28,T=22,n=rows.length,cw=(W0-20)/n,max=Math.max(1,...rows.map(r=>r[v]));
+  return `<svg class="chart" viewBox="0 0 ${W0} ${H0}" role="img" aria-label="Günlük grafik"><line x1="10" x2="${W0-10}" y1="${H0-B}" y2="${H0-B}" stroke="var(--line)"/>${rows.map((r,i)=>{const hh=Math.max(2,(H0-B-T)*r[v]/max),x=10+i*cw+cw*.18,w=cw*.64,y=H0-B-hh;
+    return `<rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="4" fill="var(--brand)"/><text class="val" x="${x+w/2}" y="${y-6}" text-anchor="middle">${u==='%'?'%'+P1(r[v]):r[v]>=1e6?P1(r[v]/1e6)+' M':r[v]>=1e4?Math.round(r[v]/1000)+' B':N(r[v])}</text><text x="${x+w/2}" y="${H0-9}" text-anchor="middle">${esc(r.k)}</text>`}).join('')}</svg>`;
+}
+function repCols(rep,by){
+  const f=(k,l,fmt,cls)=>[l,r=>fmt?fmt(r[k]):`<span class="num">${N(r[k])}</span>`,cls||'r'];
+  const pc=v=>`<span class="num">%${P1(v)}</span>`;
+  if(rep.k==='uretim')return [f('prod','Paketlenen etiket'),f('koli','Koli'),f('setup','İş değişimi'),f('pct','Hedef gerçekleşme',pc)];
+  if(rep.k==='hedef')return [f('prod','Üretilen'),f('target','Hedef'),['Fark',r=>`<span class="num ${r.prod>=r.target?'delta-up':'delta-down'}">${r.prod>=r.target?'+':''}${N(r.prod-r.target)}</span>`,'r'],f('pct','Gerçekleşme',pc)];
+  if(rep.k==='kamera')return by==='code'?[f('errs','Hatalı koli')]:[f('koli','Kontrol edilen koli'),...S.errorCodes.map(c=>f(c.code,c.label)),f('errs','Hatalı koli'),f('errRate','Hata oranı',pc)];
+  if(rep.k==='bozuk')return by==='reason'?[f('bad','Bozuk etiket')]:[f('prod','Paketlenen'),f('bad','Bozuk etiket'),f('badRate','Bozuk oranı',v=>`<span class="num">%${String(v).replace('.',',')}</span>`)];
+  if(rep.k==='durus')return [f('stopN','Duruş sayısı'),f('stopMin','Toplam süre (dk)'),['Ortalama (dk)',r=>`<span class="num">${r.stopN?Math.round(r.stopMin/r.stopN):0}</span>`,'r']];
+  return [];
+}
+function viewReports(){
+  const F=U.rf=U.rf||(()=>{const q=quickRange('d7');return {r:'pano',from:prodDayKey(q[0]),to:prodDayKey(q[1]),m:'all',sh:'all',c:'all',by:'m',cmp:false}})();
+  const minK=prodDayKey(dayStart(Date.now())-6*DAY),maxK=prodDayKey(Date.now());if(F.from>F.to)F.to=F.from;
+  const rep=REPORTS.find(x=>x.k===F.r);if(rep.by.length&&!rep.by.includes(F.by))F.by=rep.by[0];
+  const custs=[...new Set([...(S.hist||[]).map(x=>x.customer),...Object.values(S.orders).map(o=>o.customer)])].sort();
+  const list=`<div class="replist">${REPORTS.map(x=>`<button class="${x.k===F.r?'on':''}" data-act="repSel" data-v="${x.k}"><b>${x.n}</b><small>${x.d}</small></button>`).join('')}</div>`;
+  const qk=PERIODS.find(p=>{const q=quickRange(p[0]);return prodDayKey(q[0])===F.from&&prodDayKey(q[1])===F.to});
+  const filters=`<div class="filters">${fld('Tarih',`<div class="seg">${PERIODS.map(p=>`<button class="${qk&&qk[0]===p[0]?'on':''}" data-act="repQuick" data-v="${p[0]}">${p[1]}</button>`).join('')}</div>`)}${fld('Başlangıç',`<input class="input" type="date" data-rf="from" min="${minK}" max="${maxK}" value="${F.from}">`)}${fld('Bitiş',`<input class="input" type="date" data-rf="to" min="${minK}" max="${maxK}" value="${F.to}">`)}${fld('Makine',`<select class="input" data-rf="m">${opts([['all','Bütün Bitirme makineleri'],...S.machines.map(m=>[m.id,m.name])],F.m)}</select>`)}${F.r==='pano'?'':fld('Vardiya',`<select class="input" data-rf="sh">${opts([['all','Bütün vardiyalar'],...S.shifts.map((s,i)=>[i,s.n+' · '+s.s+'–'+s.e])],F.sh)}</select>`)}${fld('Müşteri',`<select class="input" data-rf="c">${opts([['all','Bütün müşteriler'],...custs],F.c)}</select>`)}${rep.by.length?fld('Kırılım',`<select class="input" data-rf="by">${opts(rep.by.map(b=>[b,BYL[b]]),F.by)}</select>`):''}</div>`;
+  let body;
+  if(rep.k==='pano'){body=dashBody(F,rangeFacts(F))}
+  else if(rep.k==='siparis'){
+    const os=Object.values(S.orders).filter(o=>(F.m==='all'||o.machine===F.m)&&(F.c==='all'||o.customer===F.c)).sort((a,b)=>a.due-b.due);
+    const st=o=>o.status==='bitti'?'<span class="pill st-run">Bitti</span>':o.status==='calisiyor'?'<span class="pill st-info">Çalışıyor</span>':o.status==='sirada'?'<span class="pill st-idle">Sırada</span>':'<span class="pill st-warn">Havuzda</span>';
+    const late=os.filter(o=>o.status!=='bitti'&&dayKey(o.due)<dayKey(Date.now())).length,tot=os.reduce((a,o)=>a+o.qty,0),pk=os.reduce((a,o)=>a+produced(o),0);
+    U.repExport={name:'siparis_durumu',head:['SD','SOB','Müşteri','Artikel','Stok adı','Sipariş','Paketlenen','Bakiye','Durum','Makine','Termin'],rows:os.map(o=>[o.id,o.sob,o.customer,o.artikel,o.name,o.qty,produced(o),produced(o)-o.qty,o.status,o.machine?mName(o.machine):'',DD(o.due)])};
+    body=`<div class="strip">${kpi('Sipariş',os.length)}${kpi('Sipariş edilen etiket',N(tot))}${kpi('Paketlenen',N(pk),'var(--ok)','%'+P1(tot?pk/tot*100:0))}${kpi('Termini geçmiş açık',late,late?'var(--bad)':'')}</div>
+    <section class="panel">${table([['SD',o=>`<b class="mono">${o.id}</b><br><span class="small muted">${esc(o.sob)}</span>`],['Müşteri · Artikel',o=>`${esc(o.customer)}<br><span class="mono small muted">${esc(o.artikel)}</span>`],['Sipariş',o=>`<span class="num">${N(o.qty)}</span>`,'r'],['Paketlenen',o=>`<div style="display:grid;gap:4px;min-width:140px"><span class="num">${N(produced(o))} · %${P1(Math.min(999,pct(o)))}</span><div class="bar"><span style="width:${Math.min(100,pct(o))}%"></span></div></div>`],['Bakiye',o=>{const b=produced(o)-o.qty;return `<span class="num ${b>=0?'delta-up':'delta-down'}">${b>0?'+':''}${N(b)}</span>`},'r'],['Durum',o=>st(o)],['Makine',o=>esc(o.machine?mName(o.machine):'—')],['Termin',o=>o.status!=='bitti'&&dayKey(o.due)<dayKey(Date.now())?`<span class="chip c-bad">${D(o.due)}</span>`:D(o.due)]],os)}</section>`;
+  } else {
+    const facts=rangeFacts(F),{rows,tot}=aggregate(rep,facts,F.by),prev=F.cmp?aggregate(rep,prevRange(F),F.by):null;
+    const v=rep.k==='hedef'?'pct':rep.v;
+    const k1=rep.k==='uretim'?[['Paketlenen etiket',N(tot.prod)],['Koli',N(tot.koli)],['Hedef gerçekleşme','%'+P1(tot.pct)],['İş değişimi',N(tot.setup)]]
+      :rep.k==='hedef'?[['Üretilen',N(tot.prod)],['Hedef',N(tot.target)],['Gerçekleşme','%'+P1(tot.pct)],['Fark',(tot.prod>=tot.target?'+':'')+N(tot.prod-tot.target)]]
+      :rep.k==='kamera'?[['Kontrol edilen koli',N(tot.koli)],['Hatalı koli',N(tot.errs)],['Hata oranı','%'+P1(tot.errRate)],['En sık',(()=>{const c=S.errorCodes.map(c=>[c.label,tot[c.code]]).sort((a,b)=>b[1]-a[1])[0];return c&&c[1]?c[0]:'—'})()]]
+      :rep.k==='bozuk'?[['Paketlenen',N(tot.prod)],['Bozuk etiket',N(tot.bad)],['Bozuk oranı','%'+String(tot.badRate).replace('.',',')],['En sık neden',(()=>{const r={};facts.forEach(x=>Object.entries(x.reasons).forEach(([k,v])=>r[k]=(r[k]||0)+v));const t=Object.entries(r).sort((a,b)=>b[1]-a[1])[0];return t?t[0]:'—'})()]]
+      :[['Duruş sayısı',N(tot.stopN)],['Toplam süre',dur(tot.stopMin)],['Ortalama',(tot.stopN?Math.round(tot.stopMin/tot.stopN):0)+' dk'],['En uzun neden',(()=>{const r={};facts.forEach(x=>x.stops.forEach(s=>r[s.r]=(r[s.r]||0)+s.min));const t=Object.entries(r).sort((a,b)=>b[1]-a[1])[0];return t?t[0]:'—'})()]];
+    const pv=prev?prev.tot:null,keyV={uretim:'prod',hedef:'pct',kamera:'errs',bozuk:'bad',durus:'stopMin'}[rep.k],higherBetter=rep.k==='uretim'||rep.k==='hedef';
+    const delta=pv?(()=>{const a=tot[keyV],b=pv[keyV];if(!b)return '<small>Önceki dönemde veri yok</small>';const d=Math.round((a-b)/b*1000)/10,good=higherBetter?d>=0:d<=0;return `<small class="${good?'delta-up':'delta-down'}">${d>0?'+':''}${P1(d)}% önceki döneme göre</small>`})():'';
+    const cols=repCols(rep,F.by),prevMap=prev?Object.fromEntries(prev.rows.map(r=>[r.k,r])):{};
+    const allCols=[[BYL[F.by],r=>`<b>${esc(r.k)}</b>`,''],...cols,...(prev?[['Önceki dönem',r=>{const p=prevMap[r.k];if(!p)return '<span class="muted">—</span>';const a=r[v],b=p[v];const d=b?Math.round((a-b)/b*1000)/10:0,good=higherBetter?d>=0:d<=0;return `<span class="num">${v==='pct'?'%'+P1(b):N(b)}</span> <span class="small ${good?'delta-up':'delta-down'}">${d>0?'+':''}${P1(d)}%</span>`},'r']]:[])];
+    const totRow=Object.assign({},tot,{k:'Toplam',_cls:'tot'});
+    U.repExport={name:rep.k+'_'+F.by+'_'+F.per,head:[BYL[F.by],...cols.map(c=>c[0].replace(/<[^>]+>/g,''))],rows:[...rows,tot].map(r=>[r.k,...cols.map(c=>c[1](r).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim())])};
+    body=`<div class="strip">${k1.map((x,i)=>kpi(x[0],esc(x[1]),i===2&&rep.k!=='durus'?(rep.k==='uretim'||rep.k==='hedef'?(tot.pct>=100?'var(--ok)':'var(--bad)'):'var(--bad)'):'',i===0?delta:'')).join('')}</div>
+    <section class="panel"><div class="panel-h"><div><span class="label">${esc(rep.n)} · ${esc(rangeLabel(F))} · ${esc(BYL[F.by])} kırılımı</span><h2>${esc(rep.n)} ${esc(BYL[F.by]).toLocaleLowerCase('tr')} bazında</h2></div></div>
+      ${rows.length?(F.by==='day'?vcol(rows,v,rep.k==='hedef'?'%':rep.u):hbar(rows.slice(0,12),v,rep.k==='hedef'?'%':rep.u,rep.k==='hedef')):''}
+      ${table(allCols,rows.length?[...rows,totRow]:[],'Seçilen filtrelerde veri yok.')}</section>`;
+  }
+  return `<div class="head"><div><div class="crumb"><span>Analiz</span></div><h1>Raporlar</h1><p>Rapor seçin, filtreleyin, kırılımı değiştirin. Bugünün verisi canlı; geçmiş 6 gün örnek veridir.</p></div>
+    <div class="btns">${F.r!=='siparis'&&F.r!=='pano'?`<label class="toggle" style="padding:8px 12px"><span>Önceki dönemle karşılaştır</span><input type="checkbox" data-rf="cmp" ${F.cmp?'checked':''}></label>`:''}<button class="btn" data-act="repCsv">↓ CSV indir</button></div></div>
+  <div class="rep">${list}<div style="display:grid;gap:18px;min-width:0">${filters}${body}</div></div>`;
+}
+function exportCsv(){
+  const x=U.repExport;if(!x)return;const q=v=>{const s=String(v??'');return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+  const csv='﻿'+[x.head,...x.rows].map(r=>r.map(q).join(';')).join('\n');
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='korsini_'+x.name+'_'+dayKey(Date.now())+'.csv';document.body.appendChild(a);a.click();a.remove();toast('CSV indiriliyor · '+x.rows.length+' satır')}catch(e){toast('Bu görünümde indirme kapalı. GitHub sayfasından indirebilirsiniz.',true)}
+}
+
 /* ---------- kalite ---------- */
 function allBoxes(){const out=[];Object.values(S.orders).forEach(o=>o.boxes.forEach(b=>out.push({o,b})));return out}
 function viewQuality(){
@@ -838,9 +1003,9 @@ document.addEventListener('click',e=>{
     case 'goStart':render();setTimeout(()=>{const x=document.getElementById('start-'+m.id);x&&x.scrollIntoView({behavior:'smooth',block:'start'})},30);break;
     case 'goFin':U.tab['m-'+m.id]='fin';render();setTimeout(()=>{const x=document.getElementById('right-'+m.id);x&&x.scrollIntoView({behavior:'smooth',block:'start'})},30);break;
     case 'stopcancel':U.stopPick[m.id]=false;render();break;
-    case 'stop':{const rs=S.stopReasons.find(x=>x.n===el.dataset.r);m.status='stop';m.stopReason=el.dataset.r;m.stopSince=Date.now();U.stopPick[m.id]=false;audit('Duruş',m.name+' · '+el.dataset.r);
+    case 'stop':{const rs=S.stopReasons.find(x=>x.n===el.dataset.r);m.status='stop';m.stopReason=el.dataset.r;m.stopSince=Date.now();(S.stopLog=S.stopLog||[]).push({m:m.id,r:el.dataset.r,s:Date.now(),e:null});U.stopPick[m.id]=false;audit('Duruş',m.name+' · '+el.dataset.r);
       let msg=m.name+' durdu · '+el.dataset.r;if(rs&&rs.maint){const b=openBT(m.id,el.dataset.r,'Koparma makinesinde '+el.dataset.r+' nedeniyle duruş','Duruş kaydı');msg+=' · '+b.id+' açıldı'}save();render();toast(msg);break}
-    case 'resume':m.status='run';m.stopReason=null;m.stopSince=null;audit('Duruş bitti',m.name);save();render();toast(m.name+' çalışmaya devam ediyor');break;
+    case 'resume':(S.stopLog||[]).filter(x=>x.m===m.id&&!x.e).forEach(x=>x.e=Date.now());m.status='run';m.stopReason=null;m.stopSince=null;audit('Duruş bitti',m.name);save();render();toast(m.name+' çalışmaya devam ediyor');break;
     case 'filter':U.onlyErr[m.id]=el.dataset.v==='1';render();break;
     case 'review':U.review=el.dataset.k;render();setTimeout(()=>{const i=$('#note-input');i&&i.focus()},0);break;
     case 'reviewcancel':U.review=null;render();break;
@@ -854,6 +1019,9 @@ document.addEventListener('click',e=>{
     case 'up':case 'down':{const o=W(el.dataset.id),mm=M(o.machine),i=mm.queue.indexOf(o.id),j=a==='up'?i-1:i+1;if(j<0||j>=mm.queue.length)return;[mm.queue[i],mm.queue[j]]=[mm.queue[j],mm.queue[i]];save();render();break}
     case 'unassign':assign(el.dataset.id,'pool');break;
     case 'assignTo':assign(el.dataset.id,el.dataset.m);break;
+    case 'repSel':U.rf.r=el.dataset.v;render();break;
+    case 'repCsv':exportCsv();break;
+    case 'repQuick':{const q=quickRange(el.dataset.v);U.rf.from=prodDayKey(q[0]);U.rf.to=prodDayKey(q[1]);render();break}
     case 'repSend':S.reports.push({key:el.dataset.k,ts:Date.now(),by:me()});audit('Vardiya sayı raporu teslim edildi',el.dataset.k);notify('Vardiya sayı raporu teslim edildi',el.dataset.k.replace(/\|/g,' · '),['lider','yonetici']);persist();render();toast('Rapor paketleme şefine teslim edildi');break;
     case 'ncrStart':{const n=S.ncrs.find(x=>x.id===el.dataset.id);n.status='İncelemede';audit('Uygunsuzluk incelemeye alındı',n.id);save();render();break}
     case 'btStart':{const b=S.maint.find(x=>x.id===el.dataset.id);b.status='Müdahalede';b.startedAt=Date.now();audit('Bakım müdahalesi başladı',b.id);save();render();toast(b.id+' müdahalede');break}
@@ -880,6 +1048,7 @@ document.addEventListener('change',e=>{const t=e.target,d=t.dataset;
   else if(d.fin&&t.tagName==='SELECT'){const m=M(d.m),f=finState(m,W(m.current));f[d.fin]=t.value;refreshFin(m)}
   else if(d.fr){const m=M(d.m);render()}
   else if(d.rep){U.rep[d.rep]=d.rep==='m'?t.value:+t.value;render()}
+  else if(d.rf){U.rf[d.rf]=d.rf==='cmp'?t.checked:t.value;render()}
   else if(d.slotnote){const [mid,i]=d.slotnote.split(':');rollBoard();S.board[mid].slots[+i].note=t.value.trim();audit('Pano notu',mName(mid)+' · '+slotLabel(+i)+' · '+t.value.trim());persist();toast('Not kaydedildi')}
   else if(d.autoon){const a=S.autos.find(x=>x.id==d.autoon);a.on=t.checked;audit(a.on?'Otomasyon açıldı':'Otomasyon kapatıldı',a.name);save();render();toast(a.name+(a.on?' açıldı':' kapatıldı'))}
   else if(d.rule){S.rules[d.rule]=t.checked;audit('İş kuralı',d.rule+' → '+(t.checked?'açık':'kapalı'));persist();toast('Kural güncellendi')}

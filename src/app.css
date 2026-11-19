@@ -446,3 +446,18 @@ tr.wrn td{background:var(--warn-bg)}
 .mpick span{font-size:12px;color:var(--muted);margin-right:2px}
 .mpick button{min-width:38px;min-height:32px;padding:0 8px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);cursor:pointer;font-weight:700;font-size:12.5px}
 .mpick button:hover{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+
+/* v10: raporlar */
+.rep{display:grid;grid-template-columns:250px minmax(0,1fr);gap:20px;align-items:start}
+.replist{display:grid;gap:6px;position:sticky;top:90px}
+.replist button{display:grid;gap:2px;text-align:left;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+.replist button b{font-size:14.5px}
+.replist button small{color:var(--muted);font-size:12.5px}
+.replist button.on{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--f-body);font-size:12px;fill:var(--muted)}
+.chart .val{fill:var(--fg);font-weight:700}
+.chart .lbl{fill:var(--fg)}
+.delta-up{color:var(--ok);font-weight:700}.delta-down{color:var(--bad);font-weight:700}
+tr.tot td{font-weight:700;background:var(--surface-2)}
+@media (max-width:1100px){.rep{grid-template-columns:1fr}.replist{position:static;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}}
