@@ -840,26 +840,34 @@ function koparmaForm(m,wo){
   ${KOP_CHECKS.some(c=>k.checks[c])?`<input class="input" data-kin="aciklama" data-m="${m.id}" placeholder="Açıklama, örn. 3 destede sakal var, kırmızı kasaya ayrıldı" value="${esc(k.aciklama)}" ${dis}>`:''}</div>
   <label class="toggle"><span><b>OÖK#3 karışma kontrolü:</b> Koparma sırasında dosya kokteyline göre her dizayn ayrı kasaya kondu; önceki işe ait tüm etiket ve evraklar temizlendi.</span><input type="checkbox" data-kchk="${m.id}" ${k.ook3?'checked':''} ${dis}></label></div>`;
 }
+function actionBar(m){
+  const wo=m.current&&W(m.current),cs=can('start'),cf=can('finish');
+  const why=(ok,t)=>ok?'':` title="${esc(t)}"`;
+  const stOk=cs&&!m.current&&m.queue.length,stWhy=!cs?'İşi koparma operatörü başlatır':m.current?'Makinede çalışan iş var; önce bitirilmeli':'Sırada iş yok, takım lideri atama yapmalı';
+  const sp=m.status==='stop'?`<button class="btn primary big" data-act="resume" data-m="${m.id}" ${cs?'':'disabled'}${why(cs,'Duruşu koparma operatörü bitirir')}>▶ Duruşu bitir</button>`
+    :`<button class="btn danger big" data-act="stoppick" data-m="${m.id}" ${cs&&m.status==='run'?'':'disabled'}${why(cs&&m.status==='run',!cs?'Duruşu koparma operatörü girer':'Çalışan iş yok')}>■ Duruş gir</button>`;
+  const fOk=cf&&!!wo,fWhy=!cf?'İşi Pakon operatörü bitirir':'Makinede çalışan iş yok';
+  const hint=!cs&&!cf?`Siz ${ROLES[user.role]} olarak bu ekranı görüntülüyorsunuz.`:!cs?'İşi başlatma ve duruş girme koparma operatörünün.':!cf?'İşi bitirme Pakon operatörünün.':'';
+  const picker=U.stopPick[m.id]&&m.status==='run'?`<div class="sub"><span class="label">Duruş nedeni seçin</span><div class="reasons">${S.stopReasons.map(r=>`<button data-act="stop" data-m="${m.id}" data-r="${esc(r.n)}">${esc(r.n)}${r.maint?'<small>Bakım talebi açılır</small>':''}</button>`).join('')}</div><button class="btn ghost sm" style="justify-self:start" data-act="stopcancel" data-m="${m.id}">Vazgeç</button></div>`:'';
+  return `<section class="panel"><div class="btns">
+    <button class="btn primary big" data-act="goStart" data-m="${m.id}" ${stOk?'':'disabled'}${why(stOk,stWhy)}>＋ İşi başlat</button>${sp}
+    <button class="btn dark big" data-act="goFin" data-m="${m.id}" ${fOk?'':'disabled'}${why(fOk,fWhy)}>✓ İşi bitir</button>
+    <span class="muted small" style="flex:1;min-width:200px">${m.status==='stop'?`<b style="color:var(--bad)">Duruş: ${esc(m.stopReason)} · <span data-since="${m.stopSince}">${dur(mins(m.stopSince))}</span></b>`:wo?`Çalışan iş: <b>SD ${wo.id}</b> · %${P1(Math.min(100,pct(wo)))}`:m.queue.length?`Sıradaki iş: <b>SD ${m.queue[0]}</b>`:'Makine boşta, sırada iş yok'}${hint?'<br>'+hint:''}</span></div>${picker}</section>`;
+}
 function viewMachine(m){
   const wo=m.current&&W(m.current);let cur;
   if(wo){
     cur=`<div class="bigjob"><span class="id">SD ${wo.id} · ${esc(wo.sob)}</span><b>${esc(wo.name)}</b><span class="muted">${esc(wo.customer)} · artikel <span class="mono">${esc(wo.artikel)}</span></span>${techTag(wo)}</div>
-    <dl class="kv"><dt>Başlangıç</dt><dd>${DT(wo.startedAt)}</dd><dt>Koparma</dt><dd>${esc(wo.kop?wo.kop.sekil:'—')} · kokteyl ${wo.kop?wo.kop.kokteyl:1}</dd><dt>Ambalaj</dt><dd class="num">${N(wo.perDeste)} etiket/deste · ${wo.desteKoli} deste/koli · ${N(perBox(wo))} etiket/koli</dd><dt>Teslim</dt><dd>${esc(wo.place)} · ${D(wo.due)}</dd>${wo.note?`<dt>Müşteri notu</dt><dd style="color:var(--bad);font-weight:600">${esc(wo.note)}</dd>`:''}</dl>
-    ${m.status==='stop'?`<div class="stopband">● Duruş · ${esc(m.stopReason)} · <span data-since="${m.stopSince}">${dur(mins(m.stopSince))}</span></div>`:''}
-    ${can('start')?(m.status==='run'
-      ?(U.stopPick[m.id]?`<div class="sub"><span class="label">Duruş nedeni seçin</span><div class="reasons">${S.stopReasons.map(r=>`<button data-act="stop" data-m="${m.id}" data-r="${esc(r.n)}">${esc(r.n)}${r.maint?'<small>Bakım talebi açılır</small>':''}</button>`).join('')}</div><button class="btn ghost sm" style="justify-self:start" data-act="stopcancel" data-m="${m.id}">Vazgeç</button></div>`
-        :`<div class="btns"><button class="btn danger big" data-act="stoppick" data-m="${m.id}">Durdur</button></div>`)
-      :`<div class="btns"><button class="btn primary big" data-act="resume" data-m="${m.id}">Devam et</button></div>`):''}`;
+    <dl class="kv"><dt>Başlangıç</dt><dd>${DT(wo.startedAt)}</dd><dt>Koparma</dt><dd>${esc(wo.kop?wo.kop.sekil:'—')} · kokteyl ${wo.kop?wo.kop.kokteyl:1}</dd><dt>Ambalaj</dt><dd class="num">${N(wo.perDeste)} etiket/deste · ${wo.desteKoli} deste/koli · ${N(perBox(wo))} etiket/koli</dd><dt>Teslim</dt><dd>${esc(wo.place)} · ${D(wo.due)}</dd>${wo.note?`<dt>Müşteri notu</dt><dd style="color:var(--bad);font-weight:600">${esc(wo.note)}</dd>`:''}</dl>`;
   }else cur='<div class="empty">Makinede çalışan iş yok.</div>';
   const sel=U.sel[m.id]&&m.queue.includes(U.sel[m.id])?U.sel[m.id]:m.queue[0],sw=sel&&W(sel);
-  const startBlock=m.queue.length?`
-    <div class="qlist">${m.queue.map((id,i)=>{const o=W(id);return `<button class="qitem ${id===sel?'sel':''}" data-act="sel" data-m="${m.id}" data-id="${id}"><span class="ord">${i+1}.</span><span class="t"><b>${esc(o.name)}</b><span><span class="mono">SD ${o.id} · ${esc(o.artikel)}</span> · ${esc(o.customer)} · ${N(o.qty)} etiket · termin ${D(o.due)}${o.upstream&&!o.upstream.ack?' · <b style="color:var(--warn)">önceki proses uyarısı</b>':''}</span></span></button>`}).join('')}</div>
-    ${sw?koparmaForm(m,sw):''}
-    ${can('start')?`<div id="rules-${m.id}">${startRulesBlock(m,sel)}</div>`:'<p class="muted" style="margin:0">İşi koparma operatörü başlatır.</p>'}`
-    :`<div class="empty">Bu makinenin sırasında iş yok.${can('plan')?' <a href="#planlama">Planlamadan iş atayın.</a>':''}</div>`;
-  const left=`<section class="panel"><div class="panel-h"><div><span class="label">Koparma makinesi</span><h2>Çalışan iş</h2></div></div>${cur}${machineFlags(m)}
-    <div class="sub"><div><span class="label">Koparma makinesi</span><h2>Sıradaki işi başlat</h2></div>${startBlock}</div></section>`;
-  const t=tabs('m-'+m.id,[['cam','Kamera sonuçları'],['board','2 saatlik pano'],['fin','Pakon formu ve bitir']],'cam');
+  const qlist=`<div class="qlist">${m.queue.map((id,i)=>{const o=W(id);return `<button class="qitem ${id===sel&&!m.current?'sel':''}" data-act="sel" data-m="${m.id}" data-id="${id}"><span class="ord">${i+1}.</span><span class="t"><b>${esc(o.name)}</b><span><span class="mono">SD ${o.id} · ${esc(o.artikel)}</span> · ${esc(o.customer)} · ${N(o.qty)} etiket · termin ${D(o.due)}${o.upstream&&!o.upstream.ack?' · <b style="color:var(--warn)">önceki proses uyarısı</b>':''}</span></span></button>`}).join('')}</div>`;
+  let lower;
+  if(!m.queue.length)lower=`<div><span class="label">Sıradaki işler</span><h2>Sırada iş yok</h2></div><div class="empty">Takım lideri planlamadan bu makineye iş atayınca burada görünür.${can('plan')?' <a href="#planlama">Planlamaya git</a>':''}</div>`;
+  else if(m.current)lower=`<div><span class="label">Sıradaki işler</span><h2>${m.queue.length} iş sırada</h2></div>${qlist}<p class="muted small" style="margin:0">Çalışan iş Pakon formuyla bitince sıradaki işin koparma formu açılır.</p>`;
+  else lower=`<div id="start-${m.id}"><span class="label">Form-181 · Koparma makinesi</span><h2>İşi başlat</h2></div>${qlist}${sw?koparmaForm(m,sw):''}${can('start')?`<div id="rules-${m.id}">${startRulesBlock(m,sel)}</div>`:'<p class="muted" style="margin:0">İşi koparma operatörü başlatır.</p>'}`;
+  const left=`<section class="panel"><div class="panel-h"><div><span class="label">Koparma makinesi</span><h2>Çalışan iş</h2></div></div>${cur}${machineFlags(m)}<div class="sub">${lower}</div></section>`;
+  const t=tabs('m-'+m.id,[['cam','Kamera sonuçları'],['fin','Pakon formu ve bitir'],['board','2 saatlik pano']],'cam');
   let right;
   if(t.cur==='board')right=boardPanel(m);
   else if(!wo)right=`<div class="empty">Makinede çalışan iş yok. Koparmada bir iş başlayınca kamera ${esc(m.camera)} adresinden sipariş bazında sorgulanır.</div>`;
@@ -867,7 +875,8 @@ function viewMachine(m){
   else right=finPanel(m,wo);
   return `<div class="head"><div><div class="crumb"><a href="#makineler">Paketleme</a>/<span>${esc(m.name)}</span></div>
     <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><h1>${esc(m.name)}</h1>${PILL[m.status]}<span class="chip c-idle">Pakon masa ${esc(m.masa)}</span></div></div><a class="btn" href="#makineler">← Makinelerim</a></div>
-  <div class="cols">${left}<section class="panel">${t.html}${right}</section></div>`;
+  ${actionBar(m)}
+  <div class="cols">${left}<section class="panel" id="right-${m.id}">${t.html}${right}</section></div>`;
 }
 function startRulesBlock(m,sel){
   const rs=startRules(m,sel),ok=rs.every(r=>r.ok);
@@ -1276,6 +1285,8 @@ document.addEventListener('click',e=>{
       delete U.kop[m.id];U.sel[m.id]=null;audit('Koparma formu · iş başladı','SD '+wo.id+' · '+m.name+' · '+wo.kop.sekil);save();render();
       toast(`SD ${wo.id} başladı · kameraya gönderildi: ${wo.sob}, artikel ${wo.artikel}, ${wo.desteKoli} deste × ${N(wo.perDeste)}`);break}
     case 'stoppick':U.stopPick[m.id]=true;render();break;
+    case 'goStart':render();setTimeout(()=>{const x=document.getElementById('start-'+m.id);x&&x.scrollIntoView({behavior:'smooth',block:'start'})},30);break;
+    case 'goFin':U.tab['m-'+m.id]='fin';render();setTimeout(()=>{const x=document.getElementById('right-'+m.id);x&&x.scrollIntoView({behavior:'smooth',block:'start'})},30);break;
     case 'stopcancel':U.stopPick[m.id]=false;render();break;
     case 'stop':{const rs=S.stopReasons.find(x=>x.n===el.dataset.r);m.status='stop';m.stopReason=el.dataset.r;m.stopSince=Date.now();U.stopPick[m.id]=false;audit('Duruş',m.name+' · '+el.dataset.r);
       let msg=m.name+' durdu · '+el.dataset.r;if(rs&&rs.maint){const b=openBT(m.id,el.dataset.r,'Koparma makinesinde '+el.dataset.r+' nedeniyle duruş','Duruş kaydı');msg+=' · '+b.id+' açıldı'}save();render();toast(msg);break}
