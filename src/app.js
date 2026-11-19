@@ -470,15 +470,16 @@ function viewPlan(){
         ${cur?woCard(cur,{type:'cur'}):''}${m.queue.map((id,i)=>woCard(W(id),{type:'queue',i,last:i===m.queue.length-1})).join('')}
         ${!cur&&!m.queue.length?'<div class="empty" style="padding:18px;font-size:13px">İş atanmadı</div>':''}</section>`}).join('')}
     </div></div></div></section>`;
-  const off=U.planDay||0;
-  return `<div class="head"><div><div class="crumb"><a href="#prosesler">Prosesler</a>/<span>Paketleme · Pakon</span></div><h1>Pakon İş Planı</h1><p>Saha takım lideri Pakon planını Excel ile yükler, yayınlanan işler havuza düşer ve yine takım lideri Bitirme-1…5'e atar.</p></div>
-    <div class="seg" aria-label="Plan kaynağı"><button class="on" data-act="xlsFocus">Excel</button><button disabled title="ERP entegrasyonu sonraki fazda eklenecek">ERP · Sonraki faz</button></div></div>
-  ${steps}${imp}
-  ${last?`<div class="camhdr"><span class="dot"></span><span>Son yayın: <b>${esc(last.file)}</b> · ${DT(last.ts)} · ${esc(last.user)} · ${last.added} iş havuza eklendi${last.skipped?', '+last.skipped+' satır atlandı':''}</span></div>`:''}
-  ${assignSec}
-  <section class="panel"><div class="panel-h"><div><h2>Yayınlanan plan</h2><span class="muted small">Bitirme makinesi başına tahmini çizelge · hız ${N(S.rules.slotTarget/2)} etiket/saat · iş değişimi 15 dk</span></div>
-    <div class="seg">${[[0,'Bugün'],[1,'Yarın']].map(([v,l])=>`<button class="${off===v?'on':''}" data-act="planDay" data-v="${v}">${l} · ${D(dayStart(Date.now())+v*DAY)}</button>`).join('')}</div></div>
-    ${gantt(off)}</section>`;
+  const off=U.planDay||0,t=tabs('planlama',[['yukle','Plan yükleme',pool.length],['atama','Atama ve makineler']],'yukle');
+  const now=Date.now(),td=dayKey(now);
+  const orderList=`<section class="panel"><div class="panel-h"><div><h2>Siparişler · Pakon havuzu</h2><span class="muted small">Yayınlanmış, henüz Bitirme makinesine atanmamış iş emirleri</span></div><div class="btns"><span class="chip c-idle">${pool.length} sipariş · ${N(pool.reduce((a,o)=>a+o.qty-(o.done||0),0))} etiket</span>${pool.length?'<button class="btn" data-act="tab" data-p="planlama" data-v="atama">Atamaya geç →</button>':''}</div></div>
+    ${table([['SD',o=>`<b class="mono">${o.id}</b>`],['SOB',o=>`<span class="mono small">${esc(o.sob)}</span>`],['Müşteri',o=>esc(o.customer)],['Artikel',o=>`<span class="mono">${esc(o.artikel)}</span>`],['Stok adı',o=>`${esc(o.name)}${o.note?`<br><span class="small" style="color:var(--bad)">${esc(o.note)}</span>`:''}`],['Miktar',o=>`<span class="num">${N(o.qty)}</span>${o.done?`<br><span class="small muted">${N(o.done)} paketlendi</span>`:''}`,'r'],['Montaj',o=>o.montaj,'r'],['Ambalaj',o=>`<span class="num small">${N(o.perDeste)} × ${o.desteKoli}</span>`],['Teslim',o=>{const dk=dayKey(o.due);return dk<td?`<span class="chip c-bad">Geçti · ${D(o.due)}</span>`:dk===td?'<span class="chip c-warn">Bugün</span>':D(o.due)}],['Not',o=>`${o.upstream&&!o.upstream.ack?`<span class="chip c-warn" title="${esc(o.upstream.type)}">⚠ ${esc(o.upstream.src)}</span> `:''}${o.kokteyl>1?`<span class="chip c-idle">Kokteyl ${o.kokteyl}</span>`:''}`],['Kaynak',o=>`<span class="small muted">${esc(o.src||'')}</span>`]],pool.map(o=>Object.assign({_cls:dayKey(o.due)<td?'err':''},o)),'Havuzda sipariş yok. Planı Excel ile yükleyin.')}</section>`;
+  const gsec=`<section class="panel"><div class="panel-h"><div><h2>Yayınlanan plan</h2><span class="muted small">Bitirme makinesi başına tahmini çizelge · hız ${N(S.rules.slotTarget/2)} etiket/saat · iş değişimi 15 dk</span></div>
+    <div class="seg">${[[0,'Bugün'],[1,'Yarın']].map(([v,l])=>`<button class="${off===v?'on':''}" data-act="planDay" data-v="${v}">${l} · ${D(dayStart(now)+v*DAY)}</button>`).join('')}</div></div>${gantt(off)}</section>`;
+  return `<div class="head"><div><div class="crumb"><a href="#prosesler">Prosesler</a>/<span>Paketleme · Pakon</span></div><h1>Pakon İş Planı</h1><p>Saha takım lideri planı Excel ile yükler, yayınlanan siparişler havuza düşer ve yine takım lideri Bitirme-1…5'e atar.</p></div>
+    ${t.cur==='yukle'?'<div class="seg" aria-label="Plan kaynağı"><button class="on" data-act="xlsFocus">Excel</button><button disabled title="ERP entegrasyonu sonraki fazda eklenecek">ERP · Sonraki faz</button></div>':''}</div>
+  ${t.html}
+  ${t.cur==='yukle'?`${steps}${imp}${last?`<div class="camhdr"><span class="dot"></span><span>Son yayın: <b>${esc(last.file)}</b> · ${DT(last.ts)} · ${esc(last.user)} · ${last.added} iş havuza eklendi${last.skipped?', '+last.skipped+' satır atlandı':''}</span></div>`:''}${orderList}`:`${assignSec}${gsec}`}`;
 }
 function schedule(m){
   const now=Date.now(),rate=S.rules.slotTarget/2/H,setup=15*MIN,out=[];
