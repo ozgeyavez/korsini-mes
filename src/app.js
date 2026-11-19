@@ -356,7 +356,7 @@ function machineCard(m){
     ${st==='stop'?`<div class="stopband">● ${esc(m.stopReason)} · <span data-since="${m.stopSince}">${dur(mins(m.stopSince))}</span></div>`:''}
     ${wo.approvalRequested&&!wo.approved?'<span class="chip c-warn">Bitirme onayı bekliyor</span>':''}`;
   }else{const nx=m.queue[0]&&W(m.queue[0]);
-    job=`<div class="job"><b class="muted">Makine boşta</b>${nx?`<span style="font-size:13px">Sıradaki: <span class="mono">SD ${nx.id}</span> · ${esc(nx.name)}</span>${techTag(nx)}`:'<span class="muted" style="font-size:13px">Sırada iş yok. Takım lideri planlamadan iş atar.</span>'}</div>`}
+    job=`<div class="job full"><b class="muted">Makine boşta</b>${nx?`<span style="font-size:13px">Sıradaki: <span class="mono">SD ${nx.id}</span> · ${esc(nx.name)}</span>${techTag(nx)}`:'<span class="muted" style="font-size:13px">Sırada iş yok. Takım lideri planlamadan iş atar.</span>'}</div>`}
   return `<a class="mcard ${st}" href="#makine-${m.id}"><div class="row"><h2>${esc(m.name)}</h2>${PILL[st]}</div>${job}${machineFlags(m)}
     <div class="foot"><span>Sırada ${m.queue.length} iş · Masa ${esc(m.masa)}</span>${prev&&prev.prod?`<span class="${prev.prod>=S.rules.slotTarget?'':'c-bad chip'}" title="Son 2 saatlik dilim">${slotLabel(ci-1)}: ${N(prev.prod)}</span>`:''}</div></a>`;
 }

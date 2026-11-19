@@ -414,3 +414,18 @@ tr.wrn td{background:var(--warn-bg)}
 .task small{color:var(--muted);font-size:13px}
 .task .go{font-weight:700;color:var(--brand-deep);white-space:nowrap;font-size:13.5px}
 @media (max-width:900px){.procsel span{display:none}.task{grid-template-columns:auto minmax(0,1fr)}.task .go{grid-column:2}}
+
+/* v7: makine kartları geniş, 2'li */
+.mgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.mcard{grid-template-columns:minmax(0,1fr) auto;column-gap:28px;row-gap:14px;padding:22px 24px}
+.mcard > .row,.mcard > .flags,.mcard > .foot,.mcard > .stopband,.mcard > .chip{grid-column:1/-1}
+.mcard > .chip{justify-self:start}
+.mcard h2{font-size:24px}
+.mcard .job{min-height:0}
+.mcard .job.full{grid-column:1/-1}
+.mcard .meter{flex-direction:row;align-self:center;gap:16px}
+.mcard .ring{width:84px;height:84px}
+.mcard .ring span{width:66px;height:66px;font-size:16px}
+.mcard .meter .t{font-size:13.5px}
+@media (max-width:900px){.mgrid{grid-template-columns:1fr}}
+@media (max-width:560px){.mcard{grid-template-columns:1fr}.mcard .meter{align-self:start}}
