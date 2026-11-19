@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const TZ='Europe/Istanbul',KEY='korsini-mes-v4',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
+const TZ='Europe/Istanbul',KEY='korsini-mes-v5',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
 const ROLES={lider:'Takım lideri',koparma:'Koparma operatörü',paketleme:'Pakon operatörü',kalite:'Kalite uzmanı',bakim:'Bakım teknisyeni',yonetici:'Yönetici',admin:'Admin'};
 const USERS=[
   {id:'u1',name:'Takım Lideri 1',ini:'TL',c:'#2fac66',role:'lider',note:'Pakon planını Excel ile yükler, Bitirme makinelerine atar'},
@@ -25,6 +25,8 @@ const DECISIONS=['Koli yeniden sayıldı','Karışan etiketler ayıklandı','Kol
 const CLEAN_Q=['Bir önceki işe ait tüm dokümanlar (iş emirleri, raporlar, ürün izleme etiketleri) kaldırıldı mı?','Hammadde, film, yarı mamul, bitmiş ürün ve yardımcı malzemeler kaldırıldı mı?','Firelerden makine ve çevresi arındırıldı mı?','Ambalaj malzemeleri kaldırıldı mı?','Makine ve çevresinin temizlik kontrolü, materyallerin sıkışabileceği alanların kontrolü uygun yapıldı mı?'];
 const KOP_CHECKS=['Kurumama','Kesim hatası','Sakal','Karışma','Yolma','Yırtık','Çapak','Büyüme','Kırışıklık','Diğer'];
 const UP_ACK=['Bozuklar kırmızı kasalarda geldi, ayıklama yapıldı','Ayıklamaya gerek kalmadı','İşaretli kısım dışında da hata görüldü'];
+const TEAM_ROLES=['Koparma','Birleştirme','Birleştirme','Kamera ve koli'];
+const CREW_C=['#9fd7b8','#b9d8f0','#b9d8f0','#ffe58a'];
 const PAKON_R=['Karışma','Renk farkı','Tonlama','Leke','Benek','Çizik','Kırık','Çiftleme','Kırışıklık','Lak bozuğu','Açma','Kurumama','Silik','Yolma','Arka verme / yapışma','Yaldız bozuğu','Kesim hatası','Yırtık','Çapak','Yenik','Hammadde bozuğu','Diğer'];
 const ICON={home:'<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',proc:'<path d="M4 6h16M4 12h10M4 18h6"/>',mac:'<rect x="3" y="4" width="8" height="7" rx="1.5"/><rect x="13" y="4" width="8" height="7" rx="1.5"/><rect x="3" y="13" width="8" height="7" rx="1.5"/><rect x="13" y="13" width="8" height="7" rx="1.5"/>',plan:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',rep:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/>',qual:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',maint:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',act:'<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 13l2 2 4-4"/>',auto:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',set:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>'};
 const svg=k=>`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[k]}</svg>`;
@@ -106,7 +108,7 @@ function addBox(wo,ts,result,r,reviewed){
 function seed(){
   const r=rng(19),now=Date.now(),orders={};
   SEED_ORDERS.forEach(p=>orders[p[0]]=mkOrder(p,now));
-  const team=[['Ayşe K.','Fatma D.','Mehmet Y.','Elif S.','Hasan T.'],['Zeynep A.','Ali R.','Sevgi B.','Murat C.'],['Hatice E.','Emre G.','Selin H.','Kemal İ.','Derya O.'],['Burak P.','Gül Ş.','Osman U.','Merve V.'],['Cem Y.','Aslı Z.','Okan B.']];
+  const team=[['Hasan T.','Ayşe K.','Fatma D.','Elif S.'],['Murat C.','Zeynep A.','Sevgi B.','Ali R.'],['Kemal İ.','Hatice E.','Selin H.','Emre G.'],['Osman U.','Gül Ş.','Merve V.','Burak P.'],['Okan B.','Aslı Z.','Derya O.','Cem Y.']];
   const machines=[1,2,3,4,5].map(i=>({id:'B'+i,name:'Bitirme-'+i,masa:'K-'+i,status:'idle',current:null,queue:[],stopReason:null,stopSince:null,idleSince:now-(20+i*7)*MIN,camera:'10.138.10.200',team:team[i-1],lastQuery:now-40000}));
   const put=(mi,id)=>{const m=machines[mi],o=orders[id];o.status='sirada';o.machine=m.id;m.queue.push(id);return o};
   const run=(mi,id,hours,n,rate,bias)=>{const o=put(mi,id),m=machines[mi];m.queue.shift();m.current=id;m.status='run';o.status='calisiyor';o.startedAt=now-hours*H;
@@ -346,6 +348,10 @@ function machineFlags(m){
   const bt=S.maint.find(b=>b.machine===m.id&&b.status!=='Tamamlandı'),late=S.pm.filter(t=>t.machine===m.id&&pmLate(t)).length,ug=S.ncrs.filter(n=>n.machine===m.id&&n.status!=='Kapatıldı').length,up=m.queue.filter(id=>W(id).upstream&&!W(id).upstream.ack).length;
   return (bt||late||ug||up)?`<div class="flags">${bt?`<span class="chip c-bad">${bt.id} · ${esc(bt.status)}</span>`:''}${up?`<span class="chip c-warn">${up} işte önceki proses uyarısı</span>`:''}${late?`<span class="chip c-warn">${late} bakım gecikti</span>`:''}${ug?`<span class="chip c-info">${ug} açık uygunsuzluk</span>`:''}</div>`:'';
 }
+const curShift=()=>S.shifts[Math.min(2,Math.floor(slotOf(Date.now())/4))];
+const ini=n=>String(n).split(/\s+/).map(x=>x[0]||'').join('').slice(0,2).toLocaleUpperCase('tr');
+function crewHtml(m){const t=(m.team||[]).slice(0,4);const sh=curShift();
+  return `<div class="crew"><div class="crew-h"><span class="label">Vardiya ekibi · ${esc(sh.n)} ${esc(sh.s)}–${esc(sh.e)}</span><span class="muted small">${t.length} kişi</span></div>${t.length?`<div class="crew-list">${t.map((n,i)=>`<span class="crew-p"><i style="background:${CREW_C[i]||'#dce6eb'}">${esc(ini(n))}</i><span><b>${esc(n)}</b><small>${TEAM_ROLES[i]||'Operatör'}</small></span></span>`).join('')}</div>`:'<span class="muted small">Ekip tanımlanmadı. Ayarlar &gt; Makineler ve kamera.</span>'}</div>`}
 function machineCard(m){
   const wo=m.current&&W(m.current),st=m.status;let job;
   const sl=slotData(m),ci=slotOf(Date.now()),prev=ci>0?sl[ci-1]:null;
@@ -357,7 +363,7 @@ function machineCard(m){
     ${wo.approvalRequested&&!wo.approved?'<span class="chip c-warn">Bitirme onayı bekliyor</span>':''}`;
   }else{const nx=m.queue[0]&&W(m.queue[0]);
     job=`<div class="job full"><b class="muted">Makine boşta</b>${nx?`<span style="font-size:13px">Sıradaki: <span class="mono">SD ${nx.id}</span> · ${esc(nx.name)}</span>${techTag(nx)}`:'<span class="muted" style="font-size:13px">Sırada iş yok. Takım lideri planlamadan iş atar.</span>'}</div>`}
-  return `<a class="mcard ${st}" href="#makine-${m.id}"><div class="row"><h2>${esc(m.name)}</h2>${PILL[st]}</div>${job}${machineFlags(m)}
+  return `<a class="mcard ${st}" href="#makine-${m.id}"><div class="row"><h2>${esc(m.name)}</h2>${PILL[st]}</div>${job}${machineFlags(m)}${crewHtml(m)}
     <div class="foot"><span>Sırada ${m.queue.length} iş · Masa ${esc(m.masa)}</span>${prev&&prev.prod?`<span class="${prev.prod>=S.rules.slotTarget?'':'c-bad chip'}" title="Son 2 saatlik dilim">${slotLabel(ci-1)}: ${N(prev.prod)}</span>`:''}</div></a>`;
 }
 function viewMachines(){
@@ -620,7 +626,7 @@ function viewSettings(){
     b=`<div class="cols2"><section class="panel"><h2>Kullanıcılar</h2>${table([['Kullanıcı',u=>`<div style="display:flex;gap:10px;align-items:center">${avatar(u)}<b>${esc(u.name)}</b></div>`],['Rol',u=>esc(ROLES[u.role])]],USERS)}</section>
     <section class="panel"><h2>Rol bazlı yetkiler</h2><div class="tablewrap perm"><table style="min-width:860px"><thead><tr><th>Yetki</th>${rk.map(k=>`<th style="text-align:center">${ROLES[k]}</th>`).join('')}</tr></thead><tbody>
     ${PERM_ROWS.map(([k,l])=>`<tr><td>${l}</td>${rk.map(r=>`<td class="v">${CAN[k].includes(r)?'<span class="yes">✓</span>':'<span class="no">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="hint" style="margin:0">Prototipte yetkiler sabit. Canlı sistemde admin bu tablodan değiştirebilecek.</p></section></div>`}
-  if(t.cur==='mac')b=`<section class="panel"><h2>Makineler ve kamera</h2>${table([['Kod',m=>`<span class="mono">${m.id}</span>`],['Makine adı',m=>`<input class="input" style="min-height:40px" data-mname="${m.id}" value="${esc(m.name)}" aria-label="${m.id} adı">`],['Pakon masa',m=>`<input class="input" style="min-height:40px;max-width:90px" data-mmasa="${m.id}" value="${esc(m.masa)}" aria-label="${m.id} masa">`],['Kamera IP adresi',m=>`<input class="input mono" style="min-height:40px" data-mcam="${m.id}" value="${esc(m.camera||'')}" aria-label="${m.id} kamera adresi">`],['Ekip',m=>`<input class="input" style="min-height:40px" data-mteam="${m.id}" value="${esc((m.team||[]).join(', '))}" aria-label="${m.id} ekip">`],['Durum',m=>PILL[m.status]]],S.machines)}
+  if(t.cur==='mac')b=`<section class="panel"><h2>Makineler ve kamera</h2>${table([['Kod',m=>`<span class="mono">${m.id}</span>`],['Makine adı',m=>`<input class="input" style="min-height:40px" data-mname="${m.id}" value="${esc(m.name)}" aria-label="${m.id} adı">`],['Pakon masa',m=>`<input class="input" style="min-height:40px;max-width:90px" data-mmasa="${m.id}" value="${esc(m.masa)}" aria-label="${m.id} masa">`],['Kamera IP adresi',m=>`<input class="input mono" style="min-height:40px" data-mcam="${m.id}" value="${esc(m.camera||'')}" aria-label="${m.id} kamera adresi">`],['Vardiya ekibi (koparma, birleştirme, birleştirme, kamera)',m=>`<input class="input" style="min-height:40px" data-mteam="${m.id}" value="${esc((m.team||[]).join(', '))}" aria-label="${m.id} ekip">`],['Durum',m=>PILL[m.status]]],S.machines)}
     <div class="grid2"><div class="defrow"><input class="input" id="new-machine" placeholder="Yeni makine adı, örn. Bitirme-6"><button class="btn" data-act="addm">Makine ekle</button></div>
     ${fld('Kamera sorgu sıklığı (sn)',`<input class="input num" type="number" min="5" max="600" data-rnum="camPoll" value="${R.camPoll}" style="max-width:140px">`,'Kamera sonuçları her makinenin IP adresinden çalışan siparişin SOB numarasıyla sorgulanır.')}</div></section>`;
   if(t.cur==='prod'){const map={};Object.values(S.orders).forEach(o=>{map[o.artikel]=map[o.artikel]||{artikel:o.artikel,name:o.name,customer:o.customer,tech:o.tech,enh:o.enh,perDeste:o.perDeste,desteKoli:o.desteKoli,n:0};map[o.artikel].n++});
