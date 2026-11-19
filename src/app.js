@@ -352,6 +352,11 @@ const curShift=()=>S.shifts[Math.min(2,Math.floor(slotOf(Date.now())/4))];
 const ini=n=>String(n).split(/\s+/).map(x=>x[0]||'').join('').slice(0,2).toLocaleUpperCase('tr');
 function crewHtml(m){const t=(m.team||[]).slice(0,4);const sh=curShift();
   return `<div class="crew"><div class="crew-h"><span class="label">Vardiya ekibi · ${esc(sh.n)} ${esc(sh.s)}–${esc(sh.e)}</span><span class="muted small">${t.length} kişi</span></div>${t.length?`<div class="crew-list">${t.map((n,i)=>`<span class="crew-p"><i style="background:${CREW_C[i]||'#dce6eb'}">${esc(ini(n))}</i><span><b>${esc(n)}</b><small>${TEAM_ROLES[i]||'Operatör'}</small></span></span>`).join('')}</div>`:'<span class="muted small">Ekip tanımlanmadı. Ayarlar &gt; Makineler ve kamera.</span>'}</div>`}
+function shiftFoot(m){
+  const now=Date.now(),ci=slotOf(now),sh=Math.min(2,Math.floor(ci/4)),sl=slotData(m),sum=sl.slice(sh*4,sh*4+4).filter(x=>x.i<=ci).reduce((a,x)=>a+x.prod,0);
+  const tg=S.rules.slotTarget*4,start=dayStart(now)+sh*8*H,el=Math.min(1,Math.max(0,(now-start)/(8*H))),behind=sum<tg*el*0.9,v=S.shifts[sh];
+  return `<div class="foot"><span>${esc(v.n)} · ${esc(v.s)}–${esc(v.e)}</span><span><b class="num" style="color:${behind?'var(--bad)':'var(--ok)'}">${N(sum)}</b> / ${N(tg)} etiket</span></div>`;
+}
 function machineCard(m){
   const wo=m.current&&W(m.current),st=m.status;let job;
   const sl=slotData(m),ci=slotOf(Date.now()),prev=ci>0?sl[ci-1]:null;
@@ -364,7 +369,7 @@ function machineCard(m){
   }else{const nx=m.queue[0]&&W(m.queue[0]);
     job=`<div class="job full"><b class="muted">Makine boşta</b>${nx?`<span style="font-size:13px">Sıradaki: <span class="mono">SD ${nx.id}</span> · ${esc(nx.name)}</span>${techTag(nx)}`:'<span class="muted" style="font-size:13px">Sırada iş yok. Takım lideri planlamadan iş atar.</span>'}</div>`}
   return `<a class="mcard ${st}" href="#makine-${m.id}"><div class="row"><h2>${esc(m.name)}</h2>${PILL[st]}</div>${job}${machineFlags(m)}${crewHtml(m)}
-    ${prev&&prev.prod?`<div class="foot"><span>Son 2 saat · ${slotLabel(ci-1)}</span><span class="${prev.prod>=S.rules.slotTarget?'':'c-bad chip'}">${N(prev.prod)} etiket</span></div>`:''}</a>`;
+    ${shiftFoot(m)}</a>`;
 }
 function viewMachines(){
   const ms=S.machines,c=s=>ms.filter(m=>m.status===s).length,today=dayKey(Date.now());let te=0,tp=0;
