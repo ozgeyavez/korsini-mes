@@ -818,7 +818,7 @@ function machineCard(m){
   }else{const nx=m.queue[0]&&W(m.queue[0]);
     job=`<div class="job full"><b class="muted">Makine boşta</b>${nx?`<span style="font-size:13px">Sıradaki: <span class="mono">SD ${nx.id}</span> · ${esc(nx.name)}</span>${techTag(nx)}`:'<span class="muted" style="font-size:13px">Sırada iş yok. Takım lideri planlamadan iş atar.</span>'}</div>`}
   return `<a class="mcard ${st}" href="#makine-${m.id}"><div class="row"><h2>${esc(m.name)}</h2>${PILL[st]}</div>${job}${machineFlags(m)}${crewHtml(m)}
-    <div class="foot"><span>Sırada ${m.queue.length} iş · Masa ${esc(m.masa)}</span>${prev&&prev.prod?`<span class="${prev.prod>=S.rules.slotTarget?'':'c-bad chip'}" title="Son 2 saatlik dilim">${slotLabel(ci-1)}: ${N(prev.prod)}</span>`:''}</div></a>`;
+    ${prev&&prev.prod?`<div class="foot"><span>Son 2 saat · ${slotLabel(ci-1)}</span><span class="${prev.prod>=S.rules.slotTarget?'':'c-bad chip'}">${N(prev.prod)} etiket</span></div>`:''}</a>`;
 }
 function viewMachines(){
   const ms=S.machines,c=s=>ms.filter(m=>m.status===s).length,today=dayKey(Date.now());let te=0,tp=0;
