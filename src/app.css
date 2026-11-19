@@ -440,3 +440,9 @@ tr.wrn td{background:var(--warn-bg)}
 .crew-p b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .crew-p small{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:1250px){.crew-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* v9: makineye ata düğmeleri */
+.mpick{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.mpick span{font-size:12px;color:var(--muted);margin-right:2px}
+.mpick button{min-width:38px;min-height:32px;padding:0 8px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);cursor:pointer;font-weight:700;font-size:12.5px}
+.mpick button:hover{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
