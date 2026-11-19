@@ -464,7 +464,7 @@ const TZ='Europe/Istanbul',KEY='korsini-mes-v5',MIN=6e4,H=36e5,DAY=864e5,IST=3*H
 const ROLES={lider:'Takım lideri',koparma:'Koparma operatörü',paketleme:'Pakon operatörü',kalite:'Kalite uzmanı',bakim:'Bakım teknisyeni',yonetici:'Yönetici',admin:'Admin'};
 const USERS=[
   {id:'u1',name:'Takım Lideri 1',ini:'TL',c:'#2fac66',role:'lider',note:'Pakon planını Excel ile yükler, Bitirme makinelerine atar'},
-  {id:'u2',name:'Koparma Operatörü 1',ini:'KO',c:'#6fb0e1',role:'koparma',note:'Koparma kontrol formuyla işi başlatır'},
+  {id:'u2',name:'Koparma Operatörü 1',ini:'KO',c:'#6fb0e1',role:'koparma',note:'Hat temizlik kontrolüyle Pakon işini başlatır'},
   {id:'u3',name:'Pakon Operatörü 1',ini:'PO',c:'#ffd744',role:'paketleme',note:'Kamera sonuçlarını inceler, Pakon formuyla bitirir'},
   {id:'u6',name:'Kalite Uzmanı 1',ini:'KU',c:'#9fd7b8',role:'kalite',note:'Hata analizini ve uygunsuzlukları yönetir'},
   {id:'u7',name:'Bakım Teknisyeni 1',ini:'BT',c:'#b9d8f0',role:'bakim',note:'Arızaya müdahale eder, periyodik bakımı yapar'},
@@ -477,7 +477,7 @@ const CAN={
   seeMaint:['bakim','lider','yonetici','admin'],editMaint:['bakim','admin'],
   seeTrack:['lider','kalite','bakim','yonetici','admin'],seeAuto:['lider','kalite','bakim','yonetici','admin'],editAuto:['yonetici','admin'],
   report:['lider','paketleme','yonetici','admin'],settings:['admin']};
-const PERM_ROWS=[['upload','Pakon planını Excel ile yükler'],['seePlan','Planlamayı görür'],['plan','İşi Bitirme makinesine atar'],['start','Koparma formuyla işi başlatır'],['finish','Pakon formuyla işi bitirir'],['approve','Eksik adetle bitirmeyi onaylar'],['report','Vardiya sayı raporunu görür'],['seeQual','Kalite modülünü görür'],['editQual','Uygunsuzluk açar, kapatır'],['seeMaint','Bakım modülünü görür'],['editMaint','Arızaya müdahale eder'],['seeAuto','Otomasyonları görür'],['editAuto','Otomasyon kurar'],['settings','Ayarları değiştirir']];
+const PERM_ROWS=[['upload','Pakon planını Excel ile yükler'],['seePlan','Planlamayı görür'],['plan','İşi Bitirme makinesine atar'],['start','Hat temizlik kontrolüyle işi başlatır'],['finish','Pakon formuyla işi bitirir'],['approve','Eksik adetle bitirmeyi onaylar'],['report','Vardiya sayı raporunu görür'],['seeQual','Kalite modülünü görür'],['editQual','Uygunsuzluk açar, kapatır'],['seeMaint','Bakım modülünü görür'],['editMaint','Arızaya müdahale eder'],['seeAuto','Otomasyonları görür'],['editAuto','Otomasyon kurar'],['settings','Ayarları değiştirir']];
 const TECH={'Injection Molding IML':'#2fac66','Thermoforming IML':'#6fb0e1','Blow Molding IML':'#ffd744','SealPPeel':'#a4b6be','NextCycle IML':'#1c784c','IML':'#8a9ba3'};
 const CHANNELS=['Uygulama','SMS','E-posta'],SEVS=['Bilgi','Uyarı','Kritik'],SEVC={Bilgi:'st-info',Uyarı:'st-warn',Kritik:'st-stop'};
 const RESULTS={none:'Yalnızca bildirim',action:'Aksiyon aç',ncr:'Uygunsuzluk aç',maint:'Bakım talebi aç'};
@@ -685,7 +685,7 @@ function startRules(m,woId){
   const bt=S.maint.find(b=>b.machine===m.id&&b.status!=='Tamamlandı');
   out.push({l:'Makinede açık arıza talebi olmamalı',ok:!bt,why:bt?bt.id+' tamamlanmadı. Bakım ekibi talebi kapatınca iş başlatılabilir.':''});
   if(R.clean){const y=k.clean.filter(x=>x===1).length,n=k.clean.filter(x=>x===-1).length;out.push({l:'Hat temizlik kontrolünde 5 sorunun hepsi “Evet” olmalı',ok:y===5,why:n?n+' soru “Hayır” cevaplandı. Hat temizlenmeden iş başlamaz.':(5-y)+' soru cevaplanmadı'})}
-  if(R.ook3)out.push({l:'OÖK#3 karışma kontrolü onaylanmalı',ok:k.ook3,why:'Kokteyl desteleri ayrı kasada ve önceki işin etiketleri temizlendi mi? Onay kutusunu işaretleyin.'});
+  if(R.ook3)out.push({l:'Karışma kontrolü (OÖK#3 / OÖK#4) onaylanmalı',ok:k.ook3,why:'Kokteyl desteleri ayrı kasada mı, önceki işin etiket ve evrakları koparma ve kontrol masasından temizlendi mi? Onay kutusunu işaretleyin.'});
   if(R.upstream&&wo&&wo.upstream&&!wo.upstream.ack)out.push({l:'Önceki prosesten gelen uygunsuzluk Pakon tarafından onaylanmalı',ok:!!k.upAck,why:wo.upstream.src+' · '+wo.upstream.range+' için ne yapıldığını seçin'});
   const bad=KOP_CHECKS.filter(c=>k.checks[c]);if(bad.length)out.push({l:'Uygunsuz ürün kontrolü için açıklama yazılmalı',ok:k.aciklama.length>=5,why:bad.join(', ')+' uygunsuz işaretlendi. Uygunsuz desteler kırmızı kasaya ayrılır.'});
   return out;
@@ -694,7 +694,6 @@ function finishRules(m,wo){
   const R=S.rules,out=[],f=finState(m,wo);
   if(R.reviewed){const n=errs(wo).filter(b=>!b.reviewed).length;out.push({k:'rev',l:'Kameranın bulduğu hatalı koliler incelenmiş olmalı',ok:n===0,why:n+' hatalı koli henüz incelenmedi'})}
   if(R.count2)out.push({k:'cnt',l:'Deste sayımı 2 kişi tarafından doğrulanmalı',ok:(parseInt(f.count,10)>0)&&!!f.p1&&!!f.p2&&f.p1!==f.p2,why:!(parseInt(f.count,10)>0)?'Sayılan etiket adedini girin':f.p1&&f.p1===f.p2?'Sayan ve doğrulayan farklı kişiler olmalı':'Sayan ve doğrulayan kişiyi seçin'});
-  if(R.ook4)out.push({k:'ook4',l:'OÖK#4 karışma kontrolü onaylanmalı',ok:f.ook4,why:'Kontrol masası bir sonraki iş için temizlendi mi? Onay kutusunu işaretleyin.'});
   if(R.minPctOn&&f.durum==='Bitti'){const p=pct(wo);out.push({k:'pct',l:'Paketlenen adet siparişin en az %'+R.minPct+"'i olmalı",ok:p>=R.minPct||wo.approved,why:'Şu an %'+P1(p)+'. Takım liderinin onayı gerekiyor ya da sipariş durumunu “Devam” seçin.',appr:wo.approved&&p<R.minPct})}
   return out;
 }
@@ -754,7 +753,7 @@ function updBell(){const b=$('#bell-n');if(!b)return;const u=unread();b.textCont
 function viewLogin(){
   return `<div class="login">
     <section class="login-art"><div>${LOGO()}</div>
-      <div><span class="label">MCC Korsini · Türkiye</span><h1 style="margin-top:10px">Üretim takip sistemi</h1><p>Takım lideri Pakon planını Excel ile yükler ve Bitirme makinelerine atar. İş koparma formuyla başlar, kamera sonuçları sipariş bazında izlenir ve Pakon formuyla biter.</p></div>
+      <div><span class="label">MCC Korsini · Türkiye</span><h1 style="margin-top:10px">Üretim takip sistemi</h1><p>Takım lideri Pakon planını Excel ile yükler ve Bitirme makinelerine atar. İş hat temizlik kontrolüyle başlar, kamera sonuçları sipariş bazında izlenir ve Pakon formuyla biter.</p></div>
       <div class="blocks" aria-hidden="true"><i></i><i></i><i></i></div>
       <span class="muted" style="font-size:12.5px;position:relative">Prototip · İş emirleri, kamera görüntüleri, kalite ve bakım kayıtları örnek veridir.</span></section>
     <section class="login-form"><div><h2>Giriş yapın</h2><p class="muted" style="margin:4px 0 0">Denemek için bir rol seçin.</p></div>
@@ -777,7 +776,7 @@ function tasks(){
     if(yon&&m.status==='stop')add('Kritik',`${m.name} duruşta · ${m.stopReason}`,`${dur(mins(m.stopSince))} sürüyor`,'#makine-'+m.id,'Makineye git',m.stopSince);
     if(can('start')){
       if(m.status==='stop')add('Kritik',`${m.name} duruşta · ${m.stopReason}`,`${dur(mins(m.stopSince))} sürüyor${wo?' · SD '+wo.id:''}`,'#makine-'+m.id,'Makineye git',m.stopSince);
-      if(!m.current&&m.queue.length){const o=W(m.queue[0]),idle=m.idleSince?mins(m.idleSince):0;add(idle>=15?'Uyarı':'Bilgi',`${m.name}: sıradaki işi başlat · SD ${o.id}`,`${o.name} · ${o.customer} · ${N(o.qty)} etiket${idle?' · makine '+dur(idle)+' boşta':''}`,'#makine-'+m.id,'Koparma formu',m.idleSince)}
+      if(!m.current&&m.queue.length){const o=W(m.queue[0]),idle=m.idleSince?mins(m.idleSince):0;add(idle>=15?'Uyarı':'Bilgi',`${m.name}: sıradaki işi başlat · SD ${o.id}`,`${o.name} · ${o.customer} · ${N(o.qty)} etiket${idle?' · makine '+dur(idle)+' boşta':''}`,'#makine-'+m.id,'İşi başlat',m.idleSince)}
       m.queue.forEach(id=>{const o=W(id);if(o.upstream&&!o.upstream.ack)add('Uyarı',`SD ${o.id}: önceki proses uyarısı onay bekliyor`,`${o.upstream.src} · ${o.upstream.type} · ${o.upstream.range} · ${m.name}`,'#makine-'+m.id,'İncele',o.upstream.ts)})}
     if(can('finish')&&wo){const u=errs(wo).filter(b=>!b.reviewed);
       if(u.length)add('Kritik',`${m.name}: ${u.length} hatalı koli inceleme bekliyor`,`SD ${wo.id} · ${[...new Set(u.map(b=>codeLabel(b.result)))].join(', ')}`,'#makine-'+m.id,'Kamera sonuçları',u[0].ts);
@@ -834,7 +833,7 @@ function machineCard(m){
 function viewMachines(){
   const ms=S.machines,c=s=>ms.filter(m=>m.status===s).length,today=dayKey(Date.now());let te=0,tp=0;
   Object.values(S.orders).forEach(o=>o.boxes.forEach(b=>{if(dayKey(b.ts)===today){tp+=b.count;if(b.result!=='OK')te++}}));
-  return `<div class="head"><div><div class="crumb"><span>Paketleme · Pakon</span></div><h1>Makinelerim</h1><p>Bir makineye dokunarak koparma formunu, kamera sonuçlarını ya da 2 saatlik panoyu açın.</p></div>
+  return `<div class="head"><div><div class="crumb"><span>Paketleme · Pakon</span></div><h1>Makinelerim</h1><p>Bir makineye dokunarak işi başlatmayı, kamera sonuçlarını ya da 2 saatlik panoyu açın.</p></div>
     ${can('seePlan')?'<a class="btn" href="#planlama">Planlamaya git</a>':''}</div>
   <div class="strip">${kpi('Çalışıyor',c('run'),'var(--ok)')}${kpi('Duruş',c('stop'),c('stop')?'var(--bad)':'')}${kpi('Bugün paketlenen etiket',N(tp))}${kpi('Bugün hatalı koli',te,te?'var(--bad)':'')}</div>
   <div class="mgrid">${ms.map(machineCard).join('')}</div>`;
@@ -843,13 +842,13 @@ function koparmaForm(m,wo){
   const k=kopState(m,wo),dis=can('start')?'':'disabled';
   const up=wo.upstream&&!wo.upstream.ack?`<div class="upcard"><div><span class="label">Önceki prosesten iç uygunsuzluk</span><div style="margin-top:4px"><b>${esc(wo.upstream.src)}: ${esc(wo.upstream.type)}</b></div><div class="small">${esc(wo.upstream.range)} · öngörülen hatalı miktar ${N(wo.upstream.qty)} adet · tanımlayan ${esc(wo.upstream.by)}</div></div>
     <div class="chipsel">${UP_ACK.map(a=>`<button ${dis} class="${k.upAck===a?'on':''}" data-act="kf" data-m="${m.id}" data-f="upAck" data-v="${esc(a)}">${esc(a)}</button>`).join('')}</div></div>`:wo.upstream?`<div class="upcard ok small"><b>Önceki proses uyarısı onaylandı:</b> ${esc(wo.upstream.ack)} · ${esc(wo.upstream.ackBy||'')}</div>`:'';
-  return `<div class="sub" style="padding-top:12px"><div class="panel-h"><div><span class="label">Form-181</span><h2>Koparma kontrol formu</h2></div><span class="muted small">SD ${wo.id} · sipariş ${N(wo.qty)} etiket · ${N(Math.ceil(wo.qty/wo.montaj))} tabaka</span></div>
+  return `<div class="sub" style="padding-top:12px"><div class="panel-h"><div><span class="label">Pakon · koparma, birleştirme ve ambalaj</span><h2>Hat temizlik ve iş başlatma kontrolü</h2></div><span class="muted small">SD ${wo.id} · sipariş ${N(wo.qty)} etiket · ${N(Math.ceil(wo.qty/wo.montaj))} tabaka</span></div>
   ${up}
   <div class="grid2">${fld('Koparma şekli',`<div class="seg">${['Manuel','Kawahara'].map(s=>`<button ${dis} class="${k.sekil===s?'on':''}" data-act="kf" data-m="${m.id}" data-f="sekil" data-v="${s}">${s}</button>`).join('')}</div>`)}${fld('Dosya kokteyl miktarı',`<input class="input num" type="number" min="1" max="12" data-kin="kokteyl" data-m="${m.id}" value="${k.kokteyl}" ${dis}>`,k.kokteyl>1?'Her tasarım ayrı kasaya konur.':'')}</div>
   <div style="display:grid;gap:6px"><span class="label">Hat temizlik kontrolü</span>${CLEAN_Q.map((q,i)=>`<div class="qrow"><span>${esc(q)}</span><div class="yn"><button ${dis} class="y ${k.clean[i]===1?'on':''}" data-act="kc" data-m="${m.id}" data-i="${i}" data-v="1">Evet</button><button ${dis} class="n ${k.clean[i]===-1?'on':''}" data-act="kc" data-m="${m.id}" data-i="${i}" data-v="-1">Hayır</button></div></div>`).join('')}</div>
   <div style="display:grid;gap:6px"><span class="label">Ürün kontrolü · uygunsuz olanı işaretleyin</span><div class="chipsel">${KOP_CHECKS.map(c=>`<button ${dis} class="${k.checks[c]?'bad':''}" data-act="kk" data-m="${m.id}" data-v="${esc(c)}">${k.checks[c]?'✕ ':''}${esc(c)}</button>`).join('')}</div>
   ${KOP_CHECKS.some(c=>k.checks[c])?`<input class="input" data-kin="aciklama" data-m="${m.id}" placeholder="Açıklama, örn. 3 destede sakal var, kırmızı kasaya ayrıldı" value="${esc(k.aciklama)}" ${dis}>`:''}</div>
-  <label class="toggle"><span><b>OÖK#3 karışma kontrolü:</b> Koparma sırasında dosya kokteyline göre her dizayn ayrı kasaya kondu; önceki işe ait tüm etiket ve evraklar temizlendi.</span><input type="checkbox" data-kchk="${m.id}" ${k.ook3?'checked':''} ${dis}></label></div>`;
+  <label class="toggle"><span><b>Karışma kontrolü (OÖK#3 / OÖK#4):</b> Dosya kokteyline göre her dizayn ayrı kasaya konacak; önceki işe ait tüm etiket ve evraklar koparma makinesinden ve kontrol masasından temizlendi, hat bu iş için uygun.</span><input type="checkbox" data-kchk="${m.id}" ${k.ook3?'checked':''} ${dis}></label></div>`;
 }
 function actionBar(m){
   const wo=m.current&&W(m.current),cs=can('start'),cf=can('finish');
@@ -875,8 +874,8 @@ function viewMachine(m){
   const qlist=`<div class="qlist">${m.queue.map((id,i)=>{const o=W(id);return `<button class="qitem ${id===sel&&!m.current?'sel':''}" data-act="sel" data-m="${m.id}" data-id="${id}"><span class="ord">${i+1}.</span><span class="t"><b>${esc(o.name)}</b><span><span class="mono">SD ${o.id} · ${esc(o.artikel)}</span> · ${esc(o.customer)} · ${N(o.qty)} etiket · termin ${D(o.due)}${o.upstream&&!o.upstream.ack?' · <b style="color:var(--warn)">önceki proses uyarısı</b>':''}</span></span></button>`}).join('')}</div>`;
   let lower;
   if(!m.queue.length)lower=`<div><span class="label">Sıradaki işler</span><h2>Sırada iş yok</h2></div><div class="empty">Takım lideri planlamadan bu makineye iş atayınca burada görünür.${can('plan')?' <a href="#planlama">Planlamaya git</a>':''}</div>`;
-  else if(m.current)lower=`<div><span class="label">Sıradaki işler</span><h2>${m.queue.length} iş sırada</h2></div>${qlist}<p class="muted small" style="margin:0">Çalışan iş Pakon formuyla bitince sıradaki işin koparma formu açılır.</p>`;
-  else lower=`<div id="start-${m.id}"><span class="label">Form-181 · Koparma makinesi</span><h2>İşi başlat</h2></div>${qlist}${sw?koparmaForm(m,sw):''}${can('start')?`<div id="rules-${m.id}">${startRulesBlock(m,sel)}</div>`:'<p class="muted" style="margin:0">İşi koparma operatörü başlatır.</p>'}`;
+  else if(m.current)lower=`<div><span class="label">Sıradaki işler</span><h2>${m.queue.length} iş sırada</h2></div>${qlist}<p class="muted small" style="margin:0">Çalışan iş Pakon formuyla bitince sıradaki iş için hat temizlik kontrolü açılır.</p>`;
+  else lower=`<div id="start-${m.id}"><span class="label">Pakon</span><h2>İşi başlat</h2></div>${qlist}${sw?koparmaForm(m,sw):''}${can('start')?`<div id="rules-${m.id}">${startRulesBlock(m,sel)}</div>`:'<p class="muted" style="margin:0">İşi koparma operatörü başlatır.</p>'}`;
   const left=`<section class="panel"><div class="panel-h"><div><span class="label">Koparma makinesi</span><h2>Çalışan iş</h2></div></div>${cur}${machineFlags(m)}<div class="sub">${lower}</div></section>`;
   const t=tabs('m-'+m.id,[['cam','Kamera sonuçları'],['fin','Pakon formu ve bitir'],['board','2 saatlik pano']],'cam');
   let right;
@@ -930,7 +929,6 @@ function finPanel(m,wo){
     ${fld('Sayılan etiket adedi',`<input class="input num" type="number" min="0" data-fin="count" data-m="${m.id}" value="${esc(f.count)}" placeholder="${N(wo.perDeste)}" ${dis}>`)}${fld('Sayılan etiket ağırlığı (kg)',`<input class="input num" type="number" min="0" step="0.01" data-fin="weight" data-m="${m.id}" value="${esc(f.weight)}" ${dis}>`)}
     ${fld('Sayan',`<select class="input" data-fin="p1" data-m="${m.id}" ${dis}><option value="">Seçin</option>${people.map(p=>`<option ${f.p1===p?'selected':''}>${esc(p)}</option>`).join('')}</select>`)}${fld('Doğrulayan',`<select class="input" data-fin="p2" data-m="${m.id}" ${dis}><option value="">Seçin</option>${people.map(p=>`<option ${f.p2===p?'selected':''}>${esc(p)}</option>`).join('')}</select>`)}</div></div>
   <div class="sub"><span class="label">Gövde ambalaj reçetesi ve sevkiyat</span><div class="sumline">${mini('Destede etiket',N(wo.perDeste))}${mini('Kolide deste',wo.desteKoli)}${mini('Kolide etiket',N(perBox(wo)))}${mini('Koli adedi',nk+(last&&last.count<perBox(wo)?' (son koli '+N(last.count)+')':''))}${mini('Bakiye (+/−)',(bal>0?'+':'')+N(bal),bal<0?'bad':'ok')}</div></div>
-  <label class="toggle"><span><b>OÖK#4 karışma kontrolü:</b> Kontrol masasından bir önceki işe ait tüm etiket ve evraklar temizlendi, hat bir sonraki üretim için uygun hale getirildi.</span><input type="checkbox" data-fchk="${m.id}" ${f.ook4?'checked':''} ${dis}></label>
   ${fld('Sipariş durumu',`<div class="seg">${['Devam','Bitti'].map(s=>`<button ${dis} class="${f.durum===s?'on':''}" data-act="fdur" data-m="${m.id}" data-v="${s}">${s}</button>`).join('')}</div>`,f.durum==='Devam'?'İş makineden çıkar, kalan miktarla havuza döner.':'')}
   <div id="fin-${m.id}">${finRulesBlock(m,wo)}</div>`;
 }
@@ -1110,8 +1108,8 @@ function viewSettings(){
     <div class="defrow"><input class="input" id="new-reason" placeholder="Yeni duruş nedeni"><button class="btn" data-act="addr">Ekle</button></div></section>`;
   if(t.cur==='err')b=`<section class="panel"><h2>Kamera hata kodları</h2><div class="deflist">${S.errorCodes.map((c,i)=>`<div class="defrow"><span class="mono muted" style="width:46px">${c.code}</span><input class="input" style="max-width:160px" data-elabel="${i}" value="${esc(c.label)}" aria-label="${c.code} adı"><input class="input" data-edesc="${i}" value="${esc(c.desc)}" aria-label="${c.code} açıklaması"></div>`).join('')}</div><p class="hint" style="margin:0">Kodlar görüntü işleme sisteminden gelir. Ekranda görünen adı ve açıklamayı buradan değiştirebilirsiniz.</p></section>`;
   if(t.cur==='pak')b=`<section class="panel"><h2>Pakon bozuk nedenleri</h2><p class="muted" style="margin:0">Pakon üretim takip formundaki “Uygun olmayan ürün tanımı” listesi.</p><div class="tags">${S.pakonReasons.map(r=>`<span class="tagx">${esc(r)}<button data-act="delpr" data-n="${esc(r)}" aria-label="${esc(r)} sil">×</button></span>`).join('')}</div><div class="defrow"><input class="input" id="new-preason" placeholder="Yeni neden"><button class="btn" data-act="addpr">Ekle</button></div></section>`;
-  if(t.cur==='rules')b=`<div class="defs"><section class="panel"><h2>İş başlatma · koparma formu</h2><div class="deflist">${tg('assigned','İş bu makineye atanmış olmalı')}${tg('first','İş, sıradaki ilk iş olmalı')}${tg('noOpen','Makinede açık başka iş olmamalı')}${tg('clean','Hat temizlik kontrolü 5/5 “Evet” olmalı')}${tg('ook3','OÖK#3 karışma onayı verilmeli')}${tg('upstream','Önceki proses uygunsuzluğu Pakon tarafından onaylanmalı')}<label class="toggle"><span>Makinede açık arıza talebi olmamalı</span><input type="checkbox" checked disabled></label></div></section>
-    <section class="panel"><h2>İş bitirme · Pakon formu</h2><div class="deflist">${tg('reviewed','Hatalı koliler incelenmiş olmalı')}${tg('count2','Deste sayımı 2 kişi tarafından doğrulanmalı')}${tg('ook4','OÖK#4 karışma onayı verilmeli')}${tg('minPctOn','Paketlenen adet sınırı')}
+  if(t.cur==='rules')b=`<div class="defs"><section class="panel"><h2>İş başlatma · hat temizlik kontrolü</h2><div class="deflist">${tg('assigned','İş bu makineye atanmış olmalı')}${tg('first','İş, sıradaki ilk iş olmalı')}${tg('noOpen','Makinede açık başka iş olmamalı')}${tg('clean','Hat temizlik kontrolü 5/5 “Evet” olmalı')}${tg('ook3','Karışma kontrolü (OÖK#3 / OÖK#4) onaylanmalı')}${tg('upstream','Önceki proses uygunsuzluğu Pakon tarafından onaylanmalı')}<label class="toggle"><span>Makinede açık arıza talebi olmamalı</span><input type="checkbox" checked disabled></label></div></section>
+    <section class="panel"><h2>İş bitirme · Pakon formu</h2><div class="deflist">${tg('reviewed','Hatalı koliler incelenmiş olmalı')}${tg('count2','Deste sayımı 2 kişi tarafından doğrulanmalı')}${tg('minPctOn','Paketlenen adet sınırı')}
     <div class="defrow"><label for="minpct" style="flex:1">Sınır (sipariş adedinin yüzdesi)</label><input class="input num" style="width:110px" type="number" min="50" max="110" id="minpct" value="${R.minPct}"></div>
     <div class="defrow"><label for="slottg" style="flex:1">2 saatlik üretim hedefi (etiket)</label><input class="input num" style="width:140px" type="number" min="1000" step="1000" data-rnum="slotTarget" id="slottg" value="${R.slotTarget}"></div></div></section></div>`;
   if(t.cur==='shift')b=`<section class="panel"><h2>Vardiyalar</h2><div class="deflist">${S.shifts.map((s,i)=>`<div class="defrow"><input class="input" style="max-width:200px" data-shn="${i}" value="${esc(s.n)}" aria-label="Vardiya adı"><input class="input num" style="max-width:130px" type="time" data-shs="${i}" value="${s.s}" aria-label="Başlangıç"><span class="muted">–</span><input class="input num" style="max-width:130px" type="time" data-she="${i}" value="${s.e==='24:00'?'00:00':s.e}" aria-label="Bitiş"></div>`).join('')}</div></section>`;
@@ -1294,7 +1292,7 @@ document.addEventListener('click',e=>{
       m.queue=m.queue.filter(x=>x!==wo.id);m.current=wo.id;m.status='run';m.lastQuery=Date.now();wo.status='calisiyor';wo.startedAt=Date.now();
       wo.kop={sekil:k.sekil,kokteyl:+k.kokteyl||1,clean:[...k.clean],ook3:k.ook3,checks:{...k.checks},aciklama:k.aciklama,by:me(),ts:Date.now(),live:1};
       if(wo.upstream&&!wo.upstream.ack){wo.upstream.ack=k.upAck;wo.upstream.ackBy=me()+' · '+DT(Date.now())}
-      delete U.kop[m.id];U.sel[m.id]=null;audit('Koparma formu · iş başladı','SD '+wo.id+' · '+m.name+' · '+wo.kop.sekil);save();render();
+      delete U.kop[m.id];U.sel[m.id]=null;audit('Hat temizlik kontrolü · iş başladı','SD '+wo.id+' · '+m.name+' · '+wo.kop.sekil);save();render();
       toast(`SD ${wo.id} başladı · kameraya gönderildi: ${wo.sob}, artikel ${wo.artikel}, ${wo.desteKoli} deste × ${N(wo.perDeste)}`);break}
     case 'stoppick':U.stopPick[m.id]=true;render();break;
     case 'goStart':render();setTimeout(()=>{const x=document.getElementById('start-'+m.id);x&&x.scrollIntoView({behavior:'smooth',block:'start'})},30);break;
