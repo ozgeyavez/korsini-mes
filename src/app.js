@@ -715,9 +715,11 @@ function viewReports(){
   const cr=crVisible().find(c=>c.id===F.r);if(!cr&&!REPORTS.find(x=>x.k===F.r))F.r='pano';
   const rep=cr?{k:'custom',n:cr.name,d:'',v:cr.metrics[0],u:'',by:['m','day','sh','customer','artikel']}:REPORTS.find(x=>x.k===F.r);if(rep.by.length&&!rep.by.includes(F.by))F.by=rep.by[0];
   const custs=[...new Set([...(S.hist||[]).map(x=>x.customer),...Object.values(S.orders).map(o=>o.customer)])].sort();
-  const list=`<div class="rtabs" role="tablist">${REPORTS.map(x=>`<button role="tab" aria-selected="${x.k===F.r}" class="${x.k===F.r?'on':''}" data-act="repSel" data-v="${x.k}" title="${esc(x.d)}">${x.n}</button>`).join('')}${crVisible().map(c=>`<button role="tab" aria-selected="${c.id===F.r}" class="mine ${c.id===F.r?'on':''}" data-act="repSel" data-v="${c.id}" title="${esc(c.ownerName)} oluşturdu">${esc(c.name)}</button>`).join('')}</div>`;
+  const og=(l,items)=>items.length?`<optgroup label="${esc(l)}">${items.map(([v,t])=>`<option value="${esc(v)}" ${v===F.r?'selected':''}>${esc(t)}</option>`).join('')}</optgroup>`:'';
+  const mineR=crVisible().filter(c=>c.owner===user.id),shared=crVisible().filter(c=>c.owner!==user.id);
+  const list=`<div class="field rsel"><span class="lbl">Rapor</span><select class="input" data-rf="r" aria-label="Rapor seçin">${og('Hazır raporlar',REPORTS.map(x=>[x.k,x.n]))}${og('Benim raporlarım',mineR.map(c=>[c.id,'★ '+c.name]))}${og('Paylaşılan raporlar',shared.map(c=>[c.id,'★ '+c.name+' · '+c.ownerName]))}</select></div>`;
   const qk=PERIODS.find(p=>{const q=quickRange(p[0]);return prodDayKey(q[0])===F.from&&prodDayKey(q[1])===F.to});
-  const filters=`<div class="rtool"><div class="filters">${fld('Tarih',`<div class="seg">${PERIODS.map(p=>`<button class="${qk&&qk[0]===p[0]?'on':''}" data-act="repQuick" data-v="${p[0]}">${p[1]}</button>`).join('')}</div>`)}${fld('Başlangıç',`<input class="input" type="date" data-rf="from" min="${minK}" max="${maxK}" value="${F.from}">`)}${fld('Bitiş',`<input class="input" type="date" data-rf="to" min="${minK}" max="${maxK}" value="${F.to}">`)}${fld('Makine',`<select class="input" data-rf="m">${opts([['all','Bütün Bitirme makineleri'],...S.machines.map(m=>[m.id,m.name])],F.m)}</select>`)}${F.r==='pano'?'':fld('Vardiya',`<select class="input" data-rf="sh">${opts([['all','Bütün vardiyalar'],...S.shifts.map((s,i)=>[i,s.n+' · '+s.s+'–'+s.e])],F.sh)}</select>`)}${fld('Müşteri',`<select class="input" data-rf="c">${opts([['all','Bütün müşteriler'],...custs],F.c)}</select>`)}${rep.by.length?fld('Kırılım',`<select class="input" data-rf="by">${opts(rep.by.map(b=>[b,BYL[b]]),F.by)}</select>`):''}</div></div>`;
+  const filters=`<div class="rtool"><div class="rrow">${list}${rep.by.length?fld('Kırılım · neye göre',`<select class="input" data-rf="by">${opts(rep.by.map(b=>[b,BYL[b]]),F.by)}</select>`):''}</div><div class="filters">${fld('Tarih',`<div class="seg">${PERIODS.map(p=>`<button class="${qk&&qk[0]===p[0]?'on':''}" data-act="repQuick" data-v="${p[0]}">${p[1]}</button>`).join('')}</div>`)}${fld('Başlangıç',`<input class="input" type="date" data-rf="from" min="${minK}" max="${maxK}" value="${F.from}">`)}${fld('Bitiş',`<input class="input" type="date" data-rf="to" min="${minK}" max="${maxK}" value="${F.to}">`)}${fld('Makine',`<select class="input" data-rf="m">${opts([['all','Bütün Bitirme makineleri'],...S.machines.map(m=>[m.id,m.name])],F.m)}</select>`)}${F.r==='pano'?'':fld('Vardiya',`<select class="input" data-rf="sh">${opts([['all','Bütün vardiyalar'],...S.shifts.map((s,i)=>[i,s.n+' · '+s.s+'–'+s.e])],F.sh)}</select>`)}${fld('Müşteri',`<select class="input" data-rf="c">${opts([['all','Bütün müşteriler'],...custs],F.c)}</select>`)}</div></div>`;
   let body;
   if(cr){body=customBody(cr,F)}
   else if(rep.k==='pano'){body=dashBody(F,rangeFacts(F))}
@@ -749,7 +751,7 @@ function viewReports(){
   }
   return `<div class="head"><div><div class="crumb"><span>Analiz</span></div><h1>Raporlar</h1><p>Rapor seçin, filtreleyin, kırılımı değiştirin. Bugünün verisi canlı; geçmiş 6 gün örnek veridir.</p></div>
     <div class="btns">${F.r!=='siparis'&&F.r!=='pano'&&!cr?`<label class="toggle" style="padding:8px 12px"><span>Önceki dönemle karşılaştır</span><input type="checkbox" data-rf="cmp" ${F.cmp?'checked':''}></label>`:''}<button class="btn primary" data-act="modal" data-k="repNew">＋ Rapor ekle</button><button class="btn" data-act="repCsv">↓ CSV indir</button></div></div>
-  ${list}<div class="rcanvas">${filters}${body}</div>`;
+  <div class="rcanvas">${filters}${body}</div>`;
 }
 function customBody(cr,F){
   const facts=rangeFacts(F),{rows,tot}=aggregate({k:'custom',v:cr.metrics[0]},facts,F.by),m0=cr.metrics[0],t0=(CM.find(x=>x[0]===m0)||[])[2];
@@ -1105,6 +1107,7 @@ document.addEventListener('change',e=>{const t=e.target,d=t.dataset;
   else if(d.fin&&t.tagName==='SELECT'){const m=M(d.m),f=finState(m,W(m.current));f[d.fin]=t.value;refreshFin(m)}
   else if(d.fr){const m=M(d.m);render()}
   else if(d.rep){U.rep[d.rep]=d.rep==='m'?t.value:+t.value;render()}
+  else if(d.rf==='r'){U.rf.r=t.value;const c=(S.customReports||[]).find(x=>x.id===t.value);if(c){const q=quickRange(c.per);Object.assign(U.rf,{by:c.by,m:c.m,from:prodDayKey(q[0]),to:prodDayKey(q[1])})}render()}
   else if(d.rf){U.rf[d.rf]=d.rf==='cmp'?t.checked:t.value;render()}
   else if(d.slotnote){const [mid,i]=d.slotnote.split(':');rollBoard();S.board[mid].slots[+i].note=t.value.trim();audit('Pano notu',mName(mid)+' · '+slotLabel(+i)+' · '+t.value.trim());persist();toast('Not kaydedildi')}
   else if(d.autoon){const a=S.autos.find(x=>x.id==d.autoon);a.on=t.checked;audit(a.on?'Otomasyon açıldı':'Otomasyon kapatıldı',a.name);save();render();toast(a.name+(a.on?' açıldı':' kapatıldı'))}

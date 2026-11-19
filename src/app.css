@@ -553,3 +553,10 @@ tr.tot td{font-weight:700;background:var(--surface-2)}
 .chartsw{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 @media (max-width:700px){.donutw{grid-template-columns:1fr}}
 .dleg{max-width:460px}
+.rtool .field.rsel{flex:1 1 300px;max-width:380px}
+.rtool .field.rsel select{font-weight:700;border-color:var(--brand);background:var(--brand-soft)}
+.rtool .rrow{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.rtool .rrow{padding-bottom:14px;margin-bottom:14px;border-bottom:1px dashed var(--line)}
+.rtool .seg button{white-space:nowrap}
+.rtool .rrow .field.rsel{flex:0 1 420px;max-width:420px}
+.rtool .rrow > .field:not(.rsel){flex:0 1 240px}
