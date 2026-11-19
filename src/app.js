@@ -26,11 +26,11 @@ const CLEAN_Q=['Bir önceki işe ait tüm dokümanlar (iş emirleri, raporlar, �
 const KOP_CHECKS=['Kurumama','Kesim hatası','Sakal','Karışma','Yolma','Yırtık','Çapak','Büyüme','Kırışıklık','Diğer'];
 const UP_ACK=['Bozuklar kırmızı kasalarda geldi, ayıklama yapıldı','Ayıklamaya gerek kalmadı','İşaretli kısım dışında da hata görüldü'];
 const PAKON_R=['Karışma','Renk farkı','Tonlama','Leke','Benek','Çizik','Kırık','Çiftleme','Kırışıklık','Lak bozuğu','Açma','Kurumama','Silik','Yolma','Arka verme / yapışma','Yaldız bozuğu','Kesim hatası','Yırtık','Çapak','Yenik','Hammadde bozuğu','Diğer'];
-const ICON={proc:'<path d="M4 6h16M4 12h10M4 18h6"/>',mac:'<rect x="3" y="4" width="8" height="7" rx="1.5"/><rect x="13" y="4" width="8" height="7" rx="1.5"/><rect x="3" y="13" width="8" height="7" rx="1.5"/><rect x="13" y="13" width="8" height="7" rx="1.5"/>',plan:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',rep:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/>',qual:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',maint:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',act:'<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 13l2 2 4-4"/>',auto:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',set:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>'};
+const ICON={home:'<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',proc:'<path d="M4 6h16M4 12h10M4 18h6"/>',mac:'<rect x="3" y="4" width="8" height="7" rx="1.5"/><rect x="13" y="4" width="8" height="7" rx="1.5"/><rect x="3" y="13" width="8" height="7" rx="1.5"/><rect x="13" y="13" width="8" height="7" rx="1.5"/>',plan:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',rep:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/>',qual:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',maint:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',act:'<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 13l2 2 4-4"/>',auto:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',set:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>'};
 const svg=k=>`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[k]}</svg>`;
 
 let S,user=null;
-const U={kop:{},fin:{},sel:{},stopPick:{},onlyErr:{},review:null,tab:{},modal:null,bell:false,err:'',xls:null,rep:{}};
+const U={proc:'paketleme',kop:{},fin:{},sel:{},stopPick:{},onlyErr:{},review:null,tab:{},modal:null,bell:false,err:'',xls:null,rep:{}};
 const LOGO=()=>document.getElementById('logo-tpl').innerHTML;
 const $=s=>document.querySelector(s);
 const val=id=>{const e=document.getElementById(id);return e?String(e.value).trim():''};
@@ -254,24 +254,25 @@ function camImg(wo,b){
 
 /* ---------- kabuk ---------- */
 const NAVG=[
-  ['Üretim',[['prosesler','Prosesler','proc',1],['makineler','Makinelerim','mac',1],['planlama','Planlama','plan','seePlan'],['rapor','Vardiya Sayı Raporu','rep','report']]],
+  ['Üretim',[['isler','Bekleyen İşlerim','home',1],['makineler','Makinelerim','mac',1],['planlama','Planlama','plan','seePlan'],['rapor','Vardiya Sayı Raporu','rep','report']]],
   ['Kalite',[['kalite','Kalite Kontrol','qual','seeQual']]],
   ['Bakım',[['bakim','Bakım Yönetimi','maint','seeMaint']]],
   ['Takip',[['aksiyonlar','Aksiyonlar','act','seeTrack'],['otomasyonlar','Akıllı Otomasyonlar','auto','seeAuto']]],
   ['Yönetim',[['ayarlar','Ayarlar','set','settings']]]];
 const navOk=i=>i[3]===1||can(i[3]);
-const route=()=>(location.hash||'').slice(1)||'prosesler';
-function counts(){return {kalite:S.ncrs.filter(n=>n.status!=='Kapatıldı').length+Object.values(S.orders).filter(o=>o.upstream&&!o.upstream.ack&&o.status!=='bitti').length,bakim:S.maint.filter(b=>b.status!=='Tamamlandı').length+S.pm.filter(pmLate).length,aksiyonlar:S.actions.filter(a=>a.status!=='Tamamlandı'&&a.due<Date.now()).length}}
+const route=()=>(location.hash||'').slice(1)||'isler';
+function counts(){return {isler:tasks().filter(t=>t.sev!=='Bilgi').length,kalite:S.ncrs.filter(n=>n.status!=='Kapatıldı').length+Object.values(S.orders).filter(o=>o.upstream&&!o.upstream.ack&&o.status!=='bitti').length,bakim:S.maint.filter(b=>b.status!=='Tamamlandı').length+S.pm.filter(pmLate).length,aksiyonlar:S.actions.filter(a=>a.status!=='Tamamlandı'&&a.due<Date.now()).length}}
 function render(){
   const app=$('#app');
   if(!user){app.innerHTML=viewLogin()+(U.modal?modalHtml():'');return}
   let r=route();const it=NAVG.flatMap(g=>g[1]).find(i=>i[0]===r);if(it&&!navOk(it))r='makineler';
   let body;
   if(r.startsWith('makine-')&&M(r.slice(7)))body=viewMachine(M(r.slice(7)));
-  else body=({makineler:viewMachines,planlama:viewPlan,rapor:viewReport,kalite:viewQuality,bakim:viewMaint,aksiyonlar:viewActions,otomasyonlar:viewAutos,ayarlar:viewSettings}[r]||(()=>{r='prosesler';return viewProcs()}))();
+  else body=U.proc!=='paketleme'&&r!=='ayarlar'?viewSoon():({isler:viewTasks,makineler:viewMachines,planlama:viewPlan,rapor:viewReport,kalite:viewQuality,bakim:viewMaint,aksiyonlar:viewActions,otomasyonlar:viewAutos,ayarlar:viewSettings}[r]||(()=>{r='isler';return viewTasks()}))();
   const nk=r.startsWith('makine-')?'makineler':r,cn=counts(),un=unread();
   app.innerHTML=`<header class="hdr"><div class="hdr-in">
-      <a class="prod" href="#prosesler" aria-label="Ana sayfa">${LOGO()}<span class="sep"></span><div><b>Korsini MES</b><small>Türkiye</small></div></a>
+      <a class="prod" href="#isler" aria-label="Ana sayfa">${LOGO()}<span class="sep"></span><div><b>Korsini MES</b><small>Türkiye</small></div></a>
+      <label class="procsel"><span>Proses</span><select data-proc aria-label="Proses seçimi">${opts([['baski','Baskı · yakında'],['kesim','Kesim · yakında'],['paketleme','Paketleme · Pakon']],U.proc)}</select></label>
       <span class="spacer"></span><span class="clock" id="clock"></span>
       <button class="btn primary sm" data-act="sim" title="Çalışan makinelerde kameradan yeni koli sonuçları alır">▶<span class="sim-t">Üretimi canlandır</span></button>
       <div class="bellw"><button class="bell" data-act="bell" aria-label="Bildirimler">${svg('bell')}<span class="n" id="bell-n" ${un?'':'hidden'}>${un}</span></button>${U.bell?bellPanel():''}</div>
@@ -304,14 +305,42 @@ const table=(cols,rows,empty)=>rows.length?`<div class="tablewrap"><table><thead
 const mini=(l,v,cls)=>`<div class="mini ${cls||''}"><span class="label">${l}</span><b>${v}</b></div>`;
 
 /* ---------- üretim ---------- */
-function viewProcs(){
-  return `<div class="head"><div><h1>Prosesler</h1><p>Etiket baskıdan başlar, kesimden geçer ve Pakon'da kontrol edilip koliye girer.</p></div></div>
-  <div class="procs">
-    <button class="proc soon" data-act="soon" data-name="Baskı"><span class="tag">Yakında</span><span class="step">01</span><h2>Baskı</h2><p>Ofset baskı, mürekkep ve lak reçetesi sonraki sürümde.</p></button>
-    <button class="proc soon" data-act="soon" data-name="Kesim"><span class="tag">Yakında</span><span class="step">02</span><h2>Kesim</h2><p>DD kesim kayıtları sonraki sürümde.</p></button>
-    <a class="proc live" href="#makineler"><span class="tag">Aktif</span><span class="step">03</span><h2>Paketleme</h2><p>Pakon iş yeri · ${S.machines.length} bitirme makinesi. Koparmada başlar, kamera kontrolüyle koliye girer.</p><span class="go">Makinelerim →</span></a>
-  </div>
-  <div class="flow"><span class="label">Pakon akışı</span><i>Excel ile iş emri</i>→<i>Takım lideri Bitirme'ye atar</i>→<i>Koparma kontrol formu</i>→<i>Birleştirme</i>→<i>Kamera ve koli etiketi</i>→<i>Pakon üretim takip formu</i>→<i>Palet</i></div>`;
+function viewSoon(){const n=U.proc==='baski'?'Baskı':'Kesim';
+  return `<div class="head"><div><div class="crumb"><span>${n}</span></div><h1>${n} prosesi</h1><p>Bu proses sonraki sürümde eklenecek.</p></div></div>
+  <section class="panel" style="justify-items:start"><span class="chip c-idle">Yakında</span><h2>${n} prosesi henüz bu sürümde yok</h2><p class="muted" style="margin:0;max-width:60ch">${n==='Baskı'?'Ofset baskı kayıtları, mürekkep ve lak reçetesi, tabaka çıkış sıcaklığı ve püskürtme tozu değerleri bu proseste tutulacak.':'DD kesim kayıtları, makinede yazan net miktar ve baskıdan eksik gelen tabaka bilgisi bu proseste tutulacak.'} Şimdilik yalnızca Paketleme (Pakon) aktif.</p><button class="btn primary" data-act="toPak">Paketlemeye dön</button></section>`}
+function tasks(){
+  if(!user)return [];const out=[],now=Date.now(),add=(sev,title,detail,href,btn,ts)=>out.push({sev,title,detail,href,btn,ts:ts||now});
+  S.machines.forEach(m=>{const wo=m.current&&W(m.current);
+    const yon=user.role==='yonetici';
+    if(yon&&m.status==='stop')add('Kritik',`${m.name} duruşta · ${m.stopReason}`,`${dur(mins(m.stopSince))} sürüyor`,'#makine-'+m.id,'Makineye git',m.stopSince);
+    if(can('start')){
+      if(m.status==='stop')add('Kritik',`${m.name} duruşta · ${m.stopReason}`,`${dur(mins(m.stopSince))} sürüyor${wo?' · SD '+wo.id:''}`,'#makine-'+m.id,'Makineye git',m.stopSince);
+      if(!m.current&&m.queue.length){const o=W(m.queue[0]),idle=m.idleSince?mins(m.idleSince):0;add(idle>=15?'Uyarı':'Bilgi',`${m.name}: sıradaki işi başlat · SD ${o.id}`,`${o.name} · ${o.customer} · ${N(o.qty)} etiket${idle?' · makine '+dur(idle)+' boşta':''}`,'#makine-'+m.id,'Koparma formu',m.idleSince)}
+      m.queue.forEach(id=>{const o=W(id);if(o.upstream&&!o.upstream.ack)add('Uyarı',`SD ${o.id}: önceki proses uyarısı onay bekliyor`,`${o.upstream.src} · ${o.upstream.type} · ${o.upstream.range} · ${m.name}`,'#makine-'+m.id,'İncele',o.upstream.ts)})}
+    if(can('finish')&&wo){const u=errs(wo).filter(b=>!b.reviewed);
+      if(u.length)add('Kritik',`${m.name}: ${u.length} hatalı koli inceleme bekliyor`,`SD ${wo.id} · ${[...new Set(u.map(b=>codeLabel(b.result)))].join(', ')}`,'#makine-'+m.id,'Kamera sonuçları',u[0].ts);
+      if(pct(wo)>=95)add('Uyarı',`${m.name}: SD ${wo.id} tamamlanmak üzere`,`%${P1(pct(wo))} paketlendi · Pakon üretim takip formunu doldurun`,'#makine-'+m.id,'Pakon formu')}
+    if(can('approve')&&wo&&wo.approvalRequested&&!wo.approved)add('Kritik',`${m.name}: eksik adetle bitirme onayı bekleniyor`,`SD ${wo.id} · %${P1(pct(wo))} paketlendi`,'#makine-'+m.id,'Onayla');
+    if(can('plan')&&!m.current&&!m.queue.length)add('Uyarı',`${m.name}'in sırası boş`,'Havuzdan iş atayın','#planlama','Atamaya git')});
+  if(can('plan')){const pool=Object.values(S.orders).filter(o=>o.status==='havuz'),late=pool.filter(o=>dayKey(o.due)<dayKey(now));
+    if(late.length)add('Kritik',`Termini geçmiş ${late.length} sipariş havuzda`,late.map(o=>'SD '+o.id).join(', '),'#planlama','Atamaya git');
+    if(pool.length)add('Bilgi',`Havuzda ${pool.length} sipariş atama bekliyor`,`Toplam ${N(pool.reduce((a,o)=>a+o.qty,0))} etiket`,'#planlama','Planlamaya git')}
+  if(can('report')){const sh=Math.floor(slotOf(now)/4),ps=sh===0?2:sh-1,pd=sh===0?1:0,[a]=shiftRange(pd,ps),key=[dayKey(a),ps,'all'].join('|');
+    const has=Object.values(S.orders).some(o=>o.boxes.some(x=>x.ts>=a&&x.ts<a+8*H));
+    if(has&&!S.reports.find(r=>r.key===key))add('Bilgi',`${S.shifts[ps].n} sayı raporu teslim edilmedi`,'Paketleme sayı formunu paketleme şefine teslim edin','#rapor','Rapora git',a+8*H)}
+  if(can('editQual')){S.ncrs.filter(n=>n.status!=='Kapatıldı').forEach(n=>add(n.status==='Açık'?'Uyarı':'Bilgi',`${n.id}: ${codeLabel(n.code)} · ${mName(n.machine)}`,n.desc,'#kalite','Kaliteye git',n.created))}
+  if(can('editMaint')){S.maint.filter(b=>b.status!=='Tamamlandı').forEach(b=>add(b.status==='Açık'?'Kritik':'Uyarı',`${b.id}: ${mName(b.machine)} · ${b.type}`,b.desc+' · '+b.status,'#bakim','Bakıma git',b.created));
+    S.pm.filter(pmLate).forEach(t=>add('Uyarı',`${mName(t.machine)}: ${t.name} gecikti`,`${Math.max(1,Math.floor((now-pmDue(t))/DAY))} gün gecikti`,'#bakim','Bakıma git',pmDue(t)))}
+  if(user.role==='yonetici'){S.actions.filter(a=>a.status!=='Tamamlandı'&&a.due<now).forEach(a=>add('Uyarı',`${a.id} gecikti: ${a.title}`,`Sorumlu ${ROLES[a.owner]} · hedef ${D(a.due)}`,'#aksiyonlar','Aksiyona git',a.due));S.maint.filter(b=>b.status==='Açık').forEach(b=>add('Uyarı',`${b.id} müdahale bekliyor`,`${mName(b.machine)} · ${b.desc}`,'#bakim','Bakıma git',b.created))}
+  S.actions.filter(a=>a.owner===user.role&&a.status!=='Tamamlandı').forEach(a=>add(a.due<now?'Kritik':'Bilgi',`${a.id}: ${a.title}`,(a.due<now?'Gecikti · ':'Hedef ')+D(a.due)+' · '+a.src,'#aksiyonlar','Aksiyona git',a.created));
+  const rank={Kritik:0,Uyarı:1,Bilgi:2};return out.sort((x,y)=>rank[x.sev]-rank[y.sev]||x.ts-y.ts);
+}
+function viewTasks(){
+  const ts=tasks(),c=k=>ts.filter(t=>t.sev===k).length;
+  const ms=S.machines;
+  return `<div class="head"><div><div class="crumb"><span>Paketleme · Pakon</span></div><h1>Bekleyen İşlerim</h1><p>${esc(user.name)} · ${ROLES[user.role]} için şu an yapılması gerekenler. En acil olan en üstte.</p></div><a class="btn" href="#makineler">Makinelerim →</a></div>
+  <div class="strip">${kpi('Kritik',c('Kritik'),c('Kritik')?'var(--bad)':'')}${kpi('Uyarı',c('Uyarı'),c('Uyarı')?'var(--warn)':'')}${kpi('Bilgi',c('Bilgi'))}${kpi('Çalışan makine',ms.filter(m=>m.status==='run').length+' / '+ms.length,'var(--ok)')}</div>
+  ${ts.length?`<div class="tasks">${ts.map(t=>`<a class="task ${t.sev}" href="${t.href}"><span class="sv" aria-label="${t.sev}"></span><div style="min-width:0"><b>${esc(t.title)}</b><small>${esc(t.detail)}</small></div><span class="go">${esc(t.btn)} →</span></a>`).join('')}</div>`:'<div class="empty">Bekleyen işiniz yok. Yeni bir iş geldiğinde burada görünür.</div>'}`;
 }
 function machineFlags(m){
   const bt=S.maint.find(b=>b.machine===m.id&&b.status!=='Tamamlandı'),late=S.pm.filter(t=>t.machine===m.id&&pmLate(t)).length,ug=S.ncrs.filter(n=>n.machine===m.id&&n.status!=='Kapatıldı').length,up=m.queue.filter(id=>W(id).upstream&&!W(id).upstream.ack).length;
@@ -334,7 +363,7 @@ function machineCard(m){
 function viewMachines(){
   const ms=S.machines,c=s=>ms.filter(m=>m.status===s).length,today=dayKey(Date.now());let te=0,tp=0;
   Object.values(S.orders).forEach(o=>o.boxes.forEach(b=>{if(dayKey(b.ts)===today){tp+=b.count;if(b.result!=='OK')te++}}));
-  return `<div class="head"><div><div class="crumb"><a href="#prosesler">Prosesler</a>/<span>Paketleme · Pakon</span></div><h1>Makinelerim</h1><p>Bir makineye dokunarak koparma formunu, kamera sonuçlarını ya da 2 saatlik panoyu açın.</p></div>
+  return `<div class="head"><div><div class="crumb"><span>Paketleme · Pakon</span></div><h1>Makinelerim</h1><p>Bir makineye dokunarak koparma formunu, kamera sonuçlarını ya da 2 saatlik panoyu açın.</p></div>
     ${can('seePlan')?'<a class="btn" href="#planlama">Planlamaya git</a>':''}</div>
   <div class="strip">${kpi('Çalışıyor',c('run'),'var(--ok)')}${kpi('Duruş',c('stop'),c('stop')?'var(--bad)':'')}${kpi('Bugün paketlenen etiket',N(tp))}${kpi('Bugün hatalı koli',te,te?'var(--bad)':'')}</div>
   <div class="mgrid">${ms.map(machineCard).join('')}</div>`;
@@ -376,7 +405,7 @@ function viewMachine(m){
   else if(!wo)right=`<div class="empty">Makinede çalışan iş yok. Koparmada bir iş başlayınca kamera ${esc(m.camera)} adresinden sipariş bazında sorgulanır.</div>`;
   else if(t.cur==='cam')right=camPanel(m,wo);
   else right=finPanel(m,wo);
-  return `<div class="head"><div><div class="crumb"><a href="#prosesler">Prosesler</a>/<a href="#makineler">Paketleme</a>/<span>${esc(m.name)}</span></div>
+  return `<div class="head"><div><div class="crumb"><a href="#makineler">Paketleme</a>/<span>${esc(m.name)}</span></div>
     <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><h1>${esc(m.name)}</h1>${PILL[m.status]}<span class="chip c-idle">Pakon masa ${esc(m.masa)}</span></div></div><a class="btn" href="#makineler">← Makinelerim</a></div>
   <div class="cols">${left}<section class="panel">${t.html}${right}</section></div>`;
 }
@@ -476,7 +505,7 @@ function viewPlan(){
     ${table([['SD',o=>`<b class="mono">${o.id}</b>`],['SOB',o=>`<span class="mono small">${esc(o.sob)}</span>`],['Müşteri',o=>esc(o.customer)],['Artikel',o=>`<span class="mono">${esc(o.artikel)}</span>`],['Stok adı',o=>`${esc(o.name)}${o.note?`<br><span class="small" style="color:var(--bad)">${esc(o.note)}</span>`:''}`],['Miktar',o=>`<span class="num">${N(o.qty)}</span>${o.done?`<br><span class="small muted">${N(o.done)} paketlendi</span>`:''}`,'r'],['Montaj',o=>o.montaj,'r'],['Ambalaj',o=>`<span class="num small">${N(o.perDeste)} × ${o.desteKoli}</span>`],['Teslim',o=>{const dk=dayKey(o.due);return dk<td?`<span class="chip c-bad">Geçti · ${D(o.due)}</span>`:dk===td?'<span class="chip c-warn">Bugün</span>':D(o.due)}],['Not',o=>`${o.upstream&&!o.upstream.ack?`<span class="chip c-warn" title="${esc(o.upstream.type)}">⚠ ${esc(o.upstream.src)}</span> `:''}${o.kokteyl>1?`<span class="chip c-idle">Kokteyl ${o.kokteyl}</span>`:''}`],['Kaynak',o=>`<span class="small muted">${esc(o.src||'')}</span>`]],pool.map(o=>Object.assign({_cls:dayKey(o.due)<td?'err':''},o)),'Havuzda sipariş yok. Planı Excel ile yükleyin.')}</section>`;
   const gsec=`<section class="panel"><div class="panel-h"><div><h2>Yayınlanan plan</h2><span class="muted small">Bitirme makinesi başına tahmini çizelge · hız ${N(S.rules.slotTarget/2)} etiket/saat · iş değişimi 15 dk</span></div>
     <div class="seg">${[[0,'Bugün'],[1,'Yarın']].map(([v,l])=>`<button class="${off===v?'on':''}" data-act="planDay" data-v="${v}">${l} · ${D(dayStart(now)+v*DAY)}</button>`).join('')}</div></div>${gantt(off)}</section>`;
-  return `<div class="head"><div><div class="crumb"><a href="#prosesler">Prosesler</a>/<span>Paketleme · Pakon</span></div><h1>Pakon İş Planı</h1><p>Saha takım lideri planı Excel ile yükler, yayınlanan siparişler havuza düşer ve yine takım lideri Bitirme-1…5'e atar.</p></div>
+  return `<div class="head"><div><div class="crumb"><span>Paketleme · Pakon</span></div><h1>Pakon İş Planı</h1><p>Saha takım lideri planı Excel ile yükler, yayınlanan siparişler havuza düşer ve yine takım lideri Bitirme-1…5'e atar.</p></div>
     ${t.cur==='yukle'?'<div class="seg" aria-label="Plan kaynağı"><button class="on" data-act="xlsFocus">Excel</button><button disabled title="ERP entegrasyonu sonraki fazda eklenecek">ERP · Sonraki faz</button></div>':''}</div>
   ${t.html}
   ${t.cur==='yukle'?`${steps}${imp}${last?`<div class="camhdr"><span class="dot"></span><span>Son yayın: <b>${esc(last.file)}</b> · ${DT(last.ts)} · ${esc(last.user)} · ${last.added} iş havuza eklendi${last.skipped?', '+last.skipped+' satır atlandı':''}</span></div>`:''}${orderList}`:`${assignSec}${gsec}`}`;
@@ -755,10 +784,11 @@ document.addEventListener('click',e=>{
   const a=el.dataset.act,m=el.dataset.m&&M(el.dataset.m);
   if(a==='closeScrim'&&e.target!==el)return;
   switch(a){
-    case 'login':user=USERS.find(u=>u.id===el.dataset.id);persist();if(!location.hash)location.hash='prosesler';render();break;
+    case 'login':user=USERS.find(u=>u.id===el.dataset.id);persist();if(!location.hash||location.hash==='#prosesler')location.hash='isler';render();break;
     case 'logout':user=null;U.bell=false;persist();render();break;
     case 'reset':S=seed();runAuto(true);Object.assign(U,{kop:{},fin:{},sel:{},stopPick:{},onlyErr:{},review:null,tab:{},modal:null,bell:false,err:'',xls:null,rep:{}});persist();render();toast('Örnek veri yüklendi');break;
     case 'soon':toast(el.dataset.name+' prosesi yakında eklenecek');break;
+    case 'toPak':U.proc='paketleme';render();break;
     case 'sim':simulate();break;
     case 'poll':{const wo=W(m.current);m.lastQuery=Date.now();persist();render();toast(`${m.camera} adresinden ${wo.sob} için ${wo.boxes.length} koli sonucu alındı`);break}
     case 'bell':U.bell=!U.bell;render();break;
@@ -820,7 +850,8 @@ document.addEventListener('input',e=>{const t=e.target,d=t.dataset;
   else if(d.fr){const m=M(d.m),f=finState(m,W(m.current));f.reasons[d.fr]=t.value;refreshFin(m)}
   else if(d.fin&&t.tagName==='INPUT'){const m=M(d.m),f=finState(m,W(m.current));f[d.fin]=t.value;refreshFin(m)}});
 document.addEventListener('change',e=>{const t=e.target,d=t.dataset;
-  if(t.id==='xls-file'&&t.files[0])readFile(t.files[0]);
+  if(d.proc!==undefined&&t.tagName==='SELECT'){U.proc=t.value;render();if(t.value!=='paketleme')toast((t.value==='baski'?'Baskı':'Kesim')+' prosesi yakında eklenecek')}
+  else if(t.id==='xls-file'&&t.files[0])readFile(t.files[0]);
   else if(d.assign&&t.value)assign(d.assign,t.value);
   else if(d.kchk){const m=M(d.kchk),k=kopState(m,W(U.sel[m.id]&&m.queue.includes(U.sel[m.id])?U.sel[m.id]:m.queue[0]));k.ook3=t.checked;refreshStart(m)}
   else if(d.fchk){const m=M(d.fchk),f=finState(m,W(m.current));f.ook4=t.checked;refreshFin(m)}
