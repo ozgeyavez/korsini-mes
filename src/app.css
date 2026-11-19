@@ -586,3 +586,21 @@ tr.tot td{font-weight:700;background:var(--surface-2)}
 svg.chart{max-height:300px;width:100%}
 .donutw svg.chart{max-height:220px}
 .tmap{height:280px}
+
+/* v17: ajan */
+.ag-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;border-radius:16px;background:var(--surface);border:1px solid var(--line-2)}
+.ag-dot{width:12px;height:12px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 0 rgba(43,182,115,.5);animation:agp 2s infinite}
+@keyframes agp{0%{box-shadow:0 0 0 0 rgba(43,182,115,.5)}70%{box-shadow:0 0 0 10px rgba(43,182,115,0)}100%{box-shadow:0 0 0 0 rgba(43,182,115,0)}}
+@media (prefers-reduced-motion:reduce){.ag-dot{animation:none}}
+.ag-bar .grow{flex:1;min-width:220px;display:grid;gap:2px}
+.ag-list{display:grid;gap:12px}
+.ag-card{background:var(--surface);border:1px solid var(--line-2);border-radius:16px;padding:16px 18px;display:grid;gap:10px}
+.ag-card.p-k{border-color:var(--bad)}
+.ag-h{display:flex;gap:12px;align-items:flex-start}
+.ag-ic{flex:none;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--brand-soft);color:var(--brand-deep);font-size:18px}
+.ag-h .grow{flex:1;min-width:0;display:grid;gap:2px}
+.ag-h b{font-size:15.5px}
+.ag-why{margin:0;font-size:14px}
+.ag-ev{margin:0;padding-left:18px;color:var(--muted);font-size:13px;display:grid;gap:2px}
+.ag-f{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px}
+.ag-note{display:grid;gap:10px;padding:16px 18px;border-radius:16px;background:var(--surface);border:1px dashed var(--line-2)}

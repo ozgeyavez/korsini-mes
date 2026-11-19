@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='v25 · 20.11.2026',TZ='Europe/Istanbul',KEY='korsini-mes-v6',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
+const VERSION='v26 · 20.11.2026',TZ='Europe/Istanbul',KEY='korsini-mes-v6',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
 const ROLES={lider:'Takım lideri',koparma:'Koparma operatörü',paketleme:'Pakon operatörü',kalite:'Kalite uzmanı',bakim:'Bakım teknisyeni',yonetici:'Yönetici',admin:'Admin'};
 const USERS=[
   {id:'u1',sicil:'1001',name:'Takım Lideri 1',ini:'TL',c:'#2fac66',role:'lider',note:'Pakon planını Excel ile yükler, Bitirme makinelerine atar'},
@@ -272,7 +272,7 @@ const NAVG=[
   ['Yönetim',[['ayarlar','Ayarlar','set','settings']]]];
 const navOk=i=>i[3]===1||can(i[3]);
 const route=()=>(location.hash||'').slice(1)||'isler';
-function counts(){return {isler:tasks().filter(t=>t.sev!=='Bilgi').length,kalite:S.ncrs.filter(n=>n.status!=='Kapatıldı').length+Object.values(S.orders).filter(o=>o.upstream&&!o.upstream.ack&&o.status!=='bitti').length,bakim:S.maint.filter(b=>b.status!=='Tamamlandı').length+S.pm.filter(pmLate).length,aksiyonlar:S.actions.filter(a=>a.status!=='Tamamlandı'&&a.due<Date.now()).length}}
+function counts(){return {otomasyonlar:can('editAuto')||user.role==='lider'?((S.agent&&agNew().length)||0):0,isler:tasks().filter(t=>t.sev!=='Bilgi').length,kalite:S.ncrs.filter(n=>n.status!=='Kapatıldı').length+Object.values(S.orders).filter(o=>o.upstream&&!o.upstream.ack&&o.status!=='bitti').length,bakim:S.maint.filter(b=>b.status!=='Tamamlandı').length+S.pm.filter(pmLate).length,aksiyonlar:S.actions.filter(a=>a.status!=='Tamamlandı'&&a.due<Date.now()).length}}
 function render(){
   const app=$('#app');
   if(!user){app.innerHTML=viewLogin()+(U.modal?modalHtml():'');return}
@@ -351,6 +351,7 @@ function tasks(){
     S.pm.filter(pmLate).forEach(t=>add('Uyarı',`${mName(t.machine)}: ${t.name} gecikti`,`${Math.max(1,Math.floor((now-pmDue(t))/DAY))} gün gecikti`,'#bakim','Bakıma git',pmDue(t)))}
   if(user.role==='yonetici'){S.actions.filter(a=>a.status!=='Tamamlandı'&&a.due<now).forEach(a=>add('Uyarı',`${a.id} gecikti: ${a.title}`,`Sorumlu ${ROLES[a.owner]} · hedef ${D(a.due)}`,'#aksiyonlar','Aksiyona git',a.due));S.maint.filter(b=>b.status==='Açık').forEach(b=>add('Uyarı',`${b.id} müdahale bekliyor`,`${mName(b.machine)} · ${b.desc}`,'#bakim','Bakıma git',b.created))}
   S.actions.filter(a=>a.owner===user.role&&a.status!=='Tamamlandı').forEach(a=>add(a.due<now?'Kritik':'Bilgi',`${a.id}: ${a.title}`,(a.due<now?'Gecikti · ':'Hedef ')+D(a.due)+' · '+a.src,'#aksiyonlar','Aksiyona git',a.created));
+  if((can('editAuto')||user.role==='lider')&&S.agent&&agNew().length)add('Bilgi',`Ajanın ${agNew().length} yeni önerisi var`,agNew().slice(0,2).map(g=>g.title).join(' · '),'#otomasyonlar','Ajana git');
   const rank={Kritik:0,Uyarı:1,Bilgi:2};return out.sort((x,y)=>rank[x.sev]-rank[y.sev]||x.ts-y.ts);
 }
 function viewTasks(){
@@ -884,14 +885,59 @@ function viewActions(){
 }
 function autoSentence(a){return `<div class="sentence"><span>Eğer</span><span class="tok when">${esc(METRICS[a.metric].n)}</span><span class="tok when">${OPS[a.op]} ${fmtV(a.metric,a.th)}</span><span>olursa</span><span>→</span><span class="tok">${esc(roleList(a.roles))}</span><span class="tok">${esc(a.ch.join(', '))}</span><span class="tok then">${RESULTS[a.res]}${a.res!=='none'?': '+esc(ROLES[a.owner])+', '+a.days+' gün':''}</span></div>`}
 function viewAutos(){
-  const ed=can('editAuto'),t=tabs('otomasyonlar',[['setup','Otomasyonlar',S.autos.filter(a=>a.on).length+'/'+S.autos.length],['runs','Gerçekleşenler',S.runs.length]],'setup');
-  const body=t.cur==='setup'?`<div class="autos">${S.autos.map(a=>`<div class="auto ${a.on?'':'off'}"><div class="ico">${svg('auto')}</div>
+  const ed=can('editAuto'),t=tabs('otomasyonlar',[['setup','Otomasyonlar',S.autos.filter(a=>a.on).length+'/'+S.autos.length],['runs','Gerçekleşenler',S.runs.length],['agent','Ajan',(agInit(),agNew().length)||'']],agNew().length?'agent':'setup');
+  const body=t.cur==='agent'?viewAgent(can('seeAuto')):t.cur==='setup'?`<div class="autos">${S.autos.map(a=>`<div class="auto ${a.on?'':'off'}"><div class="ico">${svg('auto')}</div>
     <div style="min-width:0"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h3>${esc(a.name)}</h3><span class="pill ${SEVC[a.sev]}">${a.sev}</span><span class="muted small">${S.runs.filter(r=>r.auto===a.id).length} kez gerçekleşti</span></div>${autoSentence(a)}</div>
     <div class="btns">${ed?`<button class="btn sm ghost" data-act="modal" data-k="auto" data-id="${a.id}">Düzenle</button>`:''}<label class="switch" title="${a.on?'Açık':'Kapalı'}"><input type="checkbox" data-autoon="${a.id}" ${a.on?'checked':''} ${ed?'':'disabled'} aria-label="${esc(a.name)} açık"><span></span></label></div></div>`).join('')}</div>`
     :table([['Zaman',r=>DT(r.ts)],['Otomasyon',r=>`<b>${esc(r.name)}</b>`],['Makine',r=>esc(mName(r.machine))],['Değer',r=>`<span class="num">${esc(r.value)}</span>`],['Önem',r=>`<span class="pill ${SEVC[r.sev]}">${r.sev}</span>`],['Alıcılar',r=>`<span class="small">${esc(roleList(r.roles))}<br><span class="muted">${esc(r.ch.join(', '))}</span></span>`],['Sonuç',r=>r.res?`<span class="chip c-info mono">${r.res}</span>`:'<span class="muted small">Bildirim</span>']],S.runs,'Henüz gerçekleşen otomasyon yok.');
   return `<div class="head"><div><div class="crumb"><span>Takip</span></div><h1>Akıllı Otomasyonlar</h1><p>Koşulu kurarsınız; sistem durumu yakaladığında ilgili kişilere haber verir, gerekirse aksiyon, uygunsuzluk ya da bakım talebi açar.</p></div>${ed?'<button class="btn primary" data-act="modal" data-k="auto">Yeni otomasyon</button>':''}</div>${t.html}${body}`;
 }
 
+/* ---------- ajan: kural kurulmadan sistemi dinler, örüntü yakalar, öneri getirir ---------- */
+const AG_SRC=[['stop','Tekrarlayan duruşlar','■'],['fire','Fire artış eğilimi','▲'],['target','Üst üste hedef altı','◔'],['mix','Tekrarlayan karışma','✕'],['pm','Bakım ve arıza ilişkisi','⚙'],['esc','İlerlemeyen aksiyonlar','!'],['note','Saha notları','✎']];
+function agInit(){if(!S.agent)S.agent={mode:'suggest',src:Object.fromEntries(AG_SRC.map(([k])=>[k,true])),th:{stopRep:3,fireTrend:25,targetRep:3,mixRep:3},sugs:[],last:null};return S.agent}
+const agNew=()=>((S.agent||{}).sugs||[]).filter(g=>g.st==='new');
+const shN=i=>S.shifts[i]?S.shifts[i].n:'';
+function agScan(){
+  const A=agInit(),out=[],now=Date.now(),ds=dayStart(now),F=allFacts(),wk=F.filter(x=>x.day>=ds-6*DAY);
+  const has=k=>A.sugs.some(g=>g.key===k&&g.st!=='rej')||S.actions.some(a=>a.srcKey==='AG:'+k&&a.status!=='Tamamlandı');
+  if(A.src.stop){const m={};wk.forEach(x=>x.stops.forEach(st=>{const k=x.m+'|'+st.r;(m[k]=m[k]||[]).push({d:x.day,sh:x.sh,min:st.min})}));
+    Object.entries(m).filter(([,v])=>v.length>=A.th.stopRep).sort((a,b)=>b[1].length-a[1].length).slice(0,3).forEach(([k,v])=>{const [mid,r]=k.split('|'),sum=v.reduce((a,x)=>a+x.min,0);
+      out.push({key:'stop:'+k,src:'stop',m:mid,title:`${mName(mid)} · ${r} tekrarı · kök neden analizi`,why:`${mName(mid)}'de son 7 günde ${v.length} kez “${r}” duruşu oldu, toplam ${dur(sum)}. Duruşların çoğu tek başına “Uzun duruş” otomasyonunun eşiğine takılmadı ama aynı neden tekrar ediyor.`,ev:v.sort((a,b)=>b.d-a.d).slice(0,4).map(x=>`${D(x.d)} · ${shN(x.sh)} · ${x.min} dk`),owner:['Arıza','Kamera hatası','Kawahara ayarı'].includes(r)?'bakim':'lider',prio:v.length>=6?'Yüksek':'Orta',days:3,cat:'Duruş'})})}
+  if(A.src.fire){S.machines.map(m=>{const a=F.filter(x=>x.m===m.id&&x.day>=ds-2*DAY),b=F.filter(x=>x.m===m.id&&x.day<ds-2*DAY&&x.day>=ds-6*DAY),r=xs=>{const p=xs.reduce((t,x)=>t+x.prod,0);return p?xs.reduce((t,x)=>t+x.bad,0)/p*100:0};return {m,ra:r(a),rb:r(b)}}).filter(o=>o.rb>0&&(o.ra/o.rb-1)*100>=A.th.fireTrend).sort((x,y)=>y.ra/y.rb-x.ra/x.rb).slice(0,2).forEach(o=>{const inc=Math.round((o.ra/o.rb-1)*100);
+      out.push({key:'fire:'+o.m.id+':'+dayKey(ds),src:'fire',m:o.m.id,title:`${o.m.name} · fire artış incelemesi`,why:`${o.m.name}'de fire oranı son 3 günde %${o.ra.toFixed(2).replace('.',',')}; önceki 4 günde %${o.rb.toFixed(2).replace('.',',')} idi (+%${inc}). Tek bir Pakon formu dikkat çekmese de eğilim yukarı.`,ev:[`Son 3 gün: %${o.ra.toFixed(2).replace('.',',')}`,`Önceki 4 gün: %${o.rb.toFixed(2).replace('.',',')}`],owner:'kalite',prio:inc>=50?'Yüksek':'Orta',days:3,cat:'Fire'})})}
+  if(A.src.target){const cur=slotOf(now),csh=Math.min(2,Math.floor(cur/4));S.machines.forEach(m=>{const v=F.filter(x=>x.m===m.id&&!(x.day===ds&&x.sh===csh)).sort((a,b)=>b.day-a.day||b.sh-a.sh);let n=0,pc=0;for(const x of v){if(x.target&&x.prod<x.target*.9){n++;pc+=x.prod/x.target}else break}
+      if(n>=A.th.targetRep)out.push({key:'target:'+m.id+':'+n,src:'target',m:m.id,title:`${m.name} · üst üste hedef altı üretim`,why:`${m.name} son ${n} vardiyada üst üste hedefin %90'ının altında kaldı (ortalama %${Math.round(pc/n*100)}). Tek bir 2 saatlik dilim uyarısı bu sürekliliği göstermiyor.`,ev:v.slice(0,Math.min(n,4)).map(x=>`${D(x.day)} · ${shN(x.sh)} · ${N(x.prod)} / ${N(x.target)}`),owner:'lider',prio:n>=5?'Yüksek':'Orta',days:2,cat:'Üretim'})})}
+  if(A.src.mix){const m={};Object.values(S.orders).forEach(o=>o.boxes.forEach(b=>{if(b.result==='CMIX'||b.result==='PMIX')(m[o.artikel]=m[o.artikel]||{o,b:[]}).b.push(b)}));
+    Object.values(m).filter(x=>x.b.length>=A.th.mixRep).sort((a,b)=>b.b.length-a.b.length).slice(0,2).forEach(x=>out.push({key:'mix:'+x.o.artikel+':'+x.b.length,src:'mix',m:x.o.machine,title:`Artikel ${x.o.artikel} · tekrarlayan karışma`,why:`${x.o.customer} siparişinde (SD ${x.o.id}) kamera ${x.b.length} kolide karışma buldu. Önceki işin desteleri birleştirme istasyonunda kalıyor olabilir; hat temizlik kontrolü gözden geçirilmeli.`,ev:x.b.slice(-4).reverse().map(b=>`${b.no} · ${codeLabel(b.result)} · ${T(b.ts)}`),owner:'kalite',prio:x.b.length>=6?'Yüksek':'Orta',days:2,cat:'Kalite'}))}
+  if(A.src.pm){S.machines.forEach(m=>{const late=S.pm.filter(t=>t.machine===m.id&&pmLate(t)),ar=wk.filter(x=>x.m===m.id).reduce((t,x)=>t+x.stops.filter(st=>st.r==='Arıza'||st.r==='Kamera hatası').length,0)+S.maint.filter(b=>b.machine===m.id&&b.created>=ds-6*DAY).length;
+      if(late.length&&ar>=2)out.push({key:'pm:'+m.id+':'+late.length,src:'pm',m:m.id,title:`${m.name} · geciken bakım arızaları artırıyor olabilir`,why:`${m.name}'de ${late.map(t=>t.name.toLocaleLowerCase('tr')).join(', ')} gecikmiş ve son 7 günde ${ar} arıza ya da kamera hatası kaydı var. Geciken bakımın öne alınmasını öneriyorum.`,ev:late.map(t=>`${t.name} · ${Math.max(1,Math.floor((now-pmDue(t))/DAY))} gün gecikti`),owner:'bakim',prio:'Yüksek',days:1,cat:'Bakım'})})}
+  if(A.src.esc){S.actions.filter(a=>a.status!=='Tamamlandı'&&a.due<now).forEach(a=>out.push({key:'esc:'+a.id,src:'esc',escFor:a.id,m:a.machine,title:`İlerlemeyen aksiyon · ${a.title}`,why:`${a.id} hedef tarihi ${Math.max(1,Math.floor((now-a.due)/DAY))} gün önce geçti ve durumu “${a.status}”. Yeni aksiyon açmak yerine yöneticiye bildirmeyi öneriyorum.`,ev:[`Sorumlu: ${ROLES[a.owner]}`,`Kaynak: ${a.src}`],owner:a.owner,prio:'Yüksek',days:1,cat:'Takip'}))}
+  let n=0;out.forEach(g=>{if(has(g.key))return;Object.assign(g,{id:nextId('AJ'),st:'new',at:now});A.sugs.unshift(g);n++;if(A.mode==='auto')agAccept(g,true)});A.last=now;return n;
+}
+function agAccept(g,sys){const by=sys?'Ajan (otomatik)':me();
+  if(g.src==='esc'){const a=S.actions.find(x=>x.id===g.escFor);if(a){a.note=(a.note?a.note+' · ':'')+'Ajan eskalasyonu: yöneticiye bildirildi';notify('Eskalasyon: '+a.title,g.why,['yonetici',a.owner],'Kritik');g.actId=a.id}g.st='ok';g.by=by;audit('Ajan eskalasyonu',g.id+' · '+(a?a.id:''));return}
+  const a={id:nextId('AK'),title:g.title,src:'Ajan önerisi',srcKey:'AG:'+g.key,machine:g.m||null,owner:g.owner,due:Date.now()+g.days*DAY,status:'Açık',created:Date.now(),note:g.why};S.actions.unshift(a);notify('Ajan önerisiyle aksiyon: '+a.id,g.title,[g.owner],'Uyarı');
+  g.st='ok';g.actId=a.id;g.by=by;audit('Ajan önerisi aksiyona çevrildi',g.id+' → '+a.id);}
+function agNote(text,mid){const t=text.trim(),low=t.toLocaleLowerCase('tr');const pick=(arr,def)=>{for(const [re,v] of arr){const m=re.exec(low);if(m)return [v,m[0]]}return [def,'']};
+  const [own,ow]=pick([[/karış|mixup|etiket|renk|leke|lak|kalite|numune|deste sayı/,'kalite'],[/arıza|bakım|kayış|rulman|kamera|bıçak|konveyör|motor|kawahara|yağ/,'bakim']],'lider');
+  const [prio,pw]=pick([[/acil|kritik|güvenlik|kaza|yaralan/,'Kritik'],[/eksik|yapılmamış|yapılmadı|uygunsuz|hatalı|girilmemiş|tekrar/,'Yüksek']],'Orta');
+  const mm=/bitirme[\s-]?([1-9])|\bb([1-9])\b/i.exec(t);const m=mid||(mm?'B'+(mm[1]||mm[2]):'');
+  const first=(t.split(/[.\n!?]/)[0]||t).trim(),title=(first.length>70?first.slice(0,67)+'…':first);
+  const A=agInit(),g={id:nextId('AJ'),key:'note:'+Date.now(),src:'note',m:M(m)?m:null,title:title.charAt(0).toLocaleUpperCase('tr')+title.slice(1),why:`Saha notundan çıkarıldı. Sorumlu ${ow?`“${ow}” ifadesine göre`:'varsayılan olarak'} ${ROLES[own]}, öncelik ${pw?`“${pw}” ifadesine göre`:'varsayılan olarak'} ${prio} önerildi.${M(m)&&!mid?' Makine metinden bulundu: '+mName(m)+'.':''}`,ev:[t],owner:own,prio,days:prio==='Kritik'?1:prio==='Yüksek'?3:7,cat:'Saha notu',st:'new',at:Date.now(),by0:me()};
+  A.sugs.unshift(g);if(A.mode==='auto')agAccept(g,true);return g}
+function viewAgent(ed){
+  const A=agInit();if(!A.last)agScan();const Nw=agNew(),Dn=A.sugs.filter(g=>g.st!=='new'),src=AG_SRC.filter(([k])=>A.src[k]).map(x=>x[1]);
+  const card=g=>`<article class="ag-card ${g.prio==='Kritik'?'p-k':''}"><div class="ag-h"><span class="ag-ic" aria-hidden="true">${(AG_SRC.find(x=>x[0]===g.src)||[0,0,'•'])[2]}</span><div class="grow"><b>${esc(g.title)}</b><small class="muted">${esc((AG_SRC.find(x=>x[0]===g.src)||[0,''])[1])}${g.m?' · '+esc(mName(g.m)):''} · ${DT(g.at)}</small></div><span class="pill ${g.prio==='Kritik'?'st-stop':g.prio==='Yüksek'?'st-warn':'st-idle'}">${esc(g.prio)}</span></div>
+    <p class="ag-why">${esc(g.why)}</p>${g.ev&&g.ev.length?`<ul class="ag-ev">${g.ev.map(e=>`<li>${esc(e)}</li>`).join('')}</ul>`:''}
+    <div class="ag-f"><span class="small muted">${g.src==='esc'?`Aksiyon <b>${esc(g.escFor)}</b> · bildirim: Yönetici`:`Önerilen sorumlu <b>${esc(ROLES[g.owner])}</b> · ${g.days} gün · ${esc(g.cat)}`}</span>${ed?`<div class="btns"><button class="btn ghost sm" data-act="modal" data-k="agRej" data-id="${g.id}">Reddet</button><button class="btn primary sm" data-act="agOk" data-id="${g.id}">${g.src==='esc'?'Yöneticiye bildir':'Aksiyonu aç'}</button></div>`:''}</div></article>`;
+  return `<div class="ag-bar"><span class="ag-dot" aria-hidden="true"></span><div class="grow"><b>Ajan sistemi dinliyor</b><small class="muted">${esc(src.join(', '))} · son tarama ${A.last?DT(A.last):'—'} · mod: ${A.mode==='auto'?'kendisi aksiyon açar':'önerir, insan onaylar'}</small></div>${ed?`<div class="btns"><button class="btn ghost sm" data-act="modal" data-k="agSet">Ayarlar</button><button class="btn sm" data-act="agScan">Şimdi tara</button></div>`:''}</div>
+  <p class="muted" style="margin:0">Ajan için kural ya da iş kurmanıza gerek yok. Duruş, fire, üretim, kamera, bakım ve aksiyon kayıtlarını sürekli dinler; tek tek otomasyon eşiğine takılmayan ama tekrar eden örüntüleri yakalar ve neden önerdiğini kanıtlarıyla yazar.</p>
+  ${A.src.note?`<section class="ag-note"><b>Saha notu / bulgu</b><span class="muted small">Serbest yazın; ajan başlık, sorumlu, öncelik ve süre önersin. Metinde “Bitirme-3” ya da “B3” geçerse makine kendiliğinden bağlanır.</span><textarea class="input" id="agT" placeholder="Örn. Bitirme-3 birleştirme istasyonunda önceki işin desteleri kalmış, karışma riski var, acil temizlenmeli."></textarea><div class="btns" style="justify-content:space-between"><div class="field" style="min-width:220px"><select class="input" id="agM" aria-label="Makine"><option value="">Makineyi metinden bul</option>${opts(machOpts(),'')}</select></div><button class="btn primary" data-act="agNote">Ajana gönder</button></div></section>`:''}
+  <h2 style="margin-top:6px">Yeni öneriler <span class="muted small">${Nw.length}</span></h2>${Nw.length?`<div class="ag-list">${Nw.map(card).join('')}</div>`:'<div class="empty">Şu an yeni öneri yok. Ajan veri değiştikçe ve “Şimdi tara” ile yeniden bakar.</div>'}
+  ${Dn.length?`<h2>Sonuçlananlar</h2>${table([['Zaman',g=>DT(g.at)],['Öneri',g=>`<b>${esc(g.title)}</b>`],['Kaynak',g=>esc((AG_SRC.find(x=>x[0]===g.src)||[0,''])[1])],['Sonuç',g=>g.st==='ok'?'<span class="pill st-run">Uygulandı</span>':'<span class="pill st-idle">Reddedildi</span>'],['Aksiyon / gerekçe',g=>g.st==='ok'&&g.actId?`<a href="#aksiyonlar">${esc(g.actId)}</a>`:esc(g.rejWhy||'')],['Karar',g=>esc(g.by||'')]],Dn)}`:''}
+  <p class="hint" style="margin:0">Prototip: ajan örnek verideki örüntüleri kurallarla buluyor. Canlı sistemde bu ekranın arkasında yapay zekâ modeli çalışır; reddedilen öneriler ve gerekçeleri modelin öğrenmesi için saklanır.</p>`;
+}
 /* ---------- ayarlar ---------- */
 function viewSettings(){
   const t=tabs('ayarlar',[['users','Kullanıcılar ve yetkiler'],['mac','Makineler ve kamera'],['prod','Artikeller'],['stop','Duruş nedenleri'],['err','Kamera hata kodları'],['pak','Pakon bozuk nedenleri'],['rules','İş kuralları ve hedefler'],['shift','Vardiyalar'],['audit','Denetim izi']],'users');
@@ -1011,6 +1057,9 @@ function modalHtml(){
     <div class="grid3">${fld('Kırılım',`<select class="input" id="r-by">${opts(['m','day','sh','customer','artikel'].map(b=>[b,BYL[b]]),c.by)}</select>`)}${fld('Grafik',`<select class="input" id="r-chart">${opts(CHARTS,c.chart)}</select>`)}${fld('Varsayılan dönem',`<select class="input" id="r-per">${opts(PERIODS,c.per)}</select>`)}</div>
     <div class="grid2">${fld('Makine',`<select class="input" id="r-m">${opts([['all','Bütün Bitirme makineleri'],...machOpts()],c.m)}</select>`)}${fld('Kimler görsün?',`<select class="input" id="r-share">${opts([['me','Yalnızca ben'],['all','Herkes'],['roles','Seçili roller']],c.share)}</select>`)}</div>
     ${fld('Seçili roller (Kimler görsün: Seçili roller ise)',checks('r-roles',roleOpts,c.roles))}`}
+  if(md.k==='agRej'){const g=S.agent.sugs.find(x=>x.id===md.id);title='Öneriyi reddet';ok='Reddet';body=`<p style="margin:0"><b>${esc(g.title)}</b></p>${fld('Neden reddediyorsunuz?',`<textarea class="input" id="ag-r" placeholder="Örn. Bakım planında zaten var, bu hafta yapılacak."></textarea>`,'Gerekçe ajanın benzer önerileri ayırt etmesi için saklanır.')}`}
+  if(md.k==='agSet'){const A=agInit();title='Ajan ayarları';body=`${fld('Çalışma modu',`<select class="input" id="ag-mode">${opts([['suggest','Önersin, insan onaylasın'],['auto','Kendisi aksiyon açsın']],A.mode)}</select>`)}${fld('Dinlenecek kaynaklar',checks('ag-src',AG_SRC.map(x=>[x[0],x[1]]),AG_SRC.filter(([k])=>A.src[k]).map(x=>x[0])))}
+    <div class="grid2">${fld('Tekrarlayan duruş: 7 günde en az',`<input class="input num" id="ag-t1" type="number" min="1" value="${A.th.stopRep}">`)}${fld('Fire artışı: en az (%)',`<input class="input num" id="ag-t2" type="number" min="1" value="${A.th.fireTrend}">`)}${fld('Hedef altı: üst üste vardiya',`<input class="input num" id="ag-t3" type="number" min="1" value="${A.th.targetRep}">`)}${fld('Karışma: aynı artikelde en az koli',`<input class="input num" id="ag-t4" type="number" min="1" value="${A.th.mixRep}">`)}</div>`}
   if(md.k==='actNew'){title='Yeni aksiyon';body=`${fld('Başlık',`<input class="input" id="x-title" placeholder="Örn. Bitirme-3 birleştirme istasyonu düzeni">`)}<div class="grid3">${fld('Makine',`<select class="input" id="x-m"><option value="">Genel</option>${opts(machOpts(),'')}</select>`)}${fld('Sorumlu',`<select class="input" id="x-owner">${opts(roleOpts,'lider')}</select>`)}${fld('Süre (gün)',`<input class="input num" id="x-days" type="number" min="1" max="60" value="2">`)}</div>${fld('Açıklama',`<textarea class="input" id="x-note"></textarea>`)}`;ok='Aksiyonu aç'}
   if(md.k==='ncrNew'){title='Yeni uygunsuzluk';body=`<div class="grid2">${fld('Makine',`<select class="input" id="n-m">${opts(machOpts(),'B1')}</select>`)}${fld('Hata kodu',`<select class="input" id="n-code">${opts(S.errorCodes.map(c=>[c.code,c.label]),'CMIX')}</select>`)}</div>${fld('Etkilenen koli sayısı',`<input class="input num" id="n-boxes" type="number" min="0" value="1">`)}${fld('Açıklama',`<textarea class="input" id="n-desc" placeholder="Ne görüldü?"></textarea>`)}`;ok='Uygunsuzluk aç'}
   if(md.k==='upNew'){const os=Object.values(S.orders).filter(o=>o.status!=='bitti'&&!o.upstream);title='Önceki proses uygunsuzluğu';body=`${fld('İş emri (SD)',`<select class="input" id="u-sd">${opts(os.map(o=>[o.id,'SD '+o.id+' · '+o.customer+' · '+o.name]),os[0]&&os[0].id)}</select>`)}<div class="grid2">${fld('Hata tespit yeri',`<select class="input" id="u-src">${opts(['Baskı proses','Sıralı tabaka kontrol','Kesim proses'],'Kesim proses')}</select>`)}${fld('Tespit edildiği aralık',`<input class="input" id="u-range" placeholder="Tabaka 51–60">`)}</div><div class="grid2">${fld('Hata tipi',`<input class="input" id="u-type" placeholder="Örn. Lak izi">`)}${fld('Öngörülen hatalı miktar (adet)',`<input class="input num" id="u-qty" type="number" min="0" value="500">`)}</div>`;ok='Kaydet'}
@@ -1033,6 +1082,8 @@ function modalSave(){
     const o={name,metrics:mets,by:val('r-by'),chart:val('r-chart'),per:val('r-per'),m:val('r-m'),share,roles};
     let c;if(md.k==='repEdit'){c=S.customReports.find(x=>x.id===md.id);Object.assign(c,o);audit('Rapor güncellendi',name)}else{c=Object.assign({id:'c'+Date.now().toString(36),owner:user.id,ownerName:user.name,created:Date.now()},o);S.customReports.push(c);audit('Rapor eklendi',name)}
     const q=quickRange(c.per);U.rf=Object.assign(U.rf||{},{r:c.id,by:c.by,m:c.m,from:prodDayKey(q[0]),to:prodDayKey(q[1]),sh:'all',c:'all',cmp:false});toast(md.k==='repEdit'?'Rapor kaydedildi':'Rapor oluşturuldu: '+name)}
+  if(md.k==='agRej'){const r=val('ag-r');if(r.length<3)return fail('Gerekçe yazın.');const g=S.agent.sugs.find(x=>x.id===md.id);g.st='rej';g.rejWhy=r;g.by=me();audit('Ajan önerisi reddedildi',g.id+' · '+r);toast('Öneri reddedildi')}
+  if(md.k==='agSet'){const A=agInit(),th={stopRep:+val('ag-t1'),fireTrend:+val('ag-t2'),targetRep:+val('ag-t3'),mixRep:+val('ag-t4')};if(Object.values(th).some(v=>!(v>=1&&v<=200)))return fail('Eşikler 1–200 arası olmalı.');const on=checked('ag-src');A.mode=val('ag-mode');A.src=Object.fromEntries(AG_SRC.map(([k])=>[k,on.includes(k)]));A.th=th;audit('Ajan ayarları',A.mode);toast('Ajan ayarları kaydedildi')}
   if(md.k==='actNew'){const t=val('x-title'),d=parseInt(val('x-days'),10);if(!t)return fail('Başlık yazın.');if(!(d>=1))return fail('Süre en az 1 gün olmalı.');
     const a={id:nextId('AK'),title:t,src:'Elle açıldı',machine:val('x-m')||null,owner:val('x-owner'),due:Date.now()+d*DAY,status:'Açık',created:Date.now(),note:val('x-note')};S.actions.unshift(a);notify('Yeni aksiyon: '+t,a.id+' size atandı',[a.owner]);audit('Aksiyon açıldı',a.id+' · '+t);toast(a.id+' açıldı')}
   if(md.k==='ncrNew'){const d=val('n-desc');if(!d)return fail('Açıklama yazın.');const m=M(val('n-m'));
@@ -1058,7 +1109,7 @@ function simulate(){
   const r=Math.random;let n=0;
   S.machines.forEach(m=>{if(m.status!=='run'||!m.current)return;const wo=W(m.current),k=1+Math.floor(r()*2);m.lastQuery=Date.now();
     for(let i=0;i<k;i++){const x=r();const res=x<.07?'CMIX':x<.13?'PMIX':x<.18?'QTY':'OK';const b=addBox(wo,Date.now()-(k-i-1)*20000,res,r,false);if(!b)break;b.live=1;n++}});
-  const f=runAuto(true);persist();render();
+  const f=runAuto(true);if(S.agent)agScan();persist();render();
   toast(n?`Kameralardan ${n} yeni koli sonucu alındı`+(f.length?' · '+f.length+' otomasyon çalıştı':''):'Çalışan makine yok. Önce bir işi başlatın.',!n);
 }
 function finish(m){
@@ -1130,6 +1181,9 @@ document.addEventListener('click',e=>{
     case 'repSel':{U.rf.r=el.dataset.v;const c=(S.customReports||[]).find(x=>x.id===el.dataset.v);if(c){const q=quickRange(c.per);Object.assign(U.rf,{by:c.by,m:c.m,from:prodDayKey(q[0]),to:prodDayKey(q[1])})}render();break}
     case 'repDel':{const c=S.customReports.find(x=>x.id===el.dataset.id);if(!c)return;if(U.delArm!==c.id){U.delArm=c.id;toast('Silmek için “Sil”e tekrar basın');setTimeout(()=>{U.delArm=null},4000);return}S.customReports=S.customReports.filter(x=>x.id!==c.id);U.delArm=null;U.rf.r='pano';audit('Rapor silindi',c.name);persist();render();toast('Rapor silindi');break}
     case 'repCsv':exportCsv();break;
+    case 'agScan':{const n=agScan();persist();render();toast(n?`Ajan ${n} yeni öneri buldu`:'Yeni örüntü bulunamadı');break}
+    case 'agOk':{const g=S.agent.sugs.find(x=>x.id===el.dataset.id);if(!g||g.st!=='new')return;agAccept(g,false);persist();render();toast(g.src==='esc'?'Yöneticiye bildirildi':g.actId+' açıldı');break}
+    case 'agNote':{const t=val('agT');if(t.length<8){toast('Notu biraz daha açık yazın',true);return}const g=agNote(t,val('agM'));persist();render();toast(g.st==='ok'?g.actId+' açıldı':'Ajan öneriyi hazırladı');break}
     case 'pChart':U.pChart=U.pChart||{};U.pChart[el.dataset.id]=el.dataset.v;render();break;
     case 'bChart':U.bChart=U.bChart||{};U.bChart[el.dataset.id]=el.dataset.v;render();break;
     case 'crChart':{U.crChart=U.crChart||{};U.crChart[el.dataset.id]=el.dataset.v;const c=S.customReports.find(x=>x.id===el.dataset.id);if(c&&crCanEdit(c)){c.chart=el.dataset.v;persist()}render();break}
@@ -1196,6 +1250,6 @@ function tick(){
 }
 setInterval(()=>{tick();if(S&&user){const f=runAuto();if(f.length)persist()}},15000);
 window.addEventListener('hashchange',()=>{U.review=null;U.bell=false;render();window.scrollTo(0,0)});
-load();render();
+load();if(!S.agent||!S.agent.last){agInit();agScan();persist()}render();
 globalThis.__korsini={render,S:()=>S,setUser:u=>{user=u},USERS,simulate,checkRows,sampleRows,importXls,U,M,W,finish,startRules,finishRules};
 })();
