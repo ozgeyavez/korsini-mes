@@ -583,7 +583,39 @@ const REPORTS=[
 const CM=[['prod','Paketlenen etiket','n'],['koli','Kontrol edilen koli','n'],['target','Hedef (etiket)','n'],['pct','Hedef gerçekleşme','p'],['setup','İş değişimi','n'],['bad','Fire (bozuk etiket)','n'],['badRate','Fire oranı','p2'],['errs','Hatalı koli','n'],['CMIX','C. Mixup','n'],['PMIX','P. Mixup','n'],['QTY','Adet hatası','n'],['errRate','Kamera hata oranı','p'],['stopN','Duruş sayısı','n'],['stopMin','Duruş süresi (dk)','n']];
 const CML=k=>(CM.find(x=>x[0]===k)||[k,k])[1];
 const cfmt=(k,v)=>{const t=(CM.find(x=>x[0]===k)||[])[2];return t==='p'?'%'+P1(v):t==='p2'?'%'+(v||0).toFixed(2).replace('.',','):N(v)};
-const CHARTS=[['bar','Yatay çubuk'],['col','Sütun'],['line','Çizgi'],['donut','Halka (pay)'],['heat','Isı tablosu'],['table','Yalnızca tablo']];
+const CHARTS=[['bar','Yatay çubuk'],['col','Sütun'],['stack','Yığılmış çubuk'],['line','Çizgi'],['pie','Pasta'],['donut','Halka'],['tree','Ağaç haritası'],['gauge','Gösterge'],['heat','Isı tablosu'],['table','Yalnızca tablo']];
+function pie(rows,v,u){
+  const rs=rows.filter(r=>r[v]>0).slice(0,8),tot=rs.reduce((a,r)=>a+r[v],0);if(!tot)return '<div class="empty">Pasta grafik için değer yok.</div>';
+  let a0=-Math.PI/2;const f=x=>u==='%'?'%'+P1(x):u==='%%'?'%'+x.toFixed(2).replace('.',','):N(x);
+  const sl=rs.map((r,i)=>{const fr=r[v]/tot,a1=a0+fr*2*Math.PI,L=fr>.5?1:0,x0=100+90*Math.cos(a0),y0=100+90*Math.sin(a0),x1=100+90*Math.cos(a1),y1=100+90*Math.sin(a1),am=(a0+a1)/2;
+    const d=rs.length===1?'M100,10 A90,90 0 1 1 99.99,10 Z':`M100,100 L${x0},${y0} A90,90 0 ${L} 1 ${x1},${y1} Z`;a0=a1;
+    return `<path d="${d}" fill="${PAL[i%PAL.length]}" stroke="var(--surface)" stroke-width="2"/>${fr>.07?`<text x="${100+58*Math.cos(am)}" y="${104+58*Math.sin(am)}" text-anchor="middle" style="fill:#fff;font-weight:700;font-size:12px">%${Math.round(fr*100)}</text>`:''}`}).join('');
+  return `<div class="donutw"><svg class="chart" viewBox="0 0 200 200" role="img" aria-label="Pasta grafik">${sl}</svg><div class="dleg">${rs.map((r,i)=>`<div><i style="background:${PAL[i%PAL.length]}"></i><span>${esc(r.k)}</span><b>${f(r[v])}</b><span class="muted">%${P1(r[v]/tot*100)}</span></div>`).join('')}</div></div>`;
+}
+function treemap(rows,v,u){
+  const rs=rows.filter(r=>r[v]>0).sort((a,b)=>b[v]-a[v]).slice(0,12),tot=rs.reduce((a,r)=>a+r[v],0);if(!tot)return '<div class="empty">Ağaç haritası için değer yok.</div>';
+  const f=x=>u==='%'?'%'+P1(x):u==='%%'?'%'+x.toFixed(2).replace('.',','):N(x),out=[];
+  (function lay(items,x,y,w,h,vert){if(!items.length)return;if(items.length===1){out.push([items[0],x,y,w,h]);return}
+    const t=items.reduce((a,r)=>a+r[v],0);let acc=0,k=0;while(k<items.length-1&&acc+items[k][v]<t/2){acc+=items[k][v];k++}if(k===0){acc=items[0][v];k=1}
+    const fr=acc/t;if(vert){lay(items.slice(0,k),x,y,w*fr,h,!vert);lay(items.slice(k),x+w*fr,y,w*(1-fr),h,!vert)}else{lay(items.slice(0,k),x,y,w,h*fr,!vert);lay(items.slice(k),x,y+h*fr,w,h*(1-fr),!vert)}})(rs,0,0,100,100,true);
+  return `<div class="tmap" role="img" aria-label="Ağaç haritası">${out.map(([r,x,y,w,h],i)=>`<div style="left:${x}%;top:${y}%;width:${w}%;height:${h}%;background:${PAL[i%PAL.length]}" title="${esc(r.k)}: ${f(r[v])}"><b>${esc(r.k)}</b>${f(r[v])} · %${P1(r[v]/tot*100)}</div>`).join('')}</div>`;
+}
+function gauges(rows,v,u){
+  if(!rows.length)return '';const max=u==='%'||u==='%%'?Math.max(100,...rows.map(r=>r[v])):Math.max(1,...rows.map(r=>r[v]));
+  const f=x=>u==='%'?'%'+P1(x):u==='%%'?'%'+x.toFixed(2).replace('.',','):x>=1e6?P1(x/1e6)+' M':N(x);
+  const arc=fr=>{const a=Math.PI*(1-Math.min(1,fr)),x=60+46*Math.cos(a),y=62-46*Math.sin(a);return `M14,62 A46,46 0 0 1 ${x},${y}`};
+  return `<div class="gauges">${rows.slice(0,12).map(r=>{const fr=r[v]/max,col=u==='%'&&v==='pct'?(r[v]>=100?'var(--ok)':r[v]>=80?'#d9a900':'var(--bad)'):'var(--brand)';
+    return `<div class="gauge"><svg viewBox="0 0 120 72" width="150" role="img" aria-label="${esc(r.k)} ${f(r[v])}"><path d="M14,62 A46,46 0 0 1 106,62" fill="none" stroke="var(--surface-2)" stroke-width="12" stroke-linecap="round"/><path d="${arc(fr)}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round"/><text x="60" y="58" text-anchor="middle" style="font-weight:700;font-size:15px;fill:var(--fg)">${f(r[v])}</text></svg><b>${esc(r.k)}</b></div>`}).join('')}</div>`;
+}
+function stackChart(rows,metrics){
+  const ks=metrics.filter(k=>!['pct','badRate','errRate'].includes(k)&&k!=='target');if(ks.length<2)return '<div class="empty">Yığılmış çubuk için en az iki adet ölçütü seçin (ör. C. Mixup, P. Mixup, Adet hatası).</div>';
+  const lossy=ks.every(k=>['bad','errs','CMIX','PMIX','QTY','stopN','stopMin'].includes(k));return stackbar(rows.map(r=>Object.assign({},r,{errRate:r.errRate||0})),ks,ks.map(CML),lossy?['#8f1d1d','#cf3b3b','#f0a3a3','#7d8b93','#5d6e76']:PAL).replace(/ · %[0-9,]+<\/b>/g,'</b>');
+}
+function renderChart(ch,rows,v,u,metrics){
+  if(!rows.length||ch==='table')return '';
+  return ch==='col'?vcol(rows,v,u==='%%'?'%':u):ch==='line'?lineChart(rows,v,u):ch==='donut'?donut(rows,v,u):ch==='pie'?pie(rows,v,u):ch==='tree'?treemap(rows,v,u):ch==='gauge'?gauges(rows,v,u):ch==='heat'?heatTable(rows,metrics):ch==='stack'?stackChart(rows,metrics):hbar(rows.slice(0,12),v,u);
+}
+const chartSw=(cur,act,id,allowed)=>`<div class="chartsw"><span class="label">Grafik</span><div class="seg">${CHARTS.filter(c=>!allowed||allowed.includes(c[0])).map(([k,l])=>`<button class="${cur===k?'on':''}" data-act="${act}" data-id="${id}" data-v="${k}">${l}</button>`).join('')}</div></div>`;
 const PAL=['#1c784c','#2bb673','#6fb0e1','#2f6f9f','#d9a900','#a4b6be','#9fd7b8','#5d6e76'];
 function lineChart(rows,v,u){
   if(!rows.length)return '';const W0=660,H0=240,L=16,R=16,T=28,B=30,n=rows.length,max=Math.max(1,...rows.map(r=>r[v])),xs=i=>n===1?W0/2:L+i*(W0-L-R)/(n-1),ys=x=>H0-B-(H0-B-T)*x/max;
@@ -663,7 +695,7 @@ function factsToday(){
       const rs={};let bad=0;Object.values(S.orders).forEach(w=>{if(w.pakon&&w.pakon.masa===m.masa&&w.pakon.ts>=a&&w.pakon.ts<b){Object.entries(w.pakon.reasons).forEach(([k,v])=>{rs[k]=(rs[k]||0)+v;bad+=v})}});
       const stops=(S.stopLog||[]).filter(x=>x.m===m.id&&x.s<b&&(x.e||now)>a).map(x=>({r:x.r,min:Math.round((Math.min(x.e||now,b)-Math.max(x.s,a))/MIN)}));
       const setup=Object.values(S.orders).filter(w=>w.machine===m.id&&w.startedAt>=a&&w.startedAt<b).length;
-      out.push({day:ds,sh,m:m.id,sd:o?o.id:'—',customer:o?o.customer:'—',artikel:o?o.artikel:'—',prod,koli:bx.length,err:e,bad,reasons:rs,stops,setup,target:Math.round(S.rules.slotTarget*4*el)})}});
+      out.push({day:ds,sh,m:m.id,sd:o?o.id:'—',customer:o?o.customer:'—',artikel:o?o.artikel:'—',prod,koli:bx.length,err:e,bad,reasons:rs,stops,setup,target:Math.round(S.rules.slotTarget*4*el/1000)*1000})}});
   return out;
 }
 function factsFor(per,shift){const now=Date.now(),ds=dayStart(now);let f=[...(S.hist||[]),...factsToday()];
@@ -746,7 +778,9 @@ function viewReports(){
     U.repExport={name:rep.k+'_'+F.by+'_'+F.per,head:[BYL[F.by],...cols.map(c=>c[0].replace(/<[^>]+>/g,''))],rows:[...rows,tot].map(r=>[r.k,...cols.map(c=>c[1](r).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim())])};
     body=`<div class="kstrip">${k1.map((x,i)=>rk(x[0],esc(x[1]),'',i===0?delta:'')).join('')}</div>
     <section class="rsec"><div class="panel-h"><div><span class="label">${esc(rep.n)} · ${esc(rangeLabel(F))} · ${esc(BYL[F.by])} kırılımı</span><h2>${esc(rep.n)} ${esc(BYL[F.by]).toLocaleLowerCase('tr')} bazında</h2></div></div>
-      ${rows.length?(F.by==='day'?vcol(rows,v,rep.k==='hedef'?'%':rep.u,RCOL[rep.k]):hbar(rows.slice(0,12),v,rep.k==='hedef'?'%':rep.u,rep.k==='hedef',RCOL[rep.k])):''}
+      ${(()=>{const bc=(U.bChart||{})[rep.k]||'auto',uu=rep.k==='hedef'?'%':'';if(!rows.length)return '';const metrics=rep.k==='kamera'&&F.by!=='code'?['CMIX','PMIX','QTY']:[v];
+        const def=F.by==='day'?vcol(rows,v,uu,RCOL[rep.k]):hbar(rows.slice(0,12),v,uu,rep.k==='hedef',RCOL[rep.k]);
+        return chartSw(bc==='auto'?'auto':bc,'bChart',rep.k,null).replace('<div class="seg">','<div class="seg"><button class="'+(bc==='auto'?'on':'')+'" data-act="bChart" data-id="'+rep.k+'" data-v="auto">Varsayılan</button>')+(bc==='auto'?def:renderChart(bc,rows,v,uu,metrics))})()}
       <div class="nwt">${table(allCols,rows.length?[...rows,totRow]:[],'Seçilen filtrelerde veri yok.')}</div></section>`;
   }
   return `<div class="head"><div><div class="crumb"><span>Analiz</span></div><h1>Raporlar</h1><p>Rapor seçin, filtreleyin, kırılımı değiştirin. Bugünün verisi canlı; geçmiş 6 gün örnek veridir.</p></div>
@@ -759,8 +793,8 @@ function customBody(cr,F){
   const ks=`<div class="kstrip">${cr.metrics.slice(0,4).map(k=>rk(CML(k),cfmt(k,tot[k]))).join('')}</div>`;
   const u=t0==='p'?'%':t0==='p2'?'%%':'';
   const ch=(U.crChart||{})[cr.id]||cr.chart;
-  const chart=!rows.length||ch==='table'?'':ch==='col'?vcol(rows,m0,u==='%%'?'%':u):ch==='line'?lineChart(rows,m0,u):ch==='donut'?donut(rows,m0,u):ch==='heat'?heatTable(rows,cr.metrics):hbar(rows.slice(0,12),m0,u);
-  const sw=`<div class="chartsw"><span class="label">Grafik</span><div class="seg">${CHARTS.map(([k,l])=>`<button class="${ch===k?'on':''}" data-act="crChart" data-id="${cr.id}" data-v="${k}">${l}</button>`).join('')}</div></div>`;
+  const chart=renderChart(ch,rows,m0,u,cr.metrics);
+  const sw=chartSw(ch,'crChart',cr.id);
   const cols=[[BYL[F.by],r=>`<b>${esc(r.k)}</b>`,''],...cr.metrics.map(k=>[CML(k),r=>`<span class="num">${cfmt(k,r[k])}</span>`,'r'])];
   U.repExport={name:'rapor_'+cr.name.replace(/\s+/g,'_'),head:cols.map(c=>c[0]),rows:[...rows,tot].map(r=>[r.k,...cr.metrics.map(k=>cfmt(k,r[k]))])};
   return head+ks+`<section class="rsec"><div class="panel-h"><span class="label">${esc(CML(m0))} · ${esc(rangeLabel(F))}</span>${sw}</div>${chart}${F.by==='day'&&F.to===prodDayKey(Date.now())&&(ch==='line'||ch==='col')?'<p class="hint" style="margin:0">Son gün bugün; vardiyalar devam ettiği için değer henüz tam değil.</p>':''}${ch==='heat'?'':`<div class="nwt">${table(cols,rows.length?[...rows,Object.assign({},tot,{k:'Toplam',_cls:'tot'})]:[],'Seçilen filtrelerde veri yok.')}</div>`}</section>`;
@@ -1079,6 +1113,7 @@ document.addEventListener('click',e=>{
     case 'repSel':{U.rf.r=el.dataset.v;const c=(S.customReports||[]).find(x=>x.id===el.dataset.v);if(c){const q=quickRange(c.per);Object.assign(U.rf,{by:c.by,m:c.m,from:prodDayKey(q[0]),to:prodDayKey(q[1])})}render();break}
     case 'repDel':{const c=S.customReports.find(x=>x.id===el.dataset.id);if(!c)return;if(U.delArm!==c.id){U.delArm=c.id;toast('Silmek için “Sil”e tekrar basın');setTimeout(()=>{U.delArm=null},4000);return}S.customReports=S.customReports.filter(x=>x.id!==c.id);U.delArm=null;U.rf.r='pano';audit('Rapor silindi',c.name);persist();render();toast('Rapor silindi');break}
     case 'repCsv':exportCsv();break;
+    case 'bChart':U.bChart=U.bChart||{};U.bChart[el.dataset.id]=el.dataset.v;render();break;
     case 'crChart':{U.crChart=U.crChart||{};U.crChart[el.dataset.id]=el.dataset.v;const c=S.customReports.find(x=>x.id===el.dataset.id);if(c&&crCanEdit(c)){c.chart=el.dataset.v;persist()}render();break}
     case 'repQuick':{const q=quickRange(el.dataset.v);U.rf.from=prodDayKey(q[0]);U.rf.to=prodDayKey(q[1]);render();break}
     case 'repSend':S.reports.push({key:el.dataset.k,ts:Date.now(),by:me()});audit('Vardiya sayı raporu teslim edildi',el.dataset.k);notify('Vardiya sayı raporu teslim edildi',el.dataset.k.replace(/\|/g,' · '),['lider','yonetici']);persist();render();toast('Rapor paketleme şefine teslim edildi');break;
