@@ -581,3 +581,8 @@ tr.tot td{font-weight:700;background:var(--surface-2)}
 .ver{font-family:var(--f-mono);font-size:11.5px;color:var(--faint)}
 @media (max-width:640px){.users.roles{grid-template-columns:1fr}.lform .row2{grid-template-columns:1fr}}
 .user-btn .sic{display:block;margin-top:2px}
+
+/* v16: grafik yüksekliği sınırı */
+svg.chart{max-height:300px;width:100%}
+.donutw svg.chart{max-height:220px}
+.tmap{height:280px}
