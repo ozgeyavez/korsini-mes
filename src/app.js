@@ -1,15 +1,15 @@
 (function(){
 'use strict';
-const TZ='Europe/Istanbul',KEY='korsini-mes-v6',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
+const VERSION='v24 · 20.11.2026',TZ='Europe/Istanbul',KEY='korsini-mes-v6',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
 const ROLES={lider:'Takım lideri',koparma:'Koparma operatörü',paketleme:'Pakon operatörü',kalite:'Kalite uzmanı',bakim:'Bakım teknisyeni',yonetici:'Yönetici',admin:'Admin'};
 const USERS=[
-  {id:'u1',name:'Takım Lideri 1',ini:'TL',c:'#2fac66',role:'lider',note:'Pakon planını Excel ile yükler, Bitirme makinelerine atar'},
-  {id:'u2',name:'Koparma Operatörü 1',ini:'KO',c:'#6fb0e1',role:'koparma',note:'Hat temizlik kontrolüyle Pakon işini başlatır'},
-  {id:'u3',name:'Pakon Operatörü 1',ini:'PO',c:'#ffd744',role:'paketleme',note:'Kamera sonuçlarını inceler, Pakon formuyla bitirir'},
-  {id:'u6',name:'Kalite Uzmanı 1',ini:'KU',c:'#9fd7b8',role:'kalite',note:'Hata analizini ve uygunsuzlukları yönetir'},
-  {id:'u7',name:'Bakım Teknisyeni 1',ini:'BT',c:'#b9d8f0',role:'bakim',note:'Arızaya müdahale eder, periyodik bakımı yapar'},
-  {id:'u4',name:'Yönetici 1',ini:'Y1',c:'#a4b6be',role:'yonetici',note:'Bütün modülleri görür, otomasyonları kurar'},
-  {id:'u5',name:'Admin 1',ini:'A1',c:'#dce6eb',role:'admin',note:'Ayarları ve yetkileri yönetir'}];
+  {id:'u1',sicil:'1001',name:'Takım Lideri 1',ini:'TL',c:'#2fac66',role:'lider',note:'Pakon planını Excel ile yükler, Bitirme makinelerine atar'},
+  {id:'u2',sicil:'2001',name:'Koparma Operatörü 1',ini:'KO',c:'#6fb0e1',role:'koparma',note:'Hat temizlik kontrolüyle Pakon işini başlatır'},
+  {id:'u3',sicil:'3001',name:'Pakon Operatörü 1',ini:'PO',c:'#ffd744',role:'paketleme',note:'Kamera sonuçlarını inceler, Pakon formuyla bitirir'},
+  {id:'u6',sicil:'4001',name:'Kalite Uzmanı 1',ini:'KU',c:'#9fd7b8',role:'kalite',note:'Hata analizini ve uygunsuzlukları yönetir'},
+  {id:'u7',sicil:'5001',name:'Bakım Teknisyeni 1',ini:'BT',c:'#b9d8f0',role:'bakim',note:'Arızaya müdahale eder, periyodik bakımı yapar'},
+  {id:'u4',sicil:'6001',name:'Yönetici 1',ini:'Y1',c:'#a4b6be',role:'yonetici',note:'Bütün modülleri görür, otomasyonları kurar'},
+  {id:'u5',sicil:'9001',name:'Admin 1',ini:'A1',c:'#dce6eb',role:'admin',note:'Ayarları ve yetkileri yönetir'}];
 const CAN={
   upload:['lider','admin'],plan:['lider','admin'],seePlan:['lider','yonetici','admin'],
   start:['koparma','lider','admin'],finish:['paketleme','lider','admin'],approve:['lider','admin'],
@@ -175,7 +175,7 @@ function seed(){
     pm,audit:[{ts:now-10*H,user:'Takım Lideri 1',what:'Excel ile iş emri yüklendi',detail:'Pakon_plan_19.11.xlsx · '+SEED_ORDERS.length+' iş'}]};
 }
 function load(){
-  try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);S=d.S;user=USERS.find(u=>u.id===d.uid)||null;if(!S.customReports||!S.customReports.find(c=>c.id==='c2'))S.customReports=[...SEED_CR(),...(S.customReports||[]).filter(c=>c.id!=='c1'&&c.id!=='c2')];rollBoard();return}}catch(e){}
+  try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);S=d.S;user=null;if(!S.customReports||!S.customReports.find(c=>c.id==='c2'))S.customReports=[...SEED_CR(),...(S.customReports||[]).filter(c=>c.id!=='c1'&&c.id!=='c2')];rollBoard();return}}catch(e){}
   S=seed();S.customReports=SEED_CR();runAuto(true);
 }
 function rollBoard(){const ds=dayStart(Date.now());S.machines.forEach(m=>{const b=S.board[m.id];if(!b||b.day!==ds)S.board[m.id]={day:ds,slots:Array.from({length:12},()=>({prod:0,bad:0,setup:0,note:''}))}})}
@@ -305,9 +305,16 @@ function viewLogin(){
     <section class="login-art"><div>${LOGO()}</div>
       <div><span class="label">MCC Korsini · Türkiye</span><h1 style="margin-top:10px">Üretim takip sistemi</h1><p>Takım lideri Pakon planını Excel ile yükler ve Bitirme makinelerine atar. İş hat temizlik kontrolüyle başlar, kamera sonuçları sipariş bazında izlenir ve Pakon formuyla biter.</p></div>
       <div class="blocks" aria-hidden="true"><i></i><i></i><i></i></div>
-      <span class="muted" style="font-size:12.5px;position:relative">Prototip · İş emirleri, kamera görüntüleri, kalite ve bakım kayıtları örnek veridir.</span></section>
-    <section class="login-form"><div><h2>Giriş yapın</h2><p class="muted" style="margin:4px 0 0">Denemek için bir rol seçin.</p></div>
-      <div class="users">${USERS.map(u=>`<button class="user-btn" data-act="login" data-id="${u.id}">${avatar(u)}<div><strong>${esc(u.name)}</strong><span>${ROLES[u.role]} · ${esc(u.note)}</span></div><span class="go">›</span></button>`).join('')}</div>
+      <span class="muted" style="font-size:12.5px;position:relative">Prototip · Veriler örnektir · <span class="ver">${VERSION}</span></span></section>
+    <section class="login-form"><div><h2>Giriş yapın</h2><p class="muted" style="margin:4px 0 0">Sicil numaranız ve şifrenizle girin.</p></div>
+      <form class="lform" id="login-form" autocomplete="off">
+        <div class="row2">${fld('Sicil no',`<input class="input mono" id="l-sicil" inputmode="numeric" placeholder="Örn. 1001" value="${esc(U.lsic||'')}">`)}${fld('Şifre',`<input class="input" id="l-pass" type="password" placeholder="••••">`)}</div>
+        ${U.lerr?`<div class="err-line">${esc(U.lerr)}</div>`:''}
+        <button class="btn primary big" type="submit">Giriş yap</button>
+        <span class="hint">Demo: aşağıdaki sicil numaralarından biri, şifre <b>1234</b>.</span>
+      </form>
+      <div class="ldiv">Kolay giriş · rol seçin</div>
+      <div class="users roles">${USERS.map(u=>`<button class="user-btn" data-act="login" data-id="${u.id}">${avatar(u)}<div><strong>${ROLES[u.role]}</strong><span>${esc(u.name)}<span class="sic">Sicil ${u.sicil}</span></span></div><span class="go">›</span></button>`).join('')}</div>
       <button class="btn ghost sm" style="justify-self:start" data-act="reset">Örnek veriye dön</button></section></div>`;
 }
 const tabs=(page,list,def)=>{const cur=U.tab[page]||def;return {cur,html:`<div class="ptabs" role="tablist">${list.map(([k,l,c])=>`<button role="tab" aria-selected="${cur===k}" class="${cur===k?'on':''}" data-act="tab" data-p="${page}" data-v="${k}">${l}${c!=null&&c!==''?`<span class="c">${c}</span>`:''}</button>`).join('')}</div>`}};
@@ -806,6 +813,9 @@ function customBody(cr,F){
   U.repExport={name:'rapor_'+cr.name.replace(/\s+/g,'_'),head:cols.map(c=>c[0]),rows:[...rows,tot].map(r=>[r.k,...cr.metrics.map(k=>cfmt(k,r[k]))])};
   return head+ks+`<section class="rsec"><div class="panel-h"><span class="label">${esc(CML(m0))} · ${esc(rangeLabel(F))}</span>${sw}</div>${chart}${F.by==='day'&&F.to===prodDayKey(Date.now())&&(ch==='line'||ch==='col')?'<p class="hint" style="margin:0">Son gün bugün; vardiyalar devam ettiği için değer henüz tam değil.</p>':''}${ch==='heat'?'':`<div class="nwt">${table(cols,rows.length?[...rows,Object.assign({},tot,{k:'Toplam',_cls:'tot'})]:[],'Seçilen filtrelerde veri yok.')}</div>`}</section>`;
 }
+function doLogin(u){if(!u)return;user=u;U.lerr='';U.lsic='';U.modal=null;U.bell=false;persist();if(location.hash==='#isler')render();else location.hash='isler';window.scrollTo(0,0);toast('Hoş geldiniz, '+u.name)}
+document.addEventListener('submit',e=>{if(e.target.id!=='login-form')return;e.preventDefault();const sc=val('l-sicil'),pw=val('l-pass'),u=USERS.find(x=>x.sicil===sc);
+  U.lsic=sc;if(!sc||!pw){U.lerr='Sicil no ve şifreyi girin.';render();return}if(!u){U.lerr='Bu sicil numarasıyla kullanıcı bulunamadı.';render();return}if(pw!=='1234'){U.lerr='Şifre hatalı. Demo şifre 1234.';render();return}doLogin(u)});
 function exportCsv(){
   const x=U.repExport;if(!x)return;const q=v=>{const s=String(v??'');return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
   const csv='﻿'+[x.head,...x.rows].map(r=>r.map(q).join(';')).join('\n');
@@ -1066,8 +1076,8 @@ document.addEventListener('click',e=>{
   const a=el.dataset.act,m=el.dataset.m&&M(el.dataset.m);
   if(a==='closeScrim'&&e.target!==el)return;
   switch(a){
-    case 'login':user=USERS.find(u=>u.id===el.dataset.id);persist();if(!location.hash||location.hash==='#prosesler')location.hash='isler';render();break;
-    case 'logout':user=null;U.bell=false;persist();render();break;
+    case 'login':doLogin(USERS.find(u=>u.id===el.dataset.id));break;
+    case 'logout':user=null;U.bell=false;U.lerr='';U.modal=null;persist();render();break;
     case 'reset':S=seed();runAuto(true);Object.assign(U,{kop:{},fin:{},sel:{},stopPick:{},onlyErr:{},review:null,tab:{},modal:null,bell:false,err:'',xls:null,rep:{}});persist();render();toast('Örnek veri yüklendi');break;
     case 'soon':toast(el.dataset.name+' prosesi yakında eklenecek');break;
     case 'toPak':U.proc='paketleme';render();break;

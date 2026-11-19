@@ -573,6 +573,20 @@ tr.tot td{font-weight:700;background:var(--surface-2)}
 .gauge{display:grid;justify-items:center;gap:2px;padding:10px;border:1px solid var(--line);border-radius:14px}
 .gauge b{font-size:13.5px}
 .chartsw .seg{flex-wrap:wrap}
+
+/* v15: giriş */
+.lform{display:grid;gap:12px;max-width:540px;padding:20px;border:1px solid var(--line-2);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}
+.lform .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lform .btn{justify-self:stretch}
+.ldiv{display:flex;align-items:center;gap:12px;max-width:540px;color:var(--muted);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.ldiv::before,.ldiv::after{content:"";flex:1;height:1px;background:var(--line-2)}
+.users.roles{grid-template-columns:repeat(2,minmax(0,1fr))}
+.users.roles .user-btn{padding:12px 14px}
+.users.roles .user-btn strong{font-size:15px}
+.user-btn .sic{font-family:var(--f-mono);font-size:11.5px;color:var(--faint)}
+.ver{font-family:var(--f-mono);font-size:11.5px;color:var(--faint)}
+@media (max-width:640px){.users.roles{grid-template-columns:1fr}.lform .row2{grid-template-columns:1fr}}
+.user-btn .sic{display:block;margin-top:2px}
 </style></head>
 <body>
 <template id="logo-tpl"><svg class="logo" role="img" aria-label="MCC Global IML" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1326.13 313.2"> <g class="logo-st4"> <g> <g> <path class="logo-st3" d="M1143.8,66.8h128.91V.54h-128.91c-58.13,0-107.24,47.44-107.24,103.58s49.11,103.59,107.24,103.59h128.91v-66.26h-128.91c-20.52,0-37.22-16.74-37.22-37.33s16.7-37.32,37.22-37.32Z"/> <path class="logo-st3" d="M893.63,66.8h128.91V.54h-128.91c-58.13,0-107.24,47.44-107.24,103.58s49.11,103.59,107.24,103.59h128.91v-66.26h-128.91c-20.52,0-37.22-16.74-37.22-37.33s16.7-37.32,37.22-37.32Z"/> <path class="logo-st3" d="M669.34.31h-192.25v207.42h66.26V66.57h45.87v141.16h66.26V66.57h13.85c20.42,0,37.04,16.66,37.04,37.15v104.01h66.26v-104.01c0-57.02-46.34-103.4-103.3-103.4Z"/> <g> <path class="logo-st3" d="M1294.42,22.06h-4.53V3.7h-5.26V0h15.01v3.7h-5.23v18.36Z"/> <path class="logo-st3" d="M1307.22,22.06h-4.53V0h5.13l6.58,13.39,6.61-13.39h5.13v22.06h-4.53v-13.76l-7.21,14.42-7.18-14.42v13.76Z"/> </g> </g> <g> <path class="logo-st1" d="M389.25,89.61C387.36,39.88,346.38,0,296.25,0h-108.86v186.93h201.87v-97.32Z"/> <path class="logo-st0" d="M126.1,222.25c1.89,49.73,42.87,89.61,93.01,89.61h108.86V124.93H126.1v97.32Z"/> <path class="logo-st2" d="M155.77,153.59c-1.45-38.28-33-68.97-71.59-68.97H.39v143.89h155.38v-74.91Z"/> </g> <g> <path class="logo-st3" d="M545.18,273.42v3.71c0,10.61-3.09,18.55-10,25.55-6.9,6.9-15.66,10.61-25.35,10.61-20.2,0-35.34-15.25-35.34-35.55s15.04-35.86,35.24-35.86c11.13,0,21.12,4.74,27.82,13.19l-10.61,8.35c-5.05-5.98-10.1-8.55-16.9-8.55-12.06,0-21.23,9.89-21.23,22.88s9.48,22.77,21.54,22.77c5.87,0,11.75-2.58,15.35-6.9,2.06-2.37,3.09-4.53,4.22-8.66h-19.17v-11.54h34.42Z"/> <path class="logo-st3" d="M619.27,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> <path class="logo-st3" d="M711.29,253.43c5.87,6.59,8.76,14.53,8.76,24.52,0,19.58-15.66,35.34-35.14,35.34s-35.86-15.56-35.86-35.34,15.66-36.06,36.07-36.06c10.1,0,19.37,4.12,26.17,11.54ZM663.48,277.75c0,12.78,9.17,22.57,21.12,22.57s21.12-9.79,21.12-22.26c0-13.29-8.86-23.08-21.02-23.08s-21.23,9.69-21.23,22.77Z"/> <path class="logo-st3" d="M780.12,243.23c8.45,0,13.91,1.24,17.52,3.92,4.22,3.19,6.59,8.45,6.59,14.53,0,4.74-1.44,8.66-4.33,11.75-1.96,1.96-3.5,2.89-7.21,4.12,4.12.93,5.98,1.75,8.14,3.71,3.19,2.89,4.95,7.11,4.95,12.36,0,6.39-2.68,12.06-7.11,15.04-3.61,2.37-7.83,3.3-15.35,3.3h-25.35v-68.73h22.15ZM772.08,272.39h5.67c8.35,0,12.26-2.99,12.26-9.38,0-3.5-1.65-6.49-4.12-7.73-1.96-.93-4.84-1.34-8.86-1.34h-4.95v18.44ZM772.08,301.55h6.9c4.84,0,7.11-.41,9.17-1.85,2.27-1.55,3.4-4.02,3.4-7.32,0-3.71-1.34-6.29-3.92-7.83-2.16-1.24-4.33-1.65-9.48-1.65h-6.08v18.65Z"/> <path class="logo-st3" d="M855.24,300.11l-4.12,11.85h-14.94l23.7-68.73h17.62l23.49,68.73h-15.46l-3.92-11.85h-26.38ZM868.43,260.13l-9.58,28.44h19.06l-9.48-28.44Z"/> <path class="logo-st3" d="M972.19,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> <path class="logo-st3" d="M1080.18,311.96h-14.12v-68.73h14.12v68.73Z"/> <path class="logo-st3" d="M1135.41,311.96h-14.12v-68.73h15.97l20.51,41.73,20.61-41.73h15.97v68.73h-14.12v-42.87l-22.46,44.93-22.36-44.93v42.87Z"/> <path class="logo-st3" d="M1272.56,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> </g> </g> </g> </svg></template>
@@ -581,16 +595,16 @@ tr.tot td{font-weight:700;background:var(--surface-2)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>(function(){
 'use strict';
-const TZ='Europe/Istanbul',KEY='korsini-mes-v6',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
+const VERSION='v24 · 20.11.2026',TZ='Europe/Istanbul',KEY='korsini-mes-v6',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
 const ROLES={lider:'Takım lideri',koparma:'Koparma operatörü',paketleme:'Pakon operatörü',kalite:'Kalite uzmanı',bakim:'Bakım teknisyeni',yonetici:'Yönetici',admin:'Admin'};
 const USERS=[
-  {id:'u1',name:'Takım Lideri 1',ini:'TL',c:'#2fac66',role:'lider',note:'Pakon planını Excel ile yükler, Bitirme makinelerine atar'},
-  {id:'u2',name:'Koparma Operatörü 1',ini:'KO',c:'#6fb0e1',role:'koparma',note:'Hat temizlik kontrolüyle Pakon işini başlatır'},
-  {id:'u3',name:'Pakon Operatörü 1',ini:'PO',c:'#ffd744',role:'paketleme',note:'Kamera sonuçlarını inceler, Pakon formuyla bitirir'},
-  {id:'u6',name:'Kalite Uzmanı 1',ini:'KU',c:'#9fd7b8',role:'kalite',note:'Hata analizini ve uygunsuzlukları yönetir'},
-  {id:'u7',name:'Bakım Teknisyeni 1',ini:'BT',c:'#b9d8f0',role:'bakim',note:'Arızaya müdahale eder, periyodik bakımı yapar'},
-  {id:'u4',name:'Yönetici 1',ini:'Y1',c:'#a4b6be',role:'yonetici',note:'Bütün modülleri görür, otomasyonları kurar'},
-  {id:'u5',name:'Admin 1',ini:'A1',c:'#dce6eb',role:'admin',note:'Ayarları ve yetkileri yönetir'}];
+  {id:'u1',sicil:'1001',name:'Takım Lideri 1',ini:'TL',c:'#2fac66',role:'lider',note:'Pakon planını Excel ile yükler, Bitirme makinelerine atar'},
+  {id:'u2',sicil:'2001',name:'Koparma Operatörü 1',ini:'KO',c:'#6fb0e1',role:'koparma',note:'Hat temizlik kontrolüyle Pakon işini başlatır'},
+  {id:'u3',sicil:'3001',name:'Pakon Operatörü 1',ini:'PO',c:'#ffd744',role:'paketleme',note:'Kamera sonuçlarını inceler, Pakon formuyla bitirir'},
+  {id:'u6',sicil:'4001',name:'Kalite Uzmanı 1',ini:'KU',c:'#9fd7b8',role:'kalite',note:'Hata analizini ve uygunsuzlukları yönetir'},
+  {id:'u7',sicil:'5001',name:'Bakım Teknisyeni 1',ini:'BT',c:'#b9d8f0',role:'bakim',note:'Arızaya müdahale eder, periyodik bakımı yapar'},
+  {id:'u4',sicil:'6001',name:'Yönetici 1',ini:'Y1',c:'#a4b6be',role:'yonetici',note:'Bütün modülleri görür, otomasyonları kurar'},
+  {id:'u5',sicil:'9001',name:'Admin 1',ini:'A1',c:'#dce6eb',role:'admin',note:'Ayarları ve yetkileri yönetir'}];
 const CAN={
   upload:['lider','admin'],plan:['lider','admin'],seePlan:['lider','yonetici','admin'],
   start:['koparma','lider','admin'],finish:['paketleme','lider','admin'],approve:['lider','admin'],
@@ -756,7 +770,7 @@ function seed(){
     pm,audit:[{ts:now-10*H,user:'Takım Lideri 1',what:'Excel ile iş emri yüklendi',detail:'Pakon_plan_19.11.xlsx · '+SEED_ORDERS.length+' iş'}]};
 }
 function load(){
-  try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);S=d.S;user=USERS.find(u=>u.id===d.uid)||null;if(!S.customReports||!S.customReports.find(c=>c.id==='c2'))S.customReports=[...SEED_CR(),...(S.customReports||[]).filter(c=>c.id!=='c1'&&c.id!=='c2')];rollBoard();return}}catch(e){}
+  try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);S=d.S;user=null;if(!S.customReports||!S.customReports.find(c=>c.id==='c2'))S.customReports=[...SEED_CR(),...(S.customReports||[]).filter(c=>c.id!=='c1'&&c.id!=='c2')];rollBoard();return}}catch(e){}
   S=seed();S.customReports=SEED_CR();runAuto(true);
 }
 function rollBoard(){const ds=dayStart(Date.now());S.machines.forEach(m=>{const b=S.board[m.id];if(!b||b.day!==ds)S.board[m.id]={day:ds,slots:Array.from({length:12},()=>({prod:0,bad:0,setup:0,note:''}))}})}
@@ -886,9 +900,16 @@ function viewLogin(){
     <section class="login-art"><div>${LOGO()}</div>
       <div><span class="label">MCC Korsini · Türkiye</span><h1 style="margin-top:10px">Üretim takip sistemi</h1><p>Takım lideri Pakon planını Excel ile yükler ve Bitirme makinelerine atar. İş hat temizlik kontrolüyle başlar, kamera sonuçları sipariş bazında izlenir ve Pakon formuyla biter.</p></div>
       <div class="blocks" aria-hidden="true"><i></i><i></i><i></i></div>
-      <span class="muted" style="font-size:12.5px;position:relative">Prototip · İş emirleri, kamera görüntüleri, kalite ve bakım kayıtları örnek veridir.</span></section>
-    <section class="login-form"><div><h2>Giriş yapın</h2><p class="muted" style="margin:4px 0 0">Denemek için bir rol seçin.</p></div>
-      <div class="users">${USERS.map(u=>`<button class="user-btn" data-act="login" data-id="${u.id}">${avatar(u)}<div><strong>${esc(u.name)}</strong><span>${ROLES[u.role]} · ${esc(u.note)}</span></div><span class="go">›</span></button>`).join('')}</div>
+      <span class="muted" style="font-size:12.5px;position:relative">Prototip · Veriler örnektir · <span class="ver">${VERSION}</span></span></section>
+    <section class="login-form"><div><h2>Giriş yapın</h2><p class="muted" style="margin:4px 0 0">Sicil numaranız ve şifrenizle girin.</p></div>
+      <form class="lform" id="login-form" autocomplete="off">
+        <div class="row2">${fld('Sicil no',`<input class="input mono" id="l-sicil" inputmode="numeric" placeholder="Örn. 1001" value="${esc(U.lsic||'')}">`)}${fld('Şifre',`<input class="input" id="l-pass" type="password" placeholder="••••">`)}</div>
+        ${U.lerr?`<div class="err-line">${esc(U.lerr)}</div>`:''}
+        <button class="btn primary big" type="submit">Giriş yap</button>
+        <span class="hint">Demo: aşağıdaki sicil numaralarından biri, şifre <b>1234</b>.</span>
+      </form>
+      <div class="ldiv">Kolay giriş · rol seçin</div>
+      <div class="users roles">${USERS.map(u=>`<button class="user-btn" data-act="login" data-id="${u.id}">${avatar(u)}<div><strong>${ROLES[u.role]}</strong><span>${esc(u.name)}<span class="sic">Sicil ${u.sicil}</span></span></div><span class="go">›</span></button>`).join('')}</div>
       <button class="btn ghost sm" style="justify-self:start" data-act="reset">Örnek veriye dön</button></section></div>`;
 }
 const tabs=(page,list,def)=>{const cur=U.tab[page]||def;return {cur,html:`<div class="ptabs" role="tablist">${list.map(([k,l,c])=>`<button role="tab" aria-selected="${cur===k}" class="${cur===k?'on':''}" data-act="tab" data-p="${page}" data-v="${k}">${l}${c!=null&&c!==''?`<span class="c">${c}</span>`:''}</button>`).join('')}</div>`}};
@@ -1387,6 +1408,9 @@ function customBody(cr,F){
   U.repExport={name:'rapor_'+cr.name.replace(/\s+/g,'_'),head:cols.map(c=>c[0]),rows:[...rows,tot].map(r=>[r.k,...cr.metrics.map(k=>cfmt(k,r[k]))])};
   return head+ks+`<section class="rsec"><div class="panel-h"><span class="label">${esc(CML(m0))} · ${esc(rangeLabel(F))}</span>${sw}</div>${chart}${F.by==='day'&&F.to===prodDayKey(Date.now())&&(ch==='line'||ch==='col')?'<p class="hint" style="margin:0">Son gün bugün; vardiyalar devam ettiği için değer henüz tam değil.</p>':''}${ch==='heat'?'':`<div class="nwt">${table(cols,rows.length?[...rows,Object.assign({},tot,{k:'Toplam',_cls:'tot'})]:[],'Seçilen filtrelerde veri yok.')}</div>`}</section>`;
 }
+function doLogin(u){if(!u)return;user=u;U.lerr='';U.lsic='';U.modal=null;U.bell=false;persist();if(location.hash==='#isler')render();else location.hash='isler';window.scrollTo(0,0);toast('Hoş geldiniz, '+u.name)}
+document.addEventListener('submit',e=>{if(e.target.id!=='login-form')return;e.preventDefault();const sc=val('l-sicil'),pw=val('l-pass'),u=USERS.find(x=>x.sicil===sc);
+  U.lsic=sc;if(!sc||!pw){U.lerr='Sicil no ve şifreyi girin.';render();return}if(!u){U.lerr='Bu sicil numarasıyla kullanıcı bulunamadı.';render();return}if(pw!=='1234'){U.lerr='Şifre hatalı. Demo şifre 1234.';render();return}doLogin(u)});
 function exportCsv(){
   const x=U.repExport;if(!x)return;const q=v=>{const s=String(v??'');return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
   const csv='﻿'+[x.head,...x.rows].map(r=>r.map(q).join(';')).join('\n');
@@ -1647,8 +1671,8 @@ document.addEventListener('click',e=>{
   const a=el.dataset.act,m=el.dataset.m&&M(el.dataset.m);
   if(a==='closeScrim'&&e.target!==el)return;
   switch(a){
-    case 'login':user=USERS.find(u=>u.id===el.dataset.id);persist();if(!location.hash||location.hash==='#prosesler')location.hash='isler';render();break;
-    case 'logout':user=null;U.bell=false;persist();render();break;
+    case 'login':doLogin(USERS.find(u=>u.id===el.dataset.id));break;
+    case 'logout':user=null;U.bell=false;U.lerr='';U.modal=null;persist();render();break;
     case 'reset':S=seed();runAuto(true);Object.assign(U,{kop:{},fin:{},sel:{},stopPick:{},onlyErr:{},review:null,tab:{},modal:null,bell:false,err:'',xls:null,rep:{}});persist();render();toast('Örnek veri yüklendi');break;
     case 'soon':toast(el.dataset.name+' prosesi yakında eklenecek');break;
     case 'toPak':U.proc='paketleme';render();break;
