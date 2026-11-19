@@ -448,22 +448,56 @@ function woCard(o,ctx){
     <div class="r"><span class="num">${N(o.qty)} etiket · montaj ${o.montaj}</span>${due}</div>${acts}</div>`;
 }
 function viewPlan(){
-  const pool=Object.values(S.orders).filter(o=>o.status==='havuz').sort((a,b)=>a.due-b.due),last=S.imports[0];
-  return `<div class="head"><div><div class="crumb"><a href="#prosesler">Prosesler</a>/<span>Paketleme · Pakon</span></div><h1>Planlama</h1><p>${can('plan')?'Planlama Pakon iş yeri için iş emirlerini Excel ile yükler. Takım lideri havuzdaki işi Bitirme makinesinin sütununa sürükler ya da listeden seçer.':'Planı görüntülüyorsunuz. Makineye atamayı takım lideri yapar.'}</p></div>
-    <div class="btns">${can('upload')?'<button class="btn primary" data-act="modal" data-k="xls">Excel\'den iş emri yükle</button>':''}</div></div>
-  ${last?`<div class="camhdr"><span class="dot"></span><span>Son yükleme: <b>${esc(last.file)}</b> · ${DT(last.ts)} · ${esc(last.user)} · ${last.added} iş eklendi${last.skipped?', '+last.skipped+' satır atlandı':''}</span></div>`:''}
-  <div class="legend"><span><i style="background:var(--bad)"></i>Termini geçmiş</span><span><i style="background:var(--yellow)"></i>Termini bugün</span><span><i style="background:var(--brand)"></i>Çalışıyor</span><span>⚠ Önceki prosesten uygunsuzluk</span></div>
+  const pool=Object.values(S.orders).filter(o=>o.status==='havuz').sort((a,b)=>a.due-b.due),last=S.imports[0],x=U.xls;
+  let imp='';
+  if(x){const c=k=>x.rows.filter(r=>r.st[0]===k).length,ok=c('ok')+c('wrn');
+    imp=`<section class="panel"><div class="panel-h"><div><h2>Yükleme kontrolü</h2><span class="muted small">${esc(x.file)} · ${x.rows.length} satır</span></div><div class="btns"><span class="pill st-run">${c('ok')} uygun</span><span class="pill st-warn">${c('wrn')} uyarı</span><span class="pill st-stop">${c('err')} hata</span></div></div>
+    ${x.missingCols.length?`<div class="err-line">Eksik sütun: ${esc(x.missingCols.join(', '))}</div>`:''}
+    ${table([['Satır',r=>r.line,'r'],['SD',r=>`<b class="mono">${esc(r.sd||'—')}</b>`],['SOB',r=>`<span class="mono small">${esc(r.sob)}</span>`],['Müşteri · Artikel',r=>`${esc(r.customer)}<br><span class="mono small muted">${esc(r.artikel)}</span>`],['Stok adı',r=>esc(r.name)],['Miktar',r=>`<span class="num">${N(r.qty)}</span>`,'r'],['Montaj',r=>r.montaj,'r'],['Ambalaj',r=>`<span class="num small">${N(r.perDeste)} × ${r.desteKoli}</span>`],['Teslim',r=>r.due?D(r.due):'—'],['İş yeri',r=>esc(r.yer)],['Sonuç',r=>`<span class="small" style="font-weight:700;color:${r.st[0]==='ok'?'var(--ok)':r.st[0]==='wrn'?'var(--warn)':'var(--bad)'}">${esc(r.st[1])}</span>`]],x.rows.map(r=>Object.assign({_cls:r.st[0]==='err'?'err':r.st[0]==='wrn'?'wrn':''},r)))}
+    <div class="btns" style="justify-content:space-between"><button class="btn ghost" data-act="xlsBack">Yüklemeyi iptal et</button><button class="btn primary" data-act="xlsPublish" ${ok?'':'disabled'}>✓ ${c('err')?`${ok} satırı yayınla, ${c('err')} hatalı satırı atla`:`${ok} satırı yayınla`}</button></div></section>`}
+  const steps=can('upload')?`<div class="steps">
+    <div class="step"><span class="n">Adım 1</span><h3>Şablonu indir</h3><p class="small muted">Sütun başlıkları ve açıklamaları dosyanın içinde. İş yeri sütununa PAKON yazılır.</p><button class="btn" data-act="xlsTpl">↓ Şablonu indir (.xlsx)</button></div>
+    <div class="step"><span class="n">Adım 2</span><h3>Planı doldur</h3><p class="small muted">Her satır bir iş emri. Zorunlu alanlar: SD No, müşteri, artikel, stok adı, iş miktarı. Ambalaj bilgisi yoksa 1.000 × 24 deste alınır.</p><button class="btn ghost" data-act="xlsSmp">Dolu örneği indir</button></div>
+    <div class="step"><span class="n">Adım 3</span><h3>Yükle ve yayınla</h3><label class="drop" id="drop" for="xls-file" tabindex="0"><b>↑ Excel dosyasını seçin veya buraya bırakın</b><span class="muted small">.xlsx ya da .xls</span></label><input id="xls-file" type="file" accept=".xlsx,.xls" style="position:absolute;left:-9999px"><button class="btn ghost sm" style="justify-self:start" data-act="xlsSample">Örnek dosyayla dene</button></div></div>`
+    :`<div class="camhdr"><span class="muted">Plan yükleme Planlama rolüne açıktır. Takım lideri havuzdaki işleri Bitirme makinelerine atar.</span></div>`;
+  const assignSec=`<section class="panel"><div class="panel-h"><div><h2>Bitirme makinelerine atama</h2><span class="muted small">${can('plan')?'Havuzdaki işi bir makinenin sütununa sürükleyin ya da listeden seçin.':'Atamayı saha takım lideri yapar.'}</span></div>
+    <div class="legend"><span><i style="background:var(--bad)"></i>Termini geçmiş</span><span><i style="background:var(--yellow)"></i>Termini bugün</span><span><i style="background:var(--brand)"></i>Çalışıyor</span><span>⚠ Önceki proses uyarısı</span></div></div>
   <div class="plan">
-    <section class="pool" data-drop="pool"><div class="col-h"><h2>Pakon iş havuzu</h2><span class="chip c-idle">${pool.length} iş</span></div>
-      ${pool.length?pool.map(o=>woCard(o,{type:'pool'})).join(''):'<div class="empty">Havuzda bekleyen iş yok. Excel ile iş emri yükleyin.</div>'}</section>
+    <section class="pool" data-drop="pool"><div class="col-h"><h3>Pakon iş havuzu</h3><span class="chip c-idle">${pool.length} iş</span></div>
+      ${pool.length?pool.map(o=>woCard(o,{type:'pool'})).join(''):'<div class="empty">Havuzda bekleyen iş yok. Planı Excel ile yükleyin.</div>'}</section>
     <div class="board"><div class="board-in" style="--n:${S.machines.length}">
       ${S.machines.map(m=>{const cur=m.current&&W(m.current);
         return `<section class="col" data-drop="${m.id}"><div class="col-h"><h3>${esc(m.name)}</h3>${PILL[m.status]}</div>
         ${cur?woCard(cur,{type:'cur'}):''}${m.queue.map((id,i)=>woCard(W(id),{type:'queue',i,last:i===m.queue.length-1})).join('')}
         ${!cur&&!m.queue.length?'<div class="empty" style="padding:18px;font-size:13px">İş atanmadı</div>':''}</section>`}).join('')}
-    </div></div></div>`;
+    </div></div></div></section>`;
+  const off=U.planDay||0;
+  return `<div class="head"><div><div class="crumb"><a href="#prosesler">Prosesler</a>/<span>Paketleme · Pakon</span></div><h1>Pakon İş Planı</h1><p>Planlama ekibi Pakon iş emirlerini Excel ile yükler. Yayınlanan işler havuza düşer, saha takım lideri Bitirme-1…5'e atar.</p></div>
+    <div class="seg" aria-label="Plan kaynağı"><button class="on" data-act="xlsFocus">Excel</button><button disabled title="ERP entegrasyonu sonraki fazda eklenecek">ERP · Sonraki faz</button></div></div>
+  ${steps}${imp}
+  ${last?`<div class="camhdr"><span class="dot"></span><span>Son yayın: <b>${esc(last.file)}</b> · ${DT(last.ts)} · ${esc(last.user)} · ${last.added} iş havuza eklendi${last.skipped?', '+last.skipped+' satır atlandı':''}</span></div>`:''}
+  ${assignSec}
+  <section class="panel"><div class="panel-h"><div><h2>Yayınlanan plan</h2><span class="muted small">Bitirme makinesi başına tahmini çizelge · hız ${N(S.rules.slotTarget/2)} etiket/saat · iş değişimi 15 dk</span></div>
+    <div class="seg">${[[0,'Bugün'],[1,'Yarın']].map(([v,l])=>`<button class="${off===v?'on':''}" data-act="planDay" data-v="${v}">${l} · ${D(dayStart(Date.now())+v*DAY)}</button>`).join('')}</div></div>
+    ${gantt(off)}</section>`;
 }
-
+function schedule(m){
+  const now=Date.now(),rate=S.rules.slotTarget/2/H,setup=15*MIN,out=[];
+  Object.values(S.orders).forEach(o=>{if(o.status==='bitti'&&o.machine===m.id&&o.startedAt)out.push({o,s:o.startedAt,e:o.finishedAt||o.startedAt+H,k:'done'})});
+  let t=now;
+  if(m.current){const o=W(m.current),rem=Math.max(0,o.qty-produced(o));const e=now+rem/rate;out.push({o,s:o.startedAt,e:Math.max(e,now+5*MIN),k:m.status==='stop'?'stop':'run'});t=Math.max(e,now+5*MIN)}
+  m.queue.forEach(id=>{const o=W(id),rem=Math.max(0,o.qty-(o.done||0));const s=t+setup,e=s+rem/rate;out.push({o,s,e,k:'q'});t=e});
+  return out;
+}
+function gantt(off){
+  const a=dayStart(Date.now())+off*DAY,b=a+DAY,pos=v=>(v-a)/(b-a)*100,now=Date.now();
+  const ticks=[];for(let i=0;i<=12;i++)ticks.push(i);
+  const row=m=>{const js=schedule(m).filter(j=>j.e>a&&j.s<b);
+    return `<div class="g-r"><a class="g-l" href="#makine-${m.id}">${esc(m.name)}<small>${m.status==='run'?'Çalışıyor':m.status==='stop'?'Duruş':'Boşta'} · ${m.queue.length} sırada</small></a><div class="g-b">${js.map(j=>{const s=Math.max(j.s,a),e=Math.min(j.e,b);
+      return `<a class="g-j ${j.k}" href="#makine-${m.id}" style="left:${pos(s)}%;width:calc(${Math.max(.6,(e-s)/(b-a)*100)}% - 2px)" title="${esc(`SD ${j.o.id} · ${j.o.name}\n${j.o.customer} · ${N(j.o.qty)} etiket\n${T(j.s)} – ${T(j.e)}${j.k==='q'?' (tahmini)':''}`)}">SD ${j.o.id} · ${N(j.o.qty)}</a>`}).join('')}${now>=a&&now<b?`<div class="g-now" style="left:${pos(now)}%"></div>`:''}</div></div>`};
+  return `<div style="overflow-x:auto"><div class="gantt"><div class="g-r"><span></span><div class="g-t">${ticks.map(i=>`<span class="num" style="left:${i/12*100}%;${i===0?'transform:none':i===12?'transform:translateX(-100%)':''}">${String((8+i*2)%24).padStart(2,'0')}:00</span>`).join('')}</div></div>${S.machines.map(row).join('')}</div></div>
+  <div class="legend"><span><i style="background:var(--brand)"></i>Çalışıyor</span><span><i style="background:var(--blue-soft);box-shadow:inset 0 0 0 1px var(--blue)"></i>Sırada (tahmini)</span><span><i style="background:var(--idle-bg)"></i>Bitti</span><span><i style="background:var(--bad)"></i>Duruşta</span><span><i style="background:var(--bad);width:3px;border-radius:0"></i>Şu an</span></div>`;
+}
 /* ---------- vardiya sayı raporu (Form-287) ---------- */
 function shiftRange(dayOff,si){const ds=dayStart(Date.now())-dayOff*DAY;return [ds+si*8*H,ds+(si+1)*8*H]}
 function viewReport(){
@@ -594,11 +628,15 @@ function checkRows(raw,file){
   const missingCols=['sd','customer','artikel','name','qty'].filter(c=>!map[c]).map(c=>XCOLS.find(x=>x[0]===c)[1]);
   const seen={};
   const rows=raw.map((r,i)=>{const g=c=>map[c]!=null?r[map[c]]:'';const o={line:i+2,sd:String(g('sd')||'').trim(),sob:String(g('sob')||'').trim(),customer:String(g('customer')||'').trim(),artikel:String(g('artikel')||'').trim(),name:String(g('name')||'').trim(),qty:parseInt(String(g('qty')).replace(/\D/g,''),10)||0,montaj:parseInt(g('montaj'),10)||1,due:parseDate(g('due')),place:String(g('place')||'').trim(),perDeste:parseInt(g('perDeste'),10)||1000,desteKoli:parseInt(g('desteKoli'),10)||24,kokteyl:parseInt(g('kokteyl'),10)||1,note:String(g('note')||'').trim(),yer:String(g('yer')||'PAKON').trim()};
-    if(map.yer&&norm(o.yer)!=='pakon')o.st=['skip','Pakon dışı iş yeri ('+o.yer+')'];
-    else if(!o.sd||!o.customer||!o.artikel||!o.name||!o.qty)o.st=['err','Zorunlu alan eksik: '+[!o.sd&&'SD No',!o.customer&&'Müşteri',!o.artikel&&'Artikel',!o.name&&'Stok Adı',!o.qty&&'İş Miktarı'].filter(Boolean).join(', ')];
-    else if(S.orders[o.sd])o.st=['skip','Bu SD zaten sistemde'];
-    else if(seen[o.sd])o.st=['err','Dosyada SD tekrar ediyor'];
-    else o.st=['new','Havuza eklenecek'];
+    const errsL=[],w=[];
+    if(map.yer&&norm(o.yer)!=='pakon')errsL.push('Pakon dışı iş yeri ('+o.yer+'), atlanır');
+    const miss=[!o.sd&&'SD No',!o.customer&&'Müşteri',!o.artikel&&'Artikel',!o.name&&'Stok Adı',!o.qty&&'İş Miktarı'].filter(Boolean);if(miss.length)errsL.push('Zorunlu alan eksik: '+miss.join(', '));
+    if(o.sd&&S.orders[o.sd])errsL.push('Bu SD sistemde zaten var');
+    if(o.sd&&seen[o.sd])errsL.push('Dosyada SD tekrar ediyor');
+    if(!o.due)w.push('Teslim tarihi yok, 3 gün sonrası alınır');else if(dayKey(o.due)<dayKey(Date.now()))w.push('Teslim tarihi geçmiş');
+    if(!map.montaj||!(parseInt(g('montaj'),10)>0))w.push('Montaj yok, 1 alınır');
+    if(o.kokteyl>1)w.push('Kokteyl '+o.kokteyl+': tasarımlar ayrı kasaya');
+    o.st=errsL.length?['err',errsL.join(' · ')]:w.length?['wrn',w.join(' · ')]:['ok','Uygun'];
     seen[o.sd]=1;return o});
   return {file,rows,missingCols};
 }
@@ -608,10 +646,10 @@ function readFile(file){
     if(!raw.length){U.err='Dosyada satır bulunamadı. İlk sayfanın ilk satırı başlık olmalı.';render();return}
     U.xls=checkRows(raw,file.name);U.err='';render()}catch(x){U.err='Dosya okunamadı: '+x.message;render()}};fr.readAsArrayBuffer(file);
 }
-function downloadTemplate(){
+function downloadTemplate(full){
   if(!window.XLSX){toast('Excel kütüphanesi yüklenemedi',true);return}
-  const ws=XLSX.utils.json_to_sheet(sampleRows().slice(0,4),{header:XCOLS.map(c=>c[1])}),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Pakon');
-  try{XLSX.writeFile(wb,'Pakon_Is_Emri_Sablonu.xlsx');toast('Şablon indiriliyor')}catch(e){toast('Bu görünümde indirme kapalı. GitHub sayfasından indirebilirsiniz.',true)}
+  const ws=XLSX.utils.json_to_sheet(full?sampleRows():sampleRows().slice(0,1),{header:XCOLS.map(c=>c[1])}),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Pakon');
+  try{XLSX.writeFile(wb,full?'Pakon_Is_Plani_Ornek_Dolu.xlsx':'Pakon_Is_Plani_Sablonu.xlsx');toast(full?'Dolu örnek indiriliyor':'Şablon indiriliyor')}catch(e){toast('Bu görünümde indirme kapalı. GitHub sayfasından indirebilirsiniz.',true)}
 }
 function xlsModal(){
   const x=U.xls;
@@ -627,11 +665,11 @@ function xlsModal(){
 }
 function importXls(){
   const x=U.xls,now=Date.now();let n=0;
-  x.rows.filter(r=>r.st[0]==='new').forEach(r=>{const tech=(Object.values(S.orders).find(o=>o.artikel===r.artikel)||{}).tech;
+  x.rows.filter(r=>r.st[0]!=='err').forEach(r=>{const tech=(Object.values(S.orders).find(o=>o.artikel===r.artikel)||{}).tech;
     const o=mkOrder([r.sd,r.sob||'—',r.customer,r.artikel,r.name,tech||'IML','',r.qty,r.montaj,r.perDeste,r.desteKoli,r.due||now+3*DAY,r.place,r.kokteyl,r.note,''],now,'Excel: '+x.file);S.orders[o.id]=o;n++});
   S.imports.unshift({ts:now,user:me(),file:x.file,added:n,skipped:x.rows.length-n});
   audit('Excel ile iş emri yüklendi',x.file+' · '+n+' iş');notify('Pakon havuzuna '+n+' iş eklendi',x.file+' · '+me(),['lider']);
-  U.xls=null;U.modal=null;save();render();toast(n+' iş emri Pakon havuzuna eklendi. Takım lideri Bitirme makinelerine atayabilir.');
+  U.xls=null;U.modal=null;save();render();toast(n+' iş emri yayınlandı ve Pakon havuzuna düştü. Takım lideri Bitirme makinelerine atayabilir.');
 }
 
 /* ---------- pencereler ---------- */
@@ -733,6 +771,10 @@ document.addEventListener('click',e=>{
     case 'xlsSample':U.xls=checkRows(sampleRows(),'Pakon_plan_ornek.xlsx');U.err='';render();break;
     case 'xlsTpl':downloadTemplate();break;
     case 'xlsBack':U.xls=null;U.err='';render();break;
+    case 'xlsPublish':importXls();break;
+    case 'xlsSmp':downloadTemplate(true);break;
+    case 'xlsFocus':{const d=$('#drop');d&&d.focus&&d.focus();break}
+    case 'planDay':U.planDay=+el.dataset.v;render();break;
     case 'sel':U.sel[m.id]=el.dataset.id;render();break;
     case 'kf':{const k=kopState(m,W(U.sel[m.id]&&m.queue.includes(U.sel[m.id])?U.sel[m.id]:m.queue[0]));k[el.dataset.f]=el.dataset.v;render();break}
     case 'kc':{const k=kopState(m,W(U.sel[m.id]&&m.queue.includes(U.sel[m.id])?U.sel[m.id]:m.queue[0]));k.clean[+el.dataset.i]=+el.dataset.v;render();break}

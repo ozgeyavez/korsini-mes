@@ -382,6 +382,28 @@ tr.err td:first-child{box-shadow:inset 3px 0 0 var(--bad)}
 .mini.bad b{color:var(--bad)} .mini.ok b{color:var(--ok)}
 .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
 .filters .field{min-width:160px}
+
+/* v5: Lark tarzı planlama */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:10px;align-content:start;box-shadow:var(--shadow)}
+.step .n{font-size:12px;font-weight:700;color:var(--brand-deep);text-transform:uppercase;letter-spacing:.08em}
+.step p{margin:0}
+.step .drop{padding:16px;cursor:pointer}
+tr.wrn td{background:var(--warn-bg)}
+.gantt{min-width:980px;display:grid;gap:6px}
+.g-r{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px;align-items:center}
+.g-l{font-weight:700;font-size:14px;text-decoration:none;display:grid;gap:2px}
+.g-l small{font-weight:500;color:var(--muted);font-size:12px}
+.g-b{position:relative;height:50px;border-radius:10px;background:repeating-linear-gradient(90deg,var(--surface-2) 0 calc(100%/12 - 1px),var(--line) calc(100%/12 - 1px) calc(100%/12))}
+.g-t{position:relative;height:18px}
+.g-t span{position:absolute;top:0;font-size:11.5px;color:var(--muted);transform:translateX(-50%)}
+.g-j{position:absolute;top:6px;height:38px;border-radius:8px;border:0;padding:0 8px;display:flex;align-items:center;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;color:#14191c;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.g-j.run{background:var(--brand);color:var(--brand-ink)}
+.g-j.q{background:var(--blue-soft);color:var(--fg);box-shadow:inset 0 0 0 1px var(--blue)}
+.g-j.done{background:var(--idle-bg);color:var(--muted)}
+.g-j.stop{background:var(--bad);color:#fff}
+.g-now{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--bad);border-radius:2px}
+@media (max-width:900px){.steps{grid-template-columns:1fr}}
 </style></head>
 <body>
 <template id="logo-tpl"><svg class="logo" role="img" aria-label="MCC Global IML" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1326.13 313.2"> <g class="logo-st4"> <g> <g> <path class="logo-st3" d="M1143.8,66.8h128.91V.54h-128.91c-58.13,0-107.24,47.44-107.24,103.58s49.11,103.59,107.24,103.59h128.91v-66.26h-128.91c-20.52,0-37.22-16.74-37.22-37.33s16.7-37.32,37.22-37.32Z"/> <path class="logo-st3" d="M893.63,66.8h128.91V.54h-128.91c-58.13,0-107.24,47.44-107.24,103.58s49.11,103.59,107.24,103.59h128.91v-66.26h-128.91c-20.52,0-37.22-16.74-37.22-37.33s16.7-37.32,37.22-37.32Z"/> <path class="logo-st3" d="M669.34.31h-192.25v207.42h66.26V66.57h45.87v141.16h66.26V66.57h13.85c20.42,0,37.04,16.66,37.04,37.15v104.01h66.26v-104.01c0-57.02-46.34-103.4-103.3-103.4Z"/> <g> <path class="logo-st3" d="M1294.42,22.06h-4.53V3.7h-5.26V0h15.01v3.7h-5.23v18.36Z"/> <path class="logo-st3" d="M1307.22,22.06h-4.53V0h5.13l6.58,13.39,6.61-13.39h5.13v22.06h-4.53v-13.76l-7.21,14.42-7.18-14.42v13.76Z"/> </g> </g> <g> <path class="logo-st1" d="M389.25,89.61C387.36,39.88,346.38,0,296.25,0h-108.86v186.93h201.87v-97.32Z"/> <path class="logo-st0" d="M126.1,222.25c1.89,49.73,42.87,89.61,93.01,89.61h108.86V124.93H126.1v97.32Z"/> <path class="logo-st2" d="M155.77,153.59c-1.45-38.28-33-68.97-71.59-68.97H.39v143.89h155.38v-74.91Z"/> </g> <g> <path class="logo-st3" d="M545.18,273.42v3.71c0,10.61-3.09,18.55-10,25.55-6.9,6.9-15.66,10.61-25.35,10.61-20.2,0-35.34-15.25-35.34-35.55s15.04-35.86,35.24-35.86c11.13,0,21.12,4.74,27.82,13.19l-10.61,8.35c-5.05-5.98-10.1-8.55-16.9-8.55-12.06,0-21.23,9.89-21.23,22.88s9.48,22.77,21.54,22.77c5.87,0,11.75-2.58,15.35-6.9,2.06-2.37,3.09-4.53,4.22-8.66h-19.17v-11.54h34.42Z"/> <path class="logo-st3" d="M619.27,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> <path class="logo-st3" d="M711.29,253.43c5.87,6.59,8.76,14.53,8.76,24.52,0,19.58-15.66,35.34-35.14,35.34s-35.86-15.56-35.86-35.34,15.66-36.06,36.07-36.06c10.1,0,19.37,4.12,26.17,11.54ZM663.48,277.75c0,12.78,9.17,22.57,21.12,22.57s21.12-9.79,21.12-22.26c0-13.29-8.86-23.08-21.02-23.08s-21.23,9.69-21.23,22.77Z"/> <path class="logo-st3" d="M780.12,243.23c8.45,0,13.91,1.24,17.52,3.92,4.22,3.19,6.59,8.45,6.59,14.53,0,4.74-1.44,8.66-4.33,11.75-1.96,1.96-3.5,2.89-7.21,4.12,4.12.93,5.98,1.75,8.14,3.71,3.19,2.89,4.95,7.11,4.95,12.36,0,6.39-2.68,12.06-7.11,15.04-3.61,2.37-7.83,3.3-15.35,3.3h-25.35v-68.73h22.15ZM772.08,272.39h5.67c8.35,0,12.26-2.99,12.26-9.38,0-3.5-1.65-6.49-4.12-7.73-1.96-.93-4.84-1.34-8.86-1.34h-4.95v18.44ZM772.08,301.55h6.9c4.84,0,7.11-.41,9.17-1.85,2.27-1.55,3.4-4.02,3.4-7.32,0-3.71-1.34-6.29-3.92-7.83-2.16-1.24-4.33-1.65-9.48-1.65h-6.08v18.65Z"/> <path class="logo-st3" d="M855.24,300.11l-4.12,11.85h-14.94l23.7-68.73h17.62l23.49,68.73h-15.46l-3.92-11.85h-26.38ZM868.43,260.13l-9.58,28.44h19.06l-9.48-28.44Z"/> <path class="logo-st3" d="M972.19,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> <path class="logo-st3" d="M1080.18,311.96h-14.12v-68.73h14.12v68.73Z"/> <path class="logo-st3" d="M1135.41,311.96h-14.12v-68.73h15.97l20.51,41.73,20.61-41.73h15.97v68.73h-14.12v-42.87l-22.46,44.93-22.36-44.93v42.87Z"/> <path class="logo-st3" d="M1272.56,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> </g> </g> </g> </svg></template>
@@ -838,22 +860,56 @@ function woCard(o,ctx){
     <div class="r"><span class="num">${N(o.qty)} etiket · montaj ${o.montaj}</span>${due}</div>${acts}</div>`;
 }
 function viewPlan(){
-  const pool=Object.values(S.orders).filter(o=>o.status==='havuz').sort((a,b)=>a.due-b.due),last=S.imports[0];
-  return `<div class="head"><div><div class="crumb"><a href="#prosesler">Prosesler</a>/<span>Paketleme · Pakon</span></div><h1>Planlama</h1><p>${can('plan')?'Planlama Pakon iş yeri için iş emirlerini Excel ile yükler. Takım lideri havuzdaki işi Bitirme makinesinin sütununa sürükler ya da listeden seçer.':'Planı görüntülüyorsunuz. Makineye atamayı takım lideri yapar.'}</p></div>
-    <div class="btns">${can('upload')?'<button class="btn primary" data-act="modal" data-k="xls">Excel\'den iş emri yükle</button>':''}</div></div>
-  ${last?`<div class="camhdr"><span class="dot"></span><span>Son yükleme: <b>${esc(last.file)}</b> · ${DT(last.ts)} · ${esc(last.user)} · ${last.added} iş eklendi${last.skipped?', '+last.skipped+' satır atlandı':''}</span></div>`:''}
-  <div class="legend"><span><i style="background:var(--bad)"></i>Termini geçmiş</span><span><i style="background:var(--yellow)"></i>Termini bugün</span><span><i style="background:var(--brand)"></i>Çalışıyor</span><span>⚠ Önceki prosesten uygunsuzluk</span></div>
+  const pool=Object.values(S.orders).filter(o=>o.status==='havuz').sort((a,b)=>a.due-b.due),last=S.imports[0],x=U.xls;
+  let imp='';
+  if(x){const c=k=>x.rows.filter(r=>r.st[0]===k).length,ok=c('ok')+c('wrn');
+    imp=`<section class="panel"><div class="panel-h"><div><h2>Yükleme kontrolü</h2><span class="muted small">${esc(x.file)} · ${x.rows.length} satır</span></div><div class="btns"><span class="pill st-run">${c('ok')} uygun</span><span class="pill st-warn">${c('wrn')} uyarı</span><span class="pill st-stop">${c('err')} hata</span></div></div>
+    ${x.missingCols.length?`<div class="err-line">Eksik sütun: ${esc(x.missingCols.join(', '))}</div>`:''}
+    ${table([['Satır',r=>r.line,'r'],['SD',r=>`<b class="mono">${esc(r.sd||'—')}</b>`],['SOB',r=>`<span class="mono small">${esc(r.sob)}</span>`],['Müşteri · Artikel',r=>`${esc(r.customer)}<br><span class="mono small muted">${esc(r.artikel)}</span>`],['Stok adı',r=>esc(r.name)],['Miktar',r=>`<span class="num">${N(r.qty)}</span>`,'r'],['Montaj',r=>r.montaj,'r'],['Ambalaj',r=>`<span class="num small">${N(r.perDeste)} × ${r.desteKoli}</span>`],['Teslim',r=>r.due?D(r.due):'—'],['İş yeri',r=>esc(r.yer)],['Sonuç',r=>`<span class="small" style="font-weight:700;color:${r.st[0]==='ok'?'var(--ok)':r.st[0]==='wrn'?'var(--warn)':'var(--bad)'}">${esc(r.st[1])}</span>`]],x.rows.map(r=>Object.assign({_cls:r.st[0]==='err'?'err':r.st[0]==='wrn'?'wrn':''},r)))}
+    <div class="btns" style="justify-content:space-between"><button class="btn ghost" data-act="xlsBack">Yüklemeyi iptal et</button><button class="btn primary" data-act="xlsPublish" ${ok?'':'disabled'}>✓ ${c('err')?`${ok} satırı yayınla, ${c('err')} hatalı satırı atla`:`${ok} satırı yayınla`}</button></div></section>`}
+  const steps=can('upload')?`<div class="steps">
+    <div class="step"><span class="n">Adım 1</span><h3>Şablonu indir</h3><p class="small muted">Sütun başlıkları ve açıklamaları dosyanın içinde. İş yeri sütununa PAKON yazılır.</p><button class="btn" data-act="xlsTpl">↓ Şablonu indir (.xlsx)</button></div>
+    <div class="step"><span class="n">Adım 2</span><h3>Planı doldur</h3><p class="small muted">Her satır bir iş emri. Zorunlu alanlar: SD No, müşteri, artikel, stok adı, iş miktarı. Ambalaj bilgisi yoksa 1.000 × 24 deste alınır.</p><button class="btn ghost" data-act="xlsSmp">Dolu örneği indir</button></div>
+    <div class="step"><span class="n">Adım 3</span><h3>Yükle ve yayınla</h3><label class="drop" id="drop" for="xls-file" tabindex="0"><b>↑ Excel dosyasını seçin veya buraya bırakın</b><span class="muted small">.xlsx ya da .xls</span></label><input id="xls-file" type="file" accept=".xlsx,.xls" style="position:absolute;left:-9999px"><button class="btn ghost sm" style="justify-self:start" data-act="xlsSample">Örnek dosyayla dene</button></div></div>`
+    :`<div class="camhdr"><span class="muted">Plan yükleme Planlama rolüne açıktır. Takım lideri havuzdaki işleri Bitirme makinelerine atar.</span></div>`;
+  const assignSec=`<section class="panel"><div class="panel-h"><div><h2>Bitirme makinelerine atama</h2><span class="muted small">${can('plan')?'Havuzdaki işi bir makinenin sütununa sürükleyin ya da listeden seçin.':'Atamayı saha takım lideri yapar.'}</span></div>
+    <div class="legend"><span><i style="background:var(--bad)"></i>Termini geçmiş</span><span><i style="background:var(--yellow)"></i>Termini bugün</span><span><i style="background:var(--brand)"></i>Çalışıyor</span><span>⚠ Önceki proses uyarısı</span></div></div>
   <div class="plan">
-    <section class="pool" data-drop="pool"><div class="col-h"><h2>Pakon iş havuzu</h2><span class="chip c-idle">${pool.length} iş</span></div>
-      ${pool.length?pool.map(o=>woCard(o,{type:'pool'})).join(''):'<div class="empty">Havuzda bekleyen iş yok. Excel ile iş emri yükleyin.</div>'}</section>
+    <section class="pool" data-drop="pool"><div class="col-h"><h3>Pakon iş havuzu</h3><span class="chip c-idle">${pool.length} iş</span></div>
+      ${pool.length?pool.map(o=>woCard(o,{type:'pool'})).join(''):'<div class="empty">Havuzda bekleyen iş yok. Planı Excel ile yükleyin.</div>'}</section>
     <div class="board"><div class="board-in" style="--n:${S.machines.length}">
       ${S.machines.map(m=>{const cur=m.current&&W(m.current);
         return `<section class="col" data-drop="${m.id}"><div class="col-h"><h3>${esc(m.name)}</h3>${PILL[m.status]}</div>
         ${cur?woCard(cur,{type:'cur'}):''}${m.queue.map((id,i)=>woCard(W(id),{type:'queue',i,last:i===m.queue.length-1})).join('')}
         ${!cur&&!m.queue.length?'<div class="empty" style="padding:18px;font-size:13px">İş atanmadı</div>':''}</section>`}).join('')}
-    </div></div></div>`;
+    </div></div></div></section>`;
+  const off=U.planDay||0;
+  return `<div class="head"><div><div class="crumb"><a href="#prosesler">Prosesler</a>/<span>Paketleme · Pakon</span></div><h1>Pakon İş Planı</h1><p>Planlama ekibi Pakon iş emirlerini Excel ile yükler. Yayınlanan işler havuza düşer, saha takım lideri Bitirme-1…5'e atar.</p></div>
+    <div class="seg" aria-label="Plan kaynağı"><button class="on" data-act="xlsFocus">Excel</button><button disabled title="ERP entegrasyonu sonraki fazda eklenecek">ERP · Sonraki faz</button></div></div>
+  ${steps}${imp}
+  ${last?`<div class="camhdr"><span class="dot"></span><span>Son yayın: <b>${esc(last.file)}</b> · ${DT(last.ts)} · ${esc(last.user)} · ${last.added} iş havuza eklendi${last.skipped?', '+last.skipped+' satır atlandı':''}</span></div>`:''}
+  ${assignSec}
+  <section class="panel"><div class="panel-h"><div><h2>Yayınlanan plan</h2><span class="muted small">Bitirme makinesi başına tahmini çizelge · hız ${N(S.rules.slotTarget/2)} etiket/saat · iş değişimi 15 dk</span></div>
+    <div class="seg">${[[0,'Bugün'],[1,'Yarın']].map(([v,l])=>`<button class="${off===v?'on':''}" data-act="planDay" data-v="${v}">${l} · ${D(dayStart(Date.now())+v*DAY)}</button>`).join('')}</div></div>
+    ${gantt(off)}</section>`;
 }
-
+function schedule(m){
+  const now=Date.now(),rate=S.rules.slotTarget/2/H,setup=15*MIN,out=[];
+  Object.values(S.orders).forEach(o=>{if(o.status==='bitti'&&o.machine===m.id&&o.startedAt)out.push({o,s:o.startedAt,e:o.finishedAt||o.startedAt+H,k:'done'})});
+  let t=now;
+  if(m.current){const o=W(m.current),rem=Math.max(0,o.qty-produced(o));const e=now+rem/rate;out.push({o,s:o.startedAt,e:Math.max(e,now+5*MIN),k:m.status==='stop'?'stop':'run'});t=Math.max(e,now+5*MIN)}
+  m.queue.forEach(id=>{const o=W(id),rem=Math.max(0,o.qty-(o.done||0));const s=t+setup,e=s+rem/rate;out.push({o,s,e,k:'q'});t=e});
+  return out;
+}
+function gantt(off){
+  const a=dayStart(Date.now())+off*DAY,b=a+DAY,pos=v=>(v-a)/(b-a)*100,now=Date.now();
+  const ticks=[];for(let i=0;i<=12;i++)ticks.push(i);
+  const row=m=>{const js=schedule(m).filter(j=>j.e>a&&j.s<b);
+    return `<div class="g-r"><a class="g-l" href="#makine-${m.id}">${esc(m.name)}<small>${m.status==='run'?'Çalışıyor':m.status==='stop'?'Duruş':'Boşta'} · ${m.queue.length} sırada</small></a><div class="g-b">${js.map(j=>{const s=Math.max(j.s,a),e=Math.min(j.e,b);
+      return `<a class="g-j ${j.k}" href="#makine-${m.id}" style="left:${pos(s)}%;width:calc(${Math.max(.6,(e-s)/(b-a)*100)}% - 2px)" title="${esc(`SD ${j.o.id} · ${j.o.name}\n${j.o.customer} · ${N(j.o.qty)} etiket\n${T(j.s)} – ${T(j.e)}${j.k==='q'?' (tahmini)':''}`)}">SD ${j.o.id} · ${N(j.o.qty)}</a>`}).join('')}${now>=a&&now<b?`<div class="g-now" style="left:${pos(now)}%"></div>`:''}</div></div>`};
+  return `<div style="overflow-x:auto"><div class="gantt"><div class="g-r"><span></span><div class="g-t">${ticks.map(i=>`<span class="num" style="left:${i/12*100}%;${i===0?'transform:none':i===12?'transform:translateX(-100%)':''}">${String((8+i*2)%24).padStart(2,'0')}:00</span>`).join('')}</div></div>${S.machines.map(row).join('')}</div></div>
+  <div class="legend"><span><i style="background:var(--brand)"></i>Çalışıyor</span><span><i style="background:var(--blue-soft);box-shadow:inset 0 0 0 1px var(--blue)"></i>Sırada (tahmini)</span><span><i style="background:var(--idle-bg)"></i>Bitti</span><span><i style="background:var(--bad)"></i>Duruşta</span><span><i style="background:var(--bad);width:3px;border-radius:0"></i>Şu an</span></div>`;
+}
 /* ---------- vardiya sayı raporu (Form-287) ---------- */
 function shiftRange(dayOff,si){const ds=dayStart(Date.now())-dayOff*DAY;return [ds+si*8*H,ds+(si+1)*8*H]}
 function viewReport(){
@@ -984,11 +1040,15 @@ function checkRows(raw,file){
   const missingCols=['sd','customer','artikel','name','qty'].filter(c=>!map[c]).map(c=>XCOLS.find(x=>x[0]===c)[1]);
   const seen={};
   const rows=raw.map((r,i)=>{const g=c=>map[c]!=null?r[map[c]]:'';const o={line:i+2,sd:String(g('sd')||'').trim(),sob:String(g('sob')||'').trim(),customer:String(g('customer')||'').trim(),artikel:String(g('artikel')||'').trim(),name:String(g('name')||'').trim(),qty:parseInt(String(g('qty')).replace(/\D/g,''),10)||0,montaj:parseInt(g('montaj'),10)||1,due:parseDate(g('due')),place:String(g('place')||'').trim(),perDeste:parseInt(g('perDeste'),10)||1000,desteKoli:parseInt(g('desteKoli'),10)||24,kokteyl:parseInt(g('kokteyl'),10)||1,note:String(g('note')||'').trim(),yer:String(g('yer')||'PAKON').trim()};
-    if(map.yer&&norm(o.yer)!=='pakon')o.st=['skip','Pakon dışı iş yeri ('+o.yer+')'];
-    else if(!o.sd||!o.customer||!o.artikel||!o.name||!o.qty)o.st=['err','Zorunlu alan eksik: '+[!o.sd&&'SD No',!o.customer&&'Müşteri',!o.artikel&&'Artikel',!o.name&&'Stok Adı',!o.qty&&'İş Miktarı'].filter(Boolean).join(', ')];
-    else if(S.orders[o.sd])o.st=['skip','Bu SD zaten sistemde'];
-    else if(seen[o.sd])o.st=['err','Dosyada SD tekrar ediyor'];
-    else o.st=['new','Havuza eklenecek'];
+    const errsL=[],w=[];
+    if(map.yer&&norm(o.yer)!=='pakon')errsL.push('Pakon dışı iş yeri ('+o.yer+'), atlanır');
+    const miss=[!o.sd&&'SD No',!o.customer&&'Müşteri',!o.artikel&&'Artikel',!o.name&&'Stok Adı',!o.qty&&'İş Miktarı'].filter(Boolean);if(miss.length)errsL.push('Zorunlu alan eksik: '+miss.join(', '));
+    if(o.sd&&S.orders[o.sd])errsL.push('Bu SD sistemde zaten var');
+    if(o.sd&&seen[o.sd])errsL.push('Dosyada SD tekrar ediyor');
+    if(!o.due)w.push('Teslim tarihi yok, 3 gün sonrası alınır');else if(dayKey(o.due)<dayKey(Date.now()))w.push('Teslim tarihi geçmiş');
+    if(!map.montaj||!(parseInt(g('montaj'),10)>0))w.push('Montaj yok, 1 alınır');
+    if(o.kokteyl>1)w.push('Kokteyl '+o.kokteyl+': tasarımlar ayrı kasaya');
+    o.st=errsL.length?['err',errsL.join(' · ')]:w.length?['wrn',w.join(' · ')]:['ok','Uygun'];
     seen[o.sd]=1;return o});
   return {file,rows,missingCols};
 }
@@ -998,10 +1058,10 @@ function readFile(file){
     if(!raw.length){U.err='Dosyada satır bulunamadı. İlk sayfanın ilk satırı başlık olmalı.';render();return}
     U.xls=checkRows(raw,file.name);U.err='';render()}catch(x){U.err='Dosya okunamadı: '+x.message;render()}};fr.readAsArrayBuffer(file);
 }
-function downloadTemplate(){
+function downloadTemplate(full){
   if(!window.XLSX){toast('Excel kütüphanesi yüklenemedi',true);return}
-  const ws=XLSX.utils.json_to_sheet(sampleRows().slice(0,4),{header:XCOLS.map(c=>c[1])}),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Pakon');
-  try{XLSX.writeFile(wb,'Pakon_Is_Emri_Sablonu.xlsx');toast('Şablon indiriliyor')}catch(e){toast('Bu görünümde indirme kapalı. GitHub sayfasından indirebilirsiniz.',true)}
+  const ws=XLSX.utils.json_to_sheet(full?sampleRows():sampleRows().slice(0,1),{header:XCOLS.map(c=>c[1])}),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Pakon');
+  try{XLSX.writeFile(wb,full?'Pakon_Is_Plani_Ornek_Dolu.xlsx':'Pakon_Is_Plani_Sablonu.xlsx');toast(full?'Dolu örnek indiriliyor':'Şablon indiriliyor')}catch(e){toast('Bu görünümde indirme kapalı. GitHub sayfasından indirebilirsiniz.',true)}
 }
 function xlsModal(){
   const x=U.xls;
@@ -1017,11 +1077,11 @@ function xlsModal(){
 }
 function importXls(){
   const x=U.xls,now=Date.now();let n=0;
-  x.rows.filter(r=>r.st[0]==='new').forEach(r=>{const tech=(Object.values(S.orders).find(o=>o.artikel===r.artikel)||{}).tech;
+  x.rows.filter(r=>r.st[0]!=='err').forEach(r=>{const tech=(Object.values(S.orders).find(o=>o.artikel===r.artikel)||{}).tech;
     const o=mkOrder([r.sd,r.sob||'—',r.customer,r.artikel,r.name,tech||'IML','',r.qty,r.montaj,r.perDeste,r.desteKoli,r.due||now+3*DAY,r.place,r.kokteyl,r.note,''],now,'Excel: '+x.file);S.orders[o.id]=o;n++});
   S.imports.unshift({ts:now,user:me(),file:x.file,added:n,skipped:x.rows.length-n});
   audit('Excel ile iş emri yüklendi',x.file+' · '+n+' iş');notify('Pakon havuzuna '+n+' iş eklendi',x.file+' · '+me(),['lider']);
-  U.xls=null;U.modal=null;save();render();toast(n+' iş emri Pakon havuzuna eklendi. Takım lideri Bitirme makinelerine atayabilir.');
+  U.xls=null;U.modal=null;save();render();toast(n+' iş emri yayınlandı ve Pakon havuzuna düştü. Takım lideri Bitirme makinelerine atayabilir.');
 }
 
 /* ---------- pencereler ---------- */
@@ -1123,6 +1183,10 @@ document.addEventListener('click',e=>{
     case 'xlsSample':U.xls=checkRows(sampleRows(),'Pakon_plan_ornek.xlsx');U.err='';render();break;
     case 'xlsTpl':downloadTemplate();break;
     case 'xlsBack':U.xls=null;U.err='';render();break;
+    case 'xlsPublish':importXls();break;
+    case 'xlsSmp':downloadTemplate(true);break;
+    case 'xlsFocus':{const d=$('#drop');d&&d.focus&&d.focus();break}
+    case 'planDay':U.planDay=+el.dataset.v;render();break;
     case 'sel':U.sel[m.id]=el.dataset.id;render();break;
     case 'kf':{const k=kopState(m,W(U.sel[m.id]&&m.queue.includes(U.sel[m.id])?U.sel[m.id]:m.queue[0]));k[el.dataset.f]=el.dataset.v;render();break}
     case 'kc':{const k=kopState(m,W(U.sel[m.id]&&m.queue.includes(U.sel[m.id])?U.sel[m.id]:m.queue[0]));k.clean[+el.dataset.i]=+el.dataset.v;render();break}
