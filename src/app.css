@@ -534,3 +534,22 @@ tr.tot td{font-weight:700;background:var(--surface-2)}
 .rtabs button:hover{color:var(--fg)}
 .rtabs button.on{color:var(--fg);border-bottom-color:var(--brand)}
 @media (max-width:900px){.kstrip{grid-template-columns:repeat(2,minmax(0,1fr))}.rk:nth-child(3){border-left:0;padding-left:0}.rsplit{grid-template-columns:1fr}.rsplit > .rsec:first-child{padding-right:0;border-right:0;border-bottom:1px solid var(--line)}.rsplit > .rsec + .rsec{padding-left:0}.rcanvas{padding:4px 16px 8px}}
+
+/* v14: kullanıcı raporları */
+.rtabs .add{color:var(--brand-deep);font-weight:700}
+.rtabs .mine::before{content:"★ ";color:var(--yellow)}
+.rhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 0 0}
+.rhead h2{font-size:19px}
+.mgrid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
+.mgrid2 label{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px solid var(--line-2);font-size:13.5px;cursor:pointer}
+.mgrid2 input{accent-color:var(--brand)}
+.mgrid2 label:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+.donutw{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;align-items:center}
+.dleg{display:grid;gap:8px}
+.dleg div{display:grid;grid-template-columns:12px minmax(0,1fr) auto auto;gap:10px;align-items:center;font-size:13.5px}
+.dleg i{width:12px;height:12px;border-radius:3px}
+.dleg b{font-variant-numeric:tabular-nums}
+.heat td.hv{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.chartsw{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media (max-width:700px){.donutw{grid-template-columns:1fr}}
+.dleg{max-width:460px}
