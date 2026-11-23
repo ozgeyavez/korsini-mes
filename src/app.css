@@ -604,3 +604,10 @@ svg.chart{max-height:300px;width:100%}
 .ag-ev{margin:0;padding-left:18px;color:var(--muted);font-size:13px;display:grid;gap:2px}
 .ag-f{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px}
 .ag-note{display:grid;gap:10px;padding:16px 18px;border-radius:16px;background:var(--surface);border:1px dashed var(--line-2)}
+
+/* v27 · makine iş listesi → iş detayı */
+tr.jobrow{cursor:pointer}
+tr.jobrow:hover td{background:var(--surface-2)}
+tr.jobrow:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+tr.jobrow.cur td{background:color-mix(in srgb,var(--ok-bg, #e7f6ee) 70%,transparent)}
+tr.jobrow td{vertical-align:top}

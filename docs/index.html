@@ -610,6 +610,13 @@ svg.chart{max-height:300px;width:100%}
 .ag-ev{margin:0;padding-left:18px;color:var(--muted);font-size:13px;display:grid;gap:2px}
 .ag-f{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px}
 .ag-note{display:grid;gap:10px;padding:16px 18px;border-radius:16px;background:var(--surface);border:1px dashed var(--line-2)}
+
+/* v27 · makine iş listesi → iş detayı */
+tr.jobrow{cursor:pointer}
+tr.jobrow:hover td{background:var(--surface-2)}
+tr.jobrow:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+tr.jobrow.cur td{background:color-mix(in srgb,var(--ok-bg, #e7f6ee) 70%,transparent)}
+tr.jobrow td{vertical-align:top}
 </style></head>
 <body>
 <template id="logo-tpl"><svg class="logo" role="img" aria-label="MCC Global IML" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1326.13 313.2"> <g class="logo-st4"> <g> <g> <path class="logo-st3" d="M1143.8,66.8h128.91V.54h-128.91c-58.13,0-107.24,47.44-107.24,103.58s49.11,103.59,107.24,103.59h128.91v-66.26h-128.91c-20.52,0-37.22-16.74-37.22-37.33s16.7-37.32,37.22-37.32Z"/> <path class="logo-st3" d="M893.63,66.8h128.91V.54h-128.91c-58.13,0-107.24,47.44-107.24,103.58s49.11,103.59,107.24,103.59h128.91v-66.26h-128.91c-20.52,0-37.22-16.74-37.22-37.33s16.7-37.32,37.22-37.32Z"/> <path class="logo-st3" d="M669.34.31h-192.25v207.42h66.26V66.57h45.87v141.16h66.26V66.57h13.85c20.42,0,37.04,16.66,37.04,37.15v104.01h66.26v-104.01c0-57.02-46.34-103.4-103.3-103.4Z"/> <g> <path class="logo-st3" d="M1294.42,22.06h-4.53V3.7h-5.26V0h15.01v3.7h-5.23v18.36Z"/> <path class="logo-st3" d="M1307.22,22.06h-4.53V0h5.13l6.58,13.39,6.61-13.39h5.13v22.06h-4.53v-13.76l-7.21,14.42-7.18-14.42v13.76Z"/> </g> </g> <g> <path class="logo-st1" d="M389.25,89.61C387.36,39.88,346.38,0,296.25,0h-108.86v186.93h201.87v-97.32Z"/> <path class="logo-st0" d="M126.1,222.25c1.89,49.73,42.87,89.61,93.01,89.61h108.86V124.93H126.1v97.32Z"/> <path class="logo-st2" d="M155.77,153.59c-1.45-38.28-33-68.97-71.59-68.97H.39v143.89h155.38v-74.91Z"/> </g> <g> <path class="logo-st3" d="M545.18,273.42v3.71c0,10.61-3.09,18.55-10,25.55-6.9,6.9-15.66,10.61-25.35,10.61-20.2,0-35.34-15.25-35.34-35.55s15.04-35.86,35.24-35.86c11.13,0,21.12,4.74,27.82,13.19l-10.61,8.35c-5.05-5.98-10.1-8.55-16.9-8.55-12.06,0-21.23,9.89-21.23,22.88s9.48,22.77,21.54,22.77c5.87,0,11.75-2.58,15.35-6.9,2.06-2.37,3.09-4.53,4.22-8.66h-19.17v-11.54h34.42Z"/> <path class="logo-st3" d="M619.27,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> <path class="logo-st3" d="M711.29,253.43c5.87,6.59,8.76,14.53,8.76,24.52,0,19.58-15.66,35.34-35.14,35.34s-35.86-15.56-35.86-35.34,15.66-36.06,36.07-36.06c10.1,0,19.37,4.12,26.17,11.54ZM663.48,277.75c0,12.78,9.17,22.57,21.12,22.57s21.12-9.79,21.12-22.26c0-13.29-8.86-23.08-21.02-23.08s-21.23,9.69-21.23,22.77Z"/> <path class="logo-st3" d="M780.12,243.23c8.45,0,13.91,1.24,17.52,3.92,4.22,3.19,6.59,8.45,6.59,14.53,0,4.74-1.44,8.66-4.33,11.75-1.96,1.96-3.5,2.89-7.21,4.12,4.12.93,5.98,1.75,8.14,3.71,3.19,2.89,4.95,7.11,4.95,12.36,0,6.39-2.68,12.06-7.11,15.04-3.61,2.37-7.83,3.3-15.35,3.3h-25.35v-68.73h22.15ZM772.08,272.39h5.67c8.35,0,12.26-2.99,12.26-9.38,0-3.5-1.65-6.49-4.12-7.73-1.96-.93-4.84-1.34-8.86-1.34h-4.95v18.44ZM772.08,301.55h6.9c4.84,0,7.11-.41,9.17-1.85,2.27-1.55,3.4-4.02,3.4-7.32,0-3.71-1.34-6.29-3.92-7.83-2.16-1.24-4.33-1.65-9.48-1.65h-6.08v18.65Z"/> <path class="logo-st3" d="M855.24,300.11l-4.12,11.85h-14.94l23.7-68.73h17.62l23.49,68.73h-15.46l-3.92-11.85h-26.38ZM868.43,260.13l-9.58,28.44h19.06l-9.48-28.44Z"/> <path class="logo-st3" d="M972.19,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> <path class="logo-st3" d="M1080.18,311.96h-14.12v-68.73h14.12v68.73Z"/> <path class="logo-st3" d="M1135.41,311.96h-14.12v-68.73h15.97l20.51,41.73,20.61-41.73h15.97v68.73h-14.12v-42.87l-22.46,44.93-22.36-44.93v42.87Z"/> <path class="logo-st3" d="M1272.56,300.31v11.64h-37.1v-68.73h14.12v57.09h22.98Z"/> </g> </g> </g> </svg></template>
@@ -618,7 +625,7 @@ svg.chart{max-height:300px;width:100%}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>(function(){
 'use strict';
-const VERSION='v26 · 20.11.2026',TZ='Europe/Istanbul',KEY='korsini-mes-v6',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
+const VERSION='v27 · 23.11.2026',TZ='Europe/Istanbul',KEY='korsini-mes-v6',MIN=6e4,H=36e5,DAY=864e5,IST=3*H;
 const ROLES={lider:'Takım lideri',koparma:'Koparma operatörü',paketleme:'Pakon operatörü',kalite:'Kalite uzmanı',bakim:'Bakım teknisyeni',yonetici:'Yönetici',admin:'Admin'};
 const USERS=[
   {id:'u1',sicil:'1001',name:'Takım Lideri 1',ini:'TL',c:'#2fac66',role:'lider',note:'Pakon planını Excel ile yükler, Bitirme makinelerine atar'},
@@ -896,7 +903,8 @@ function render(){
   if(!user){app.innerHTML=viewLogin()+(U.modal?modalHtml():'');return}
   let r=route();const it=NAVG.flatMap(g=>g[1]).find(i=>i[0]===r);if(it&&!navOk(it))r='makineler';
   let body;
-  if(r.startsWith('makine-')&&M(r.slice(7)))body=viewMachine(M(r.slice(7)));
+  const [rm,ro]=r.startsWith('makine-')?r.slice(7).split('/'):[];
+  if(rm&&M(rm))body=ro&&W(ro)?viewJob(M(rm),W(ro)):viewMachineJobs(M(rm));
   else body=U.proc!=='paketleme'&&r!=='ayarlar'?viewSoon():({raporlar:viewReports,isler:viewTasks,makineler:viewMachines,planlama:viewPlan,rapor:viewReport,kalite:viewQuality,bakim:viewMaint,aksiyonlar:viewActions,otomasyonlar:viewAutos,ayarlar:viewSettings}[r]||(()=>{r='isler';return viewTasks()}))();
   const nk=r.startsWith('makine-')?'makineler':r,cn=counts(),un=unread();
   app.innerHTML=`<header class="hdr"><div class="hdr-in">
@@ -950,13 +958,13 @@ function tasks(){
     const yon=user.role==='yonetici';
     if(yon&&m.status==='stop')add('Kritik',`${m.name} duruşta · ${m.stopReason}`,`${dur(mins(m.stopSince))} sürüyor`,'#makine-'+m.id,'Makineye git',m.stopSince);
     if(can('start')){
-      if(m.status==='stop')add('Kritik',`${m.name} duruşta · ${m.stopReason}`,`${dur(mins(m.stopSince))} sürüyor${wo?' · SD '+wo.id:''}`,'#makine-'+m.id,'Makineye git',m.stopSince);
-      if(!m.current&&m.queue.length){const o=W(m.queue[0]),idle=m.idleSince?mins(m.idleSince):0;add(idle>=15?'Uyarı':'Bilgi',`${m.name}: sıradaki işi başlat · SD ${o.id}`,`${o.name} · ${o.customer} · ${N(o.qty)} etiket${idle?' · makine '+dur(idle)+' boşta':''}`,'#makine-'+m.id,'İşi başlat',m.idleSince)}
-      m.queue.forEach(id=>{const o=W(id);if(o.upstream&&!o.upstream.ack)add('Uyarı',`SD ${o.id}: önceki proses uyarısı onay bekliyor`,`${o.upstream.src} · ${o.upstream.type} · ${o.upstream.range} · ${m.name}`,'#makine-'+m.id,'İncele',o.upstream.ts)})}
+      if(m.status==='stop')add('Kritik',`${m.name} duruşta · ${m.stopReason}`,`${dur(mins(m.stopSince))} sürüyor${wo?' · SD '+wo.id:''}`,wo?jobHref(m,wo.id):'#makine-'+m.id,'Makineye git',m.stopSince);
+      if(!m.current&&m.queue.length){const o=W(m.queue[0]),idle=m.idleSince?mins(m.idleSince):0;add(idle>=15?'Uyarı':'Bilgi',`${m.name}: sıradaki işi başlat · SD ${o.id}`,`${o.name} · ${o.customer} · ${N(o.qty)} etiket${idle?' · makine '+dur(idle)+' boşta':''}`,jobHref(m,o.id),'İşi başlat',m.idleSince)}
+      m.queue.forEach(id=>{const o=W(id);if(o.upstream&&!o.upstream.ack)add('Uyarı',`SD ${o.id}: önceki proses uyarısı onay bekliyor`,`${o.upstream.src} · ${o.upstream.type} · ${o.upstream.range} · ${m.name}`,jobHref(m,o.id),'İncele',o.upstream.ts)})}
     if(can('finish')&&wo){const u=errs(wo).filter(b=>!b.reviewed);
-      if(u.length)add('Kritik',`${m.name}: ${u.length} hatalı koli inceleme bekliyor`,`SD ${wo.id} · ${[...new Set(u.map(b=>codeLabel(b.result)))].join(', ')}`,'#makine-'+m.id,'Kamera sonuçları',u[0].ts);
-      if(pct(wo)>=95)add('Uyarı',`${m.name}: SD ${wo.id} tamamlanmak üzere`,`%${P1(pct(wo))} paketlendi · Pakon üretim takip formunu doldurun`,'#makine-'+m.id,'Pakon formu')}
-    if(can('approve')&&wo&&wo.approvalRequested&&!wo.approved)add('Kritik',`${m.name}: eksik adetle bitirme onayı bekleniyor`,`SD ${wo.id} · %${P1(pct(wo))} paketlendi`,'#makine-'+m.id,'Onayla');
+      if(u.length)add('Kritik',`${m.name}: ${u.length} hatalı koli inceleme bekliyor`,`SD ${wo.id} · ${[...new Set(u.map(b=>codeLabel(b.result)))].join(', ')}`,jobHref(m,wo.id),'Kamera sonuçları',u[0].ts);
+      if(pct(wo)>=95)add('Uyarı',`${m.name}: SD ${wo.id} tamamlanmak üzere`,`%${P1(pct(wo))} paketlendi · Pakon üretim takip formunu doldurun`,jobHref(m,wo.id),'Pakon formu')}
+    if(can('approve')&&wo&&wo.approvalRequested&&!wo.approved)add('Kritik',`${m.name}: eksik adetle bitirme onayı bekleniyor`,`SD ${wo.id} · %${P1(pct(wo))} paketlendi`,jobHref(m,wo.id),'Onayla');
     if(can('plan')&&!m.current&&!m.queue.length)add('Uyarı',`${m.name}'in sırası boş`,'Havuzdan iş atayın','#planlama','Atamaya git')});
   if(can('plan')){const pool=Object.values(S.orders).filter(o=>o.status==='havuz'),late=pool.filter(o=>dayKey(o.due)<dayKey(now));
     if(late.length)add('Kritik',`Termini geçmiş ${late.length} sipariş havuzda`,late.map(o=>'SD '+o.id).join(', '),'#planlama','Atamaya git');
@@ -1040,6 +1048,48 @@ function actionBar(m){
     <button class="btn dark big" data-act="goFin" data-m="${m.id}" ${fOk?'':'disabled'}${why(fOk,fWhy)}>✓ İşi bitir</button>
     <span class="muted small" style="flex:1;min-width:200px">${m.status==='stop'?`<b style="color:var(--bad)">Duruş: ${esc(m.stopReason)} · <span data-since="${m.stopSince}">${dur(mins(m.stopSince))}</span></b>`:wo?`Çalışan iş: <b>SD ${wo.id}</b> · %${P1(Math.min(100,pct(wo)))}`:m.queue.length?`Sıradaki iş: <b>SD ${m.queue[0]}</b>`:'Makine boşta, sırada iş yok'}${hint?'<br>'+hint:''}</span></div>${picker}</section>`;
 }
+/* makine kartı → atanmış iş listesi → iş detayı */
+const jobHref=(m,id)=>'#makine-'+m.id+'/'+id;
+function machineJobs(m){
+  const today=dayKey(Date.now()),rows=[];
+  if(m.current)rows.push({o:W(m.current),k:'cur'});
+  m.queue.forEach((id,i)=>rows.push({o:W(id),k:'q',i}));
+  Object.values(S.orders).filter(o=>o.machine===m.id&&o.status==='bitti'&&o.finishedAt&&dayKey(o.finishedAt)===today).sort((a,b)=>b.finishedAt-a.finishedAt).forEach(o=>rows.push({o,k:'done'}));
+  return rows;
+}
+function jobState(m,r){
+  if(r.k==='cur')return m.status==='stop'?'<span class="pill st-stop">Duruş</span>':'<span class="pill st-run">Çalışıyor</span>';
+  if(r.k==='done')return '<span class="pill st-idle">Bitti</span>';
+  return !m.current&&r.i===0?'<span class="chip c-warn">Başlatılacak</span>':`<span class="chip c-idle">${r.i+1}. sırada</span>`;
+}
+function viewMachineJobs(m){
+  const rows=machineJobs(m),wo=m.current&&W(m.current);
+  const list=rows.length?`<div class="tbl"><table><thead><tr><th>Sıra</th><th>SD / SOB</th><th>Ürün</th><th>Müşteri</th><th class="r">Miktar</th><th>Termin</th><th>Durum</th><th></th></tr></thead><tbody>${rows.map(r=>{const o=r.o;
+      return `<tr class="jobrow ${r.k==='cur'?'cur':''}" data-href="${jobHref(m,o.id)}" tabindex="0" role="link" aria-label="SD ${o.id} detayını aç"><td class="num">${r.k==='cur'?'▶':r.k==='done'?'✓':r.i+1}</td><td><a href="${jobHref(m,o.id)}" class="mono"><b>SD ${o.id}</b></a><br><span class="mono muted small">${esc(o.sob)}</span></td><td><b>${esc(o.name)}</b><br><span class="muted small">artikel <span class="mono">${esc(o.artikel)}</span></span></td><td>${esc(o.customer)}</td><td class="r num">${r.k==='q'?N(o.qty):`${N(Math.min(produced(o),o.qty))} / ${N(o.qty)}`}</td><td>${D(o.due)}</td><td>${jobState(m,r)}${o.upstream&&!o.upstream.ack&&r.k==='q'?' <span class="chip c-warn">önceki proses uyarısı</span>':''}</td><td class="r"><a class="btn sm" href="${jobHref(m,o.id)}">Detay ›</a></td></tr>`}).join('')}</tbody></table></div>`
+    :`<div class="empty">Bu makineye atanmış iş yok.${can('plan')?' <a href="#planlama">Planlamaya git</a>':' Takım lideri planlamadan iş atayınca burada görünür.'}</div>`;
+  const q=m.queue.length,done=rows.filter(r=>r.k==='done').length;
+  return `<div class="head"><div><div class="crumb"><a href="#makineler">Makinelerim</a>/<span>${esc(m.name)}</span></div>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><h1>${esc(m.name)}</h1>${PILL[m.status]}<span class="chip c-idle">Pakon masa ${esc(m.masa)}</span></div>
+    <p>Bu makineye atanmış işler sırasıyla. Bir işe dokunarak detayını açın.</p></div><a class="btn" href="#makineler">← Makinelerim</a></div>
+  ${m.status==='stop'?`<div class="stopband" style="margin-bottom:12px">● Duruş: ${esc(m.stopReason)} · <span data-since="${m.stopSince}">${dur(mins(m.stopSince))}</span></div>`:''}
+  <div class="strip">${kpi('Çalışan iş',wo?'SD '+wo.id:'—',wo?'var(--ok)':'')}${kpi('Sırada',q)}${kpi('Bugün biten',done)}${kpi('Bu işte hatalı koli',wo?errs(wo).length:0,wo&&errs(wo).length?'var(--bad)':'')}</div>
+  <section class="panel"><div class="panel-h"><div><span class="label">İş listesi</span><h2>${esc(m.name)}'e atanmış işler</h2></div></div>${list}</section>`;
+}
+function viewJob(m,o){
+  const back=`<a class="btn" href="#makine-${m.id}">← ${esc(m.name)}</a>`;
+  if(o.id===m.current||(!m.current&&m.queue.includes(o.id))){if(!m.current)U.sel[m.id]=o.id;return viewMachine(m)}
+  const qi=m.queue.indexOf(o.id),done=o.status==='bitti';
+  const st=done?'<span class="pill st-idle">Bitti</span>':qi>=0?`<span class="chip c-idle">${qi+1}. sırada</span>`:'<span class="chip c-idle">Bu makinede değil</span>';
+  const info=`<div class="bigjob"><span class="id">SD ${o.id} · ${esc(o.sob)}</span><b>${esc(o.name)}</b><span class="muted">${esc(o.customer)} · artikel <span class="mono">${esc(o.artikel)}</span></span>${techTag(o)}</div>
+    <dl class="kv"><dt>Miktar</dt><dd class="num">${done?N(Math.min(produced(o),o.qty))+' / ':''}${N(o.qty)} etiket</dd><dt>Ambalaj</dt><dd class="num">${N(o.perDeste)} etiket/deste · ${o.desteKoli} deste/koli · ${N(perBox(o))} etiket/koli</dd><dt>Montaj</dt><dd class="num">${o.montaj}</dd><dt>Teslim</dt><dd>${esc(o.place)} · ${D(o.due)}</dd>${done?`<dt>Başladı</dt><dd>${DT(o.startedAt)}</dd><dt>Bitti</dt><dd>${DT(o.finishedAt)}</dd>`:''}${o.note?`<dt>Müşteri notu</dt><dd style="color:var(--bad);font-weight:600">${esc(o.note)}</dd>`:''}</dl>
+    ${o.upstream&&!o.upstream.ack?`<div class="upcard"><div><span class="label">Önceki prosesten iç uygunsuzluk</span><div><b>${esc(o.upstream.src)}: ${esc(o.upstream.type)}</b> · ${esc(o.upstream.range)}</div></div></div>`:''}
+    ${qi>=0?`<p class="muted small" style="margin:0">Bu iş ${m.name} sırasında ${qi+1}. sırada. Makinedeki iş bitince sırası gelir; hat temizlik kontrolü ve başlatma bu ekrandan yapılır.</p>`:''}`;
+  const right=done?camPanel(m,o):`<div class="empty">İş henüz başlamadı. Koparmada başlayınca kamera ${esc(m.camera)} adresinden sipariş bazında sorgulanır.</div>`;
+  return `<div class="head"><div><div class="crumb"><a href="#makineler">Makinelerim</a>/<a href="#makine-${m.id}">${esc(m.name)}</a>/<span>SD ${o.id}</span></div>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><h1>SD ${o.id}</h1>${st}</div></div>${back}</div>
+  <div class="cols"><section class="panel"><div class="panel-h"><div><span class="label">İş emri</span><h2>Detay</h2></div></div>${info}</section>
+  <section class="panel"><div class="panel-h"><div><span class="label">Kamera</span><h2>Kamera sonuçları</h2></div></div>${right}</section></div>`;
+}
 function viewMachine(m){
   const wo=m.current&&W(m.current);let cur;
   if(wo){
@@ -1059,8 +1109,9 @@ function viewMachine(m){
   else if(!wo)right=`<div class="empty">Makinede çalışan iş yok. Koparmada bir iş başlayınca kamera ${esc(m.camera)} adresinden sipariş bazında sorgulanır.</div>`;
   else if(t.cur==='cam')right=camPanel(m,wo);
   else right=finPanel(m,wo);
-  return `<div class="head"><div><div class="crumb"><a href="#makineler">Paketleme</a>/<span>${esc(m.name)}</span></div>
-    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><h1>${esc(m.name)}</h1>${PILL[m.status]}<span class="chip c-idle">Pakon masa ${esc(m.masa)}</span></div></div><a class="btn" href="#makineler">← Makinelerim</a></div>
+  const jid=wo?wo.id:sel;
+  return `<div class="head"><div><div class="crumb"><a href="#makineler">Makinelerim</a>/<a href="#makine-${m.id}">${esc(m.name)}</a>${jid?`/<span>SD ${jid}</span>`:''}</div>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><h1>${jid?'SD '+jid:esc(m.name)}</h1>${PILL[m.status]}<span class="chip c-idle">${esc(m.name)} · Pakon masa ${esc(m.masa)}</span></div></div><a class="btn" href="#makine-${m.id}">← ${esc(m.name)} iş listesi</a></div>
   ${actionBar(m)}
   <div class="cols">${left}<section class="panel" id="right-${m.id}">${t.html}${right}</section></div>`;
 }
@@ -1735,12 +1786,13 @@ function finish(m){
   wo.pakon={kontrol:pr,bozuk:bz,saglam:pr-bz,reasons:Object.fromEntries(Object.entries(f.reasons).filter(x=>+x[1]>0).map(x=>[x[0],+x[1]])),count:+f.count,weight:f.weight,p1:f.p1,p2:f.p2,ook4:f.ook4,durum:f.durum,by:me(),ts:Date.now(),masa:m.masa};
   m.current=null;m.status='idle';m.idleSince=Date.now();m.stopReason=null;m.stopSince=null;delete U.fin[m.id];
   if(f.durum==='Devam'){wo.status='havuz';wo.machine=null;wo.done=pr;audit('Pakon formu · devam','SD '+wo.id+' · '+N(pr)+' paketlendi, havuza döndü');save();render();toast('SD '+wo.id+' havuza döndü. '+m.name+' boşta.');return}
-  wo.status='bitti';wo.finishedAt=Date.now();audit('Pakon formu · bitti','SD '+wo.id+' · '+m.name+' · %'+P1(pct(wo))+' · bozuk '+N(bz));save();render();toast('SD '+wo.id+' bitti. '+m.name+' boşta.');
+  wo.status='bitti';wo.finishedAt=Date.now();if(location.hash.includes('/'))history.replaceState(null,'','#makine-'+m.id);audit('Pakon formu · bitti','SD '+wo.id+' · '+m.name+' · %'+P1(pct(wo))+' · bozuk '+N(bz));save();render();toast('SD '+wo.id+' bitti. '+m.name+' boşta.');
 }
 function refreshStart(m){const sel=U.sel[m.id]&&m.queue.includes(U.sel[m.id])?U.sel[m.id]:m.queue[0];const box=$('#rules-'+m.id);if(box)box.innerHTML=startRulesBlock(m,sel)}
 function refreshFin(m){const box=$('#fin-'+m.id);if(box&&m.current)box.innerHTML=finRulesBlock(m,W(m.current))}
 document.addEventListener('click',e=>{
   if(U.bell&&!e.target.closest('.bellw')){U.bell=false;render();return}
+  const row=e.target.closest('tr[data-href]');if(row&&!e.target.closest('a,button')){location.hash=row.dataset.href.slice(1);return}
   const el=e.target.closest('[data-act]');if(!el)return;
   const a=el.dataset.act,m=el.dataset.m&&M(el.dataset.m);
   if(a==='closeScrim'&&e.target!==el)return;
@@ -1766,7 +1818,7 @@ document.addEventListener('click',e=>{
     case 'xlsSmp':downloadTemplate(true);break;
     case 'xlsFocus':{const d=$('#drop');d&&d.focus&&d.focus();break}
     case 'planDay':U.planDay=+el.dataset.v;render();break;
-    case 'sel':U.sel[m.id]=el.dataset.id;render();break;
+    case 'sel':U.sel[m.id]=el.dataset.id;location.hash='makine-'+m.id+'/'+el.dataset.id;render();break;
     case 'kf':{const k=kopState(m,W(U.sel[m.id]&&m.queue.includes(U.sel[m.id])?U.sel[m.id]:m.queue[0]));k[el.dataset.f]=el.dataset.v;render();break}
     case 'kc':{const k=kopState(m,W(U.sel[m.id]&&m.queue.includes(U.sel[m.id])?U.sel[m.id]:m.queue[0]));k.clean[+el.dataset.i]=+el.dataset.v;render();break}
     case 'kk':{const k=kopState(m,W(U.sel[m.id]&&m.queue.includes(U.sel[m.id])?U.sel[m.id]:m.queue[0]));k.checks[el.dataset.v]=!k.checks[el.dataset.v];render();break}
@@ -1854,6 +1906,7 @@ document.addEventListener('dragleave',e=>{const d=e.target.closest&&e.target.clo
 document.addEventListener('drop',e=>{const d=e.target.closest&&e.target.closest('#drop');if(d){e.preventDefault();d.classList.remove('on');const f=e.dataTransfer.files[0];if(f)readFile(f)}});
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&(U.modal||U.bell)){U.modal=null;U.bell=false;U.xls=null;render()}
+  if(e.key==='Enter'&&e.target.matches&&e.target.matches('tr[data-href]'))location.hash=e.target.dataset.href.slice(1);
   if(e.key==='Enter'&&e.target.id==='note-input'){const b=document.querySelector('[data-act="reviewed"]');b&&b.click()}});
 function bindDnD(){
   document.querySelectorAll('[data-drag]').forEach(el=>el.addEventListener('dragstart',ev=>{ev.dataTransfer.setData('text/plain',el.dataset.drag);ev.dataTransfer.effectAllowed='move'}));
